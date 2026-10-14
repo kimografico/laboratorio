@@ -1,29 +1,54 @@
 {
-  "name": "laboratorio",
-  "type": "module",
+  "name": "@kimografico/laboratorio",
   "version": "0.1.0",
-  "private": true,
+  "description": "Fondos interactivos (canvas) y componentes de UI en React para Astro, Next.js o Vite.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./theme.css": "./src/styles/theme.css"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/styles/theme.css",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "build:lib": "tsup",
     "preview": "astro preview",
     "check": "astro check",
-    "lint": "astro check"
+    "lint": "astro check",
+    "prepack": "npm run build:lib"
   },
   "dependencies": {
-    "@astrojs/react": "^7.0.1",
-    "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.8",
-    "lucide-react": "^1.57.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "tailwindcss": "^4.3.3"
+    "lucide-react": "^1.57.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@astrojs/react": "^7.0.1",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "astro": "^7.3.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "tsup": "^8.5.1",
     "typescript": "^6.0.3"
   }
 }

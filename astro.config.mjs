@@ -10,6 +10,8 @@ const isDev = process.argv.includes("dev");
 export default defineConfig({
   site: "https://kimografico.github.io",
   base: isDev ? "/" : "/laboratorio",
+  // `dist/` lo usa la build de la librería (tsup); el sitio va a `dist-site/`.
+  outDir: "./dist-site",
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

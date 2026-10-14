@@ -1,0 +1,145 @@
+/*
+ * theme.css
+ * Tokens de tema y estilos base que necesitan los componentes de la librería.
+ *
+ * Importa este archivo DESPUÉS de la hoja de Tailwind:
+ *
+ *   @import "tailwindcss";
+ *   @import "@kimografico/laboratorio/theme.css";
+ *
+ * Si tu proyecto no usa Tailwind, la variante "themed" de `Button` y `ThemeToggle`
+ * no generará las utilidades (bg-fg, text-surface, ...); en ese caso pasa `color`
+ * a `Button` o usa tus propias clases.
+ */
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-subtle: var(--subtle);
+  --color-subtle-strong: var(--subtle-strong);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+}
+
+:root {
+  color-scheme: dark;
+  --surface: #0b0b0c;
+  --panel: #141416;
+  --fg: #ffffff;
+  --muted: rgba(255, 255, 255, 0.6);
+  --faint: rgba(255, 255, 255, 0.45);
+  --subtle: rgba(255, 255, 255, 0.05);
+  --subtle-strong: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.15);
+  --code-fg: #a7f3d0;
+}
+
+html.light {
+  color-scheme: light;
+  --surface: #f7f7f6;
+  --panel: #ffffff;
+  --fg: #0b0b0c;
+  --muted: rgba(11, 11, 12, 0.62);
+  --faint: rgba(11, 11, 12, 0.45);
+  --subtle: rgba(11, 11, 12, 0.04);
+  --subtle-strong: rgba(11, 11, 12, 0.07);
+  --line: rgba(11, 11, 12, 0.1);
+  --line-strong: rgba(11, 11, 12, 0.18);
+  --code-fg: #047857;
+}
+
+/*
+ * Wrapper compartido por todos los fondos canvas.
+ * Necesita un contenedor con `position: relative` y altura.
+ */
+.bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-canvas > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* FlipText */
+@property --flip-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.flip-text-wrapper {
+  display: inline-block;
+  line-height: 1;
+  perspective: 1000px;
+}
+
+.flip-text-wrapper .word {
+  display: inline-block;
+  white-space: nowrap;
+  transform-style: preserve-3d;
+}
+
+.flip-text-wrapper .separator {
+  display: inline-block;
+  white-space: pre;
+}
+
+.flip-text-wrapper .flip-char {
+  display: inline-block;
+  position: relative;
+  white-space: pre;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50% -0.5em;
+  transform: rotateX(calc(var(--flip-p) * 90deg));
+  animation: flip-roll var(--flip-duration) cubic-bezier(0.65, 0, 0.35, 1)
+    var(--flip-delay) var(--flip-iteration) both;
+}
+
+.flip-text-wrapper .face {
+  display: inline-block;
+  backface-visibility: hidden;
+  opacity: calc(1 - var(--flip-p) * 1.2);
+}
+
+.flip-text-wrapper .flip-char::after {
+  content: attr(data-char);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  transform-origin: top;
+  transform: rotateX(-90deg);
+  backface-visibility: hidden;
+  opacity: calc(var(--flip-p) * 1.2 - 0.2);
+}
+
+@keyframes flip-roll {
+  0% {
+    --flip-p: 0;
+  }
+  30% {
+    --flip-p: 1;
+  }
+  30.01% {
+    --flip-p: 0;
+  }
+  100% {
+    --flip-p: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-text-wrapper .flip-char {
+    animation: none;
+  }
+}
