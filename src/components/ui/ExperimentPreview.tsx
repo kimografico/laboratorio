@@ -1,0 +1,295 @@
+import { useMemo, useState } from "react";
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  Maximize2,
+  Minimize2,
+  RotateCcw,
+  SlidersHorizontal,
+  ChevronDown,
+} from "lucide-react";
+import Stage from "./Stage";
+import { defaultsFromProps, type PropDef, type PropValues } from "../../lib/props";
+
+interface ExperimentPreviewProps {
+  componentId: string;
+  propDefs: PropDef[];
+  category: string;
+  accent?: string;
+}
+
+function isHex(v: unknown): v is string {
+  return typeof v === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim());
+}
+
+function formatValue(v: unknown): string {
+  if (typeof v === "string") return JSON.stringify(v);
+  if (Array.isArray(v)) return JSON.stringify(v);
+  return String(v);
+}
+
+function buildSnippet(componentId: string, propDefs: PropDef[], values: PropValues, isText: boolean): string {
+  const attrs: string[] = [];
+  let child = "";
+  for (const p of propDefs) {
+    const v = values[p.name];
+    if (p.name === "children") {
+      child = typeof v === "string" ? v : "";
+      continue;
+    }
+    if (typeof v === "boolean") {
+      attrs.push(v ? `\n  ${p.name}` : `\n  ${p.name}={false}`);
+    } else {
+      attrs.push(`\n  ${p.name}={${formatValue(v)}}`);
+    }
+  }
+  if (isText) {
+    return `import ${componentId} from "@/components/texts/${componentId}";\n\n<${componentId}${attrs.join("")}>\n  ${child}\n</${componentId}>`;
+  }
+  return `import ${componentId} from "@/components/backgrounds/${componentId}";\n\n<${componentId}${attrs.join("")} />\n`;
+}
+
+export default function ExperimentPreview({ componentId, propDefs, category, accent }: ExperimentPreviewProps) {
+  const [values, setValues] = useState<PropValues>(() => defaultsFromProps(propDefs));
+  const [fullscreen, setFullscreen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const isText = category === "texts";
+  const snippet = useMemo(
+    () => buildSnippet(componentId, propDefs, values, isText),
+    [componentId, propDefs, values, isText]
+  );
+
+  const update = (name: string, value: unknown) => setValues((prev) => ({ ...prev, [name]: value }));
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
+
+  const stage = (
+    <div
+      className={`relative w-full overflow-hidden ${
+        fullscreen ? "h-full" : "h-[60vh] min-h-[380px] rounded-2xl border border-white/10"
+      }`}
+    >
+      {isText ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#0e0e10] p-8 text-center">
+          <div className="text-3xl sm:text-5xl">
+            <Stage componentId={componentId} values={values} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <Stage componentId={componentId} values={values} />
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5 px-6 text-center">
+            <h1 className="max-w-2xl text-3xl font-bold text-black/80 drop-shadow-sm sm:text-5xl">
+              Construye héroes que reaccionan
+            </h1>
+            <p className="max-w-lg text-sm text-black/60 sm:text-base">
+              Mueve el cursor sobre el lienzo para explorar el efecto en vivo.
+            </p>
+            <div className="pointer-events-auto flex gap-3">
+              <button className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition hover:bg-black/80">
+                Empezar
+              </button>
+              <button className="rounded-full border border-black/30 px-5 py-2 text-sm font-medium text-black/70 transition hover:border-black/60">
+                Ver más
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <a
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-white/60 transition hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" /> Galería
+        </a>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setValues(defaultsFromProps(propDefs))}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Reset
+          </button>
+          <button
+            onClick={() => setFullscreen((f) => !f)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+          >
+            {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            Pantalla completa
+          </button>
+        </div>
+      </div>
+
+      {fullscreen ? (
+        <div className="fixed inset-0 z-50 bg-black">
+          <div className="h-full w-full">{stage}</div>
+          <button
+            onClick={() => setFullscreen(false)}
+            className="absolute right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-black/60 px-3 py-1.5 text-xs text-white backdrop-blur transition hover:bg-black/80"
+          >
+            <Minimize2 className="h-3.5 w-3.5" /> Salir
+          </button>
+        </div>
+      ) : (
+        stage
+      )}
+
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#141416]">
+        <button
+          onClick={() => setPanelOpen((o) => !o)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left"
+        >
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-white">
+            <SlidersHorizontal className="h-4 w-4" style={{ color: accent ?? "#ffffff" }} />
+            Controles ({propDefs.length})
+          </span>
+          <ChevronDown className={`h-4 w-4 text-white/50 transition ${panelOpen ? "rotate-180" : ""}`} />
+        </button>
+
+        {panelOpen && (
+          <div className="border-t border-white/10 p-4">
+            {propDefs.length === 0 ? (
+              <p className="text-sm text-white/50">Este componente no expone props configurables.</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+                {propDefs.map((p) => (
+                  <Control key={p.name} def={p} value={values[p.name]} onChange={(v) => update(p.name, v)} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#141416]">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <span className="text-sm font-medium text-white">Código de uso</span>
+          <button
+            onClick={copy}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? "Copiado" : "Copiar"}
+          </button>
+        </div>
+        <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-emerald-200/90">
+          <code>{snippet}</code>
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+function Control({
+  def,
+  value,
+  onChange,
+}: {
+  def: PropDef;
+  value: unknown;
+  onChange: (v: unknown) => void;
+}) {
+  const label = def.label ?? def.name;
+
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="flex items-center justify-between text-xs text-white/60">
+        <span>{label}</span>
+        {def.type === "number" && <span className="font-mono text-white/40">{String(value)}</span>}
+      </span>
+
+      {def.type === "number" && (
+        <input
+          type="range"
+          min={def.min}
+          max={def.max}
+          step={def.step ?? 1}
+          value={Number(value)}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-white"
+        />
+      )}
+
+      {def.type === "boolean" && (
+        <input
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-4 w-4 accent-white"
+        />
+      )}
+
+      {def.type === "text" && (
+        <input
+          type="text"
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-white/30"
+        />
+      )}
+
+      {def.type === "select" && (
+        <select
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-white/30"
+        >
+          {(def.options ?? []).map((o) => (
+            <option key={o} value={o} className="bg-[#141416]">
+              {o}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {def.type === "color" && (
+        <div className="flex items-center gap-2">
+          <input
+            type="color"
+            value={isHex(value) ? value.trim() : "#000000"}
+            onChange={(e) => onChange(e.target.value)}
+            className="h-8 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+          />
+          <input
+            type="text"
+            value={String(value ?? "")}
+            onChange={(e) => onChange(e.target.value)}
+            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-white/30"
+          />
+        </div>
+      )}
+
+      {def.type === "colors" && (
+        <input
+          type="text"
+          value={Array.isArray(value) ? (value as string[]).join(", ") : String(value ?? "")}
+          onChange={(e) =>
+            onChange(
+              e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)
+            )
+          }
+          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-white/30"
+        />
+      )}
+    </label>
+  );
+}

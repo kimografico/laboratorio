@@ -1,0 +1,159 @@
+---
+interface Props {
+  /** Tamaño de la celda y del carácter (px) */
+  size?: number;
+  /** Caracteres que caen */
+  chars?: string;
+  /** Velocidad de caída (filas por fotograma): más bajo, más lento */
+  speed?: number;
+  /** Longitud de la estela (caracteres) */
+  length?: number;
+  /** Columnas a cada lado del puntero que también sueltan caracteres */
+  spread?: number;
+  /** Opacidad de la cabeza de cada gota (0-1); la estela se desvanece */
+  alpha?: number;
+  /** Color de los caracteres (blanco sobre fondo oscuro) */
+  color?: string;
+  background?: string;
+  class?: string;
+}
+
+const {
+  size = 18,
+  chars = "01",
+  speed = 0.22,
+  length = 12,
+  spread = 1,
+  alpha = 0.3,
+  color = "#ffffff",
+  background = "#1b1917",
+  class: className,
+} = Astro.props;
+---
+
+<div class:list={["matrix-background", className]} style={`background-color: ${background};`}>
+  <canvas
+    data-size={size}
+    data-chars={chars}
+    data-speed={speed}
+    data-length={length}
+    data-spread={spread}
+    data-alpha={alpha}
+    data-color={color}></canvas>
+</div>
+
+<style>
+  .matrix-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  type Drop = { col: number; y: number; speed: number; len: number; chars: string[] };
+
+  function setup(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const size = Number(canvas.dataset.size);
+    const glyphs = Array.from(canvas.dataset.chars ?? "01");
+    const baseSpeed = Number(canvas.dataset.speed);
+    const baseLength = Number(canvas.dataset.length);
+    const spread = Number(canvas.dataset.spread);
+    const alpha = Number(canvas.dataset.alpha);
+    const color = canvas.dataset.color ?? "#fff";
+
+    let width = 0;
+    let height = 0;
+    let cols = 0;
+    let rows = 0;
+    let drops: Drop[] = [];
+    let cooldown: number[] = []; // fotogramas hasta que una columna pueda volver a soltar una gota
+
+    const rand = () => glyphs[Math.floor(Math.random() * glyphs.length)];
+
+    function resize() {
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = width;
+      canvas.height = height;
+      cols = Math.ceil(width / size);
+      rows = Math.ceil(height / size);
+      cooldown = new Array(cols).fill(0);
+      drops = [];
+    }
+
+    function onPointer(clientX: number, clientY: number) {
+      const rect = canvas.getBoundingClientRect();
+      const col = Math.floor((clientX - rect.left) / size);
+      const row = Math.floor((clientY - rect.top) / size);
+      for (let dc = -spread; dc <= spread; dc++) {
+        const c = col + dc;
+        if (c < 0 || c >= cols || cooldown[c] > 0 || drops.length > 250) continue;
+        if (Math.random() > (dc === 0 ? 0.9 : 0.35)) continue;
+        cooldown[c] = 14;
+        drops.push({
+          col: c,
+          y: row,
+          speed: baseSpeed * (0.6 + Math.random() * 0.8),
+          len: Math.round(baseLength * (0.6 + Math.random() * 0.8)),
+          chars: [rand()],
+        });
+      }
+    }
+
+    function animate() {
+      ctx!.clearRect(0, 0, width, height);
+      ctx!.font = `${size * 0.9}px ui-monospace, Menlo, Consolas, monospace`;
+      ctx!.textAlign = "center";
+      ctx!.textBaseline = "middle";
+      ctx!.fillStyle = color;
+
+      for (let c = 0; c < cols; c++) if (cooldown[c] > 0) cooldown[c]--;
+
+      for (const d of drops) {
+        const before = Math.floor(d.y);
+        d.y += d.speed;
+        if (Math.floor(d.y) !== before) {
+          d.chars.unshift(rand()); // la cabeza avanza una fila
+          if (d.chars.length > d.len) d.chars.pop();
+        } else if (Math.random() < 0.03) {
+          d.chars[Math.floor(Math.random() * d.chars.length)] = rand(); // parpadeo
+        }
+        const head = Math.floor(d.y);
+        for (let i = 0; i < d.chars.length; i++) {
+          const row = head - i;
+          if (row < 0 || row >= rows) continue;
+          ctx!.globalAlpha = alpha * Math.pow(1 - i / d.len, 1.6);
+          ctx!.fillText(d.chars[i], d.col * size + size / 2, row * size + size / 2);
+        }
+      }
+      ctx!.globalAlpha = 1;
+      drops = drops.filter((d) => Math.floor(d.y) - d.len < rows);
+      requestAnimationFrame(animate);
+    }
+
+    new ResizeObserver(resize).observe(canvas);
+    window.addEventListener("mousemove", (e) => onPointer(e.clientX, e.clientY));
+    window.addEventListener(
+      "touchmove",
+      (e) => onPointer(e.touches[0].clientX, e.touches[0].clientY),
+      { passive: true }
+    );
+
+    resize();
+    animate();
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>(".matrix-background canvas").forEach(setup);
+</script>

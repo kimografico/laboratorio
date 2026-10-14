@@ -1,0 +1,33 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Gallery, { type ExperimentMeta } from "../components/ui/Gallery";
+import { getCollection } from "astro:content";
+
+const entries = await getCollection("experiments");
+
+const experiments: ExperimentMeta[] = entries
+  .map((entry) => ({
+    id: entry.id,
+    title: entry.data.title,
+    description: entry.data.description,
+    category: entry.data.category,
+    component: entry.data.component,
+    accent: entry.data.accent,
+    props: entry.data.props,
+  }))
+  .sort((a, b) => a.title.localeCompare(b.title));
+---
+
+<Layout title="Laboratorio · Interactive Backgrounds">
+  <section class="mx-auto max-w-6xl px-5 pb-10 pt-16">
+    <h1 class="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
+      Fondos interactivos que reaccionan al cursor
+    </h1>
+    <p class="mt-4 max-w-2xl text-base text-white/55">
+      Cada experimento está escrito en React (<code class="rounded bg-white/10 px-1.5 py-0.5 text-xs">.tsx</code>)
+      para poder incrustarse tanto en Astro como en Next.js o Vite. Pasa el cursor por las tarjetas para verlos en vivo.
+    </p>
+  </section>
+
+  <Gallery client:load experiments={experiments} />
+</Layout>

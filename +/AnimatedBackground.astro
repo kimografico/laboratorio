@@ -1,0 +1,162 @@
+---
+interface Props {
+  /** URL de la imagen que se ve a través de los círculos. Si no se pasa, se rellenan de color sólido. */
+  image?: string;
+  /** Separación entre círculos (px) */
+  size?: number;
+  /** Radio base de cada círculo (px) */
+  radius?: number;
+  /** Distancia de influencia del puntero (px) */
+  proximity?: number;
+  /** Crecimiento máximo del radio cerca del puntero (px) */
+  growth?: number;
+  /** Suavizado de la animación (0.02 - 0.15) */
+  ease?: number;
+  /** Color de relleno si no hay imagen */
+  fill?: string;
+  /** Color de fondo del contenedor */
+  background?: string;
+  class?: string;
+}
+
+const {
+  image,
+  size = 30,
+  radius = 1,
+  proximity = 125,
+  growth = 60,
+  ease = 0.075,
+  fill = "#000000",
+  background = "#e0dad5",
+  class: className,
+} = Astro.props;
+---
+
+<div class:list={["animated-background", className]} style={`background-color: ${background};`}>
+  <canvas
+    data-image={image}
+    data-size={size}
+    data-radius={radius}
+    data-proximity={proximity}
+    data-growth={growth}
+    data-ease={ease}
+    data-fill={fill}></canvas>
+</div>
+
+<style>
+  .animated-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  type Dot = { x: number; y: number; r: number; grow: number };
+
+  function setup(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const size = Number(canvas.dataset.size);
+    const baseRadius = Number(canvas.dataset.radius);
+    const proximity = Number(canvas.dataset.proximity);
+    const growth = Number(canvas.dataset.growth);
+    const ease = Number(canvas.dataset.ease);
+    const fill = canvas.dataset.fill ?? "#000";
+
+    let width = 0;
+    let height = 0;
+    let dots: Dot[] = [];
+
+    const image = new Image();
+    let imageLoaded = false;
+    if (canvas.dataset.image) {
+      image.onload = () => (imageLoaded = true);
+      image.src = canvas.dataset.image;
+    }
+
+    function build() {
+      const columns = Math.ceil(width / size) + 1;
+      const rows = Math.ceil(height / size) + 1;
+      dots = [];
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < columns; col++) {
+          dots.push({ x: col * size, y: row * size, r: baseRadius, grow: 0 });
+        }
+      }
+    }
+
+    function resize() {
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = width;
+      canvas.height = height;
+      build();
+    }
+
+    function onPointer(clientX: number, clientY: number) {
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.left;
+      const py = clientY - rect.top;
+      for (const d of dots) {
+        const distance = Math.hypot(d.x - px, d.y - py);
+        // 1 cuando el puntero está encima, 0 cuando está a `proximity` o más
+        const t = 1 - Math.min(Math.max(distance / proximity, 0), 1);
+        d.grow = t * growth;
+      }
+    }
+
+    function drawImage() {
+      ctx!.clip();
+      const { naturalWidth: iw, naturalHeight: ih } = image;
+      const ratio = Math.max(width / iw, height / ih); // efecto "cover"
+      const w = iw * ratio;
+      const h = ih * ratio;
+      ctx!.drawImage(image, (width - w) / 2, (height - h) / 2, w, h);
+    }
+
+    function animate() {
+      ctx!.clearRect(0, 0, width, height);
+      ctx!.save();
+      ctx!.beginPath();
+      for (const d of dots) {
+        d.r += (baseRadius + d.grow - d.r) * ease;
+        ctx!.moveTo(d.x, d.y);
+        ctx!.arc(d.x, d.y, Math.max(d.r, 0), 0, Math.PI * 2);
+      }
+      if (imageLoaded) {
+        drawImage();
+      } else {
+        ctx!.fillStyle = fill;
+        ctx!.fill();
+      }
+      ctx!.restore();
+      requestAnimationFrame(animate);
+    }
+
+    new ResizeObserver(resize).observe(canvas);
+    window.addEventListener("mousemove", (e) => onPointer(e.clientX, e.clientY));
+    window.addEventListener(
+      "touchmove",
+      (e) => onPointer(e.touches[0].clientX, e.touches[0].clientY),
+      { passive: true }
+    );
+
+    resize();
+    animate();
+  }
+
+  document
+    .querySelectorAll<HTMLCanvasElement>(".animated-background canvas")
+    .forEach(setup);
+</script>

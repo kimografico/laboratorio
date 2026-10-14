@@ -1,0 +1,52 @@
+---
+title: Aurora
+description: Manchas de color que flotan en órbitas suaves y huyen del puntero como una aurora.
+category: backgrounds
+component: AuroraBackground
+accent: "#2b4eff"
+props:
+  - name: colors
+    label: Colores
+    type: colors
+    default: ["#ee3d3d", "#f5a623", "#2b4eff"]
+  - name: size
+    label: Tamaño de mancha
+    type: number
+    default: 0.55
+    min: 0.1
+    max: 1.5
+    step: 0.05
+  - name: opacity
+    label: Opacidad
+    type: number
+    default: 0.5
+    min: 0
+    max: 1
+    step: 0.05
+  - name: ease
+    label: Suavizado
+    type: number
+    default: 0.012
+    min: 0.002
+    max: 0.08
+    step: 0.002
+  - name: avoid
+    label: Huida del puntero
+    type: number
+    default: 0.8
+    min: 0
+    max: 2
+    step: 0.1
+  - name: background
+    label: Fondo
+    type: color
+    default: "#e0dad5"
+---
+
+## Uso
+
+Cada color genera una mancha que sigue su propia órbita. Cuanto más bajo `ease`, más larga la estela entre manchas.
+
+```tsx
+<AuroraBackground colors={["#ee3d3d", "#f5a623", "#2b4eff"]} size={0.55} avoid={0.8} />
+```
