@@ -17,6 +17,7 @@ Showcase de **fondos interactivos y efectos de texto** en React, servido con Ast
 - `src/content/experiments/*.md` — metadatos de cada experimento (frontmatter + uso).
 - `src/lib/registry.tsx` — mapa `component` (string) → componente React.
 - `src/lib/props.ts` — tipos del playground de props (`PropDef`).
+- `src/lib/theme.ts` — tema activo (`useTheme`), resolución de colores y `applyTheme` para las previews.
 - `src/styles/global.css` — Tailwind + tokens de tema + clase compartida `.bg-canvas` + estilos de markdown.
 - `src/components/ui/ThemeToggle.tsx` — toggle claro/oscuro (persiste en `localStorage`).
 - `+/*.astro` — material original (no se compila; excluido en `tsconfig.json`).
@@ -31,6 +32,10 @@ Showcase de **fondos interactivos y efectos de texto** en React, servido con Ast
   `text-faint`, `bg-subtle`, `bg-subtle-strong`, `border-line`, `border-line-strong`) definidos
   en `global.css`. No uses colores fijos (`text-white`, `bg-[#141416]`) salvo en overlays sobre
   previews (badges, texto del hero, pantalla completa).
+- Previews de experimentos: `Stage` recibe `themed` (nombres de props `color` que siguen el tema).
+  Al estar en su valor por defecto, `background` adopta el color de lienzo del tema y `color`/
+  `fill` se invierten (manteniendo el alfa) si no encajan con el tema activo. Si el usuario
+  cambia un color en el playground, deja de seguir el tema. La lógica vive en `src/lib/theme.ts`.
 
 ## Conversión Astro → React
 

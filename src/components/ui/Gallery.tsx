@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
 import { defaultsFromProps, type PropDef } from "../../lib/props";
 
@@ -29,6 +29,10 @@ function LazyPreview({
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const values = useMemo(() => defaultsFromProps(props), [props]);
+  const themed = useMemo(
+    () => props.filter((p) => p.type === "color").map((p) => p.name),
+    [props]
+  );
 
   useEffect(() => {
     const el = ref.current;
@@ -54,11 +58,11 @@ function LazyPreview({
         (isText ? (
           <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
             <div className="[--flip-duration:5s]">
-              <Stage componentId={componentId} values={values} />
+              <Stage componentId={componentId} values={values} themed={themed} />
             </div>
           </div>
         ) : (
-          <Stage componentId={componentId} values={values} />
+          <Stage componentId={componentId} values={values} themed={themed} />
         ))}
     </div>
   );
@@ -128,7 +132,7 @@ export default function Gallery({ experiments }: GalleryProps) {
             >
               <div className="relative h-44 w-full overflow-hidden border-b border-line">
                 <LazyPreview componentId={exp.component} props={exp.props} category={exp.category} />
-                <span className="absolute right-3 top-3 z-10 rounded-full bg-black/50 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70 backdrop-blur">
+                <span className="absolute right-3 top-3 z-10 rounded-full bg-surface/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted backdrop-blur">
                   {exp.category}
                 </span>
               </div>
@@ -142,9 +146,6 @@ export default function Gallery({ experiments }: GalleryProps) {
                 </div>
                 <p className="line-clamp-2 text-sm text-muted">{exp.description}</p>
               </div>
-              <span className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-white/0 transition group-hover:text-white/80">
-                <Sparkles className="h-5 w-5" />
-              </span>
             </a>
           ))}
         </div>

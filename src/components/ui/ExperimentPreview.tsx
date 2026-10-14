@@ -62,6 +62,10 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
     () => buildSnippet(componentId, propDefs, values, isText),
     [componentId, propDefs, values, isText]
   );
+  const themed = useMemo(
+    () => propDefs.filter((p) => p.type === "color" && values[p.name] === p.default).map((p) => p.name),
+    [propDefs, values]
+  );
 
   const update = (name: string, value: unknown) => setValues((prev) => ({ ...prev, [name]: value }));
 
@@ -84,24 +88,24 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
       {isText ? (
         <div className="absolute inset-0 flex items-center justify-center bg-panel p-8 text-center">
           <div className="text-3xl sm:text-5xl">
-            <Stage componentId={componentId} values={values} />
+            <Stage componentId={componentId} values={values} themed={themed} />
           </div>
         </div>
       ) : (
         <>
-          <Stage componentId={componentId} values={values} />
+          <Stage componentId={componentId} values={values} themed={themed} />
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5 px-6 text-center">
-            <h1 className="max-w-2xl text-3xl font-bold text-black/80 drop-shadow-sm sm:text-5xl">
+            <h1 className="max-w-2xl text-3xl font-bold text-fg drop-shadow-sm sm:text-5xl">
               Construye héroes que reaccionan
             </h1>
-            <p className="max-w-lg text-sm text-black/60 sm:text-base">
+            <p className="max-w-lg text-sm text-muted sm:text-base">
               Mueve el cursor sobre el lienzo para explorar el efecto en vivo.
             </p>
             <div className="pointer-events-auto flex gap-3">
-              <button className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition hover:bg-black/80">
+              <button className="rounded-full bg-fg px-5 py-2 text-sm font-medium text-surface transition hover:bg-fg/90">
                 Empezar
               </button>
-              <button className="rounded-full border border-black/30 px-5 py-2 text-sm font-medium text-black/70 transition hover:border-black/60">
+              <button className="rounded-full border border-line-strong px-5 py-2 text-sm font-medium text-muted transition hover:border-fg/60">
                 Ver más
               </button>
             </div>
@@ -138,11 +142,11 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
       </div>
 
       {fullscreen ? (
-        <div className="fixed inset-0 z-50 bg-black">
+        <div className="fixed inset-0 z-50 bg-surface">
           <div className="h-full w-full">{stage}</div>
           <button
             onClick={() => setFullscreen(false)}
-            className="absolute right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-black/60 px-3 py-1.5 text-xs text-white backdrop-blur transition hover:bg-black/80"
+            className="absolute right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-lg border border-line-strong bg-surface/60 px-3 py-1.5 text-xs text-fg backdrop-blur transition hover:bg-surface/80"
           >
             <Minimize2 className="h-3.5 w-3.5" /> Salir
           </button>
