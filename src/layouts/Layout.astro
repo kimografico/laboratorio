@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import AtomIcon from "../components/ui/icons/AtomIcon.astro";
 
 interface Props {
   title?: string;
@@ -25,22 +26,11 @@ const {
     <header class="border-b border-white/10">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <a href="/" class="group inline-flex items-center gap-2.5">
-          <span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-black">L</span>
+          <AtomIcon class="h-8 w-8 text-white" />
           <span class="text-sm font-semibold tracking-tight text-white">
             Laboratorio<span class="text-white/40">.components</span>
           </span>
         </a>
-        <nav class="flex items-center gap-5 text-sm text-white/60">
-          <a href="/" class="transition hover:text-white">Galería</a>
-          <a
-            href="https://docs.astro.build"
-            target="_blank"
-            rel="noreferrer"
-            class="transition hover:text-white"
-          >
-            Astro
-          </a>
-        </nav>
       </div>
     </header>
 
@@ -50,7 +40,7 @@ const {
 
     <footer class="border-t border-white/10 py-8">
       <div class="mx-auto max-w-6xl px-5 text-center text-xs text-white/35">
-        Componentes React reutilizables · Astro + React + Tailwind
+        © 2026 kimografico
       </div>
     </footer>
   </body>
