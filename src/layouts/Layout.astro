@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import AtomIcon from "../components/ui/icons/AtomIcon.astro";
+import ThemeToggle from "../components/ui/ThemeToggle";
 
 interface Props {
   title?: string;
@@ -25,32 +26,46 @@ const isUi = path.startsWith("/ui");
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var light = stored
+            ? stored === "light"
+            : window.matchMedia("(prefers-color-scheme: light)").matches;
+          if (light) document.documentElement.classList.add("light");
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <header class="border-b border-white/10">
+    <header class="border-b border-line">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <a href="/" class="group inline-flex items-center gap-2.5">
-          <AtomIcon class="h-8 w-8 text-white" />
-          <span class="text-sm font-semibold tracking-tight text-white">
-            Laboratorio<span class="text-white/40">.components</span>
+          <AtomIcon class="h-8 w-8 text-fg" />
+          <span class="text-sm font-semibold tracking-tight text-fg">
+            Laboratorio<span class="text-faint">.components</span>
           </span>
         </a>
-        <nav class="flex items-center gap-1 text-sm">
-          <a
-            href="/"
-            class={`rounded-lg px-3 py-1.5 transition ${
-              isExperiments ? "font-semibold text-white" : "text-white/60 hover:text-white"
-            }`}
-            >Experimentos</a
-          >
-          <a
-            href="/ui"
-            class={`rounded-lg px-3 py-1.5 transition ${
-              isUi ? "font-semibold text-white" : "text-white/60 hover:text-white"
-            }`}
-            >UI</a
-          >
-        </nav>
+        <div class="flex items-center gap-4">
+          <nav class="flex items-center gap-1 text-sm">
+            <a
+              href="/"
+              class={`rounded-lg px-3 py-1.5 transition ${
+                isExperiments ? "font-semibold text-fg" : "text-muted hover:text-fg"
+              }`}
+              >Experimentos</a
+            >
+            <a
+              href="/ui"
+              class={`rounded-lg px-3 py-1.5 transition ${
+                isUi ? "font-semibold text-fg" : "text-muted hover:text-fg"
+              }`}
+              >UI</a
+            >
+          </nav>
+          <ThemeToggle client:load />
+        </div>
       </div>
     </header>
 
@@ -58,8 +73,8 @@ const isUi = path.startsWith("/ui");
       <slot />
     </main>
 
-    <footer class="border-t border-white/10 py-8">
-      <div class="mx-auto max-w-6xl px-5 text-center text-xs text-white/35">
+    <footer class="border-t border-line py-8">
+      <div class="mx-auto max-w-6xl px-5 text-center text-xs text-faint">
         © 2026 kimografico
       </div>
     </footer>

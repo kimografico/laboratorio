@@ -86,9 +86,9 @@ export default function Gallery({ experiments }: GalleryProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-24">
-      <div className="sticky top-0 z-20 -mx-5 mb-8 border-b border-white/10 bg-[#0b0b0c]/85 px-5 py-4 backdrop-blur">
+      <div className="sticky top-0 z-20 -mx-5 mb-8 border-b border-line bg-surface/85 px-5 py-4 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
-          <SlidersHorizontal className="h-4 w-4 text-white/40" />
+          <SlidersHorizontal className="h-4 w-4 text-faint" />
           {categories.map((c) => {
             const count = c === "all" ? experiments.length : counts[c] ?? 0;
             const active = category === c;
@@ -98,14 +98,14 @@ export default function Gallery({ experiments }: GalleryProps) {
                 onClick={() => setCategory(c)}
                 className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition ${
                   active
-                    ? "border-white/60 bg-white text-black"
-                    : "border-white/15 bg-white/5 text-white/70 hover:border-white/40"
+                    ? "border-fg bg-fg text-surface"
+                    : "border-line-strong bg-subtle text-muted hover:border-fg/40"
                 }`}
               >
                 {c === "all" ? "Todos" : c}
                 <span
                   className={`rounded-full px-1.5 text-xs ${
-                    active ? "bg-black/10 text-black/60" : "bg-white/10 text-white/50"
+                    active ? "bg-surface/20 text-surface/70" : "bg-subtle-strong text-faint"
                   }`}
                 >
                   {count}
@@ -117,16 +117,16 @@ export default function Gallery({ experiments }: GalleryProps) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="py-24 text-center text-sm text-white/50">Sin resultados.</p>
+        <p className="py-24 text-center text-sm text-faint">Sin resultados.</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((exp) => (
             <a
               key={exp.id}
               href={`/experiment/${exp.id}`}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#141416] transition hover:-translate-y-0.5 hover:border-white/25 hover:shadow-2xl hover:shadow-black/40"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-2xl hover:shadow-black/40"
             >
-              <div className="relative h-44 w-full overflow-hidden border-b border-white/10">
+              <div className="relative h-44 w-full overflow-hidden border-b border-line">
                 <LazyPreview componentId={exp.component} props={exp.props} category={exp.category} />
                 <span className="absolute right-3 top-3 z-10 rounded-full bg-black/50 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70 backdrop-blur">
                   {exp.category}
@@ -136,11 +136,11 @@ export default function Gallery({ experiments }: GalleryProps) {
                 <div className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: exp.accent ?? "#ffffff" }}
+                    style={{ backgroundColor: exp.accent ?? "currentColor" }}
                   />
-                  <h3 className="text-base font-semibold text-white">{exp.title}</h3>
+                  <h3 className="text-base font-semibold text-fg">{exp.title}</h3>
                 </div>
-                <p className="line-clamp-2 text-sm text-white/55">{exp.description}</p>
+                <p className="line-clamp-2 text-sm text-muted">{exp.description}</p>
               </div>
               <span className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-white/0 transition group-hover:text-white/80">
                 <Sparkles className="h-5 w-5" />

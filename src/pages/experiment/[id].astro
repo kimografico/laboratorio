@@ -18,17 +18,17 @@ const { title, description, category, component, accent, props } = entry.data;
 
 <Layout title={`${title} · Laboratorio`} description={description}>
   <section class="mx-auto max-w-6xl px-5 pt-10 pb-16">
-    <div class="mb-8 flex flex-col gap-4 border-b border-white/10 pb-8">
+    <div class="mb-8 flex flex-col gap-4 border-b border-line pb-8">
       <div class="flex flex-wrap items-center gap-2">
         <span
           class="inline-block h-2.5 w-2.5 rounded-full"
-          style={`background-color: ${accent ?? "#ffffff"}`}></span>
-        <span class="text-xs uppercase tracking-wide text-white/45">{category}</span>
-        <span class="text-xs text-white/25">/</span>
-        <code class="text-xs text-white/45">{component}</code>
+          style={`background-color: ${accent ?? "currentColor"}`}></span>
+        <span class="text-xs uppercase tracking-wide text-faint">{category}</span>
+        <span class="text-xs text-faint">/</span>
+        <code class="text-xs text-faint">{component}</code>
       </div>
-      <h1 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h1>
-      <p class="max-w-3xl text-base text-white/60">{description}</p>
+      <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">{title}</h1>
+      <p class="max-w-3xl text-base text-muted">{description}</p>
     </div>
 
     <ExperimentPreview

@@ -5,8 +5,44 @@
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
+@theme inline {
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-subtle: var(--subtle);
+  --color-subtle-strong: var(--subtle-strong);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+}
+
 :root {
   color-scheme: dark;
+  --surface: #0b0b0c;
+  --panel: #141416;
+  --fg: #ffffff;
+  --muted: rgba(255, 255, 255, 0.6);
+  --faint: rgba(255, 255, 255, 0.45);
+  --subtle: rgba(255, 255, 255, 0.05);
+  --subtle-strong: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.15);
+  --code-fg: #a7f3d0;
+}
+
+html.light {
+  color-scheme: light;
+  --surface: #f7f7f6;
+  --panel: #ffffff;
+  --fg: #0b0b0c;
+  --muted: rgba(11, 11, 12, 0.62);
+  --faint: rgba(11, 11, 12, 0.45);
+  --subtle: rgba(11, 11, 12, 0.04);
+  --subtle-strong: rgba(11, 11, 12, 0.07);
+  --line: rgba(11, 11, 12, 0.1);
+  --line-strong: rgba(11, 11, 12, 0.18);
+  --code-fg: #047857;
 }
 
 html,
@@ -16,8 +52,8 @@ body {
 }
 
 body {
-  background-color: #0b0b0c;
-  color: #e7e5e4;
+  background-color: var(--surface);
+  color: var(--fg);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -45,20 +81,20 @@ body {
   margin: 1.75rem 0 0.75rem;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--fg);
 }
 
 .exp-content p {
   margin: 0.75rem 0;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted);
 }
 
 .exp-content code {
   font-family: var(--font-mono);
   font-size: 0.8em;
-  color: #a7f3d0;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--code-fg);
+  background: var(--subtle-strong);
   border-radius: 0.35rem;
   padding: 0.1rem 0.35rem;
 }
@@ -67,15 +103,15 @@ body {
   margin: 1rem 0;
   padding: 1rem;
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--line);
   border-radius: 1rem;
-  background: #141416;
+  background: var(--panel);
 }
 
 .exp-content pre code {
   background: transparent;
   padding: 0;
-  color: #a7f3d0;
+  color: var(--code-fg);
   font-size: 0.75rem;
 }
 

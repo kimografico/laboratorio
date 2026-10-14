@@ -78,11 +78,11 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
   const stage = (
     <div
       className={`relative w-full overflow-hidden ${
-        fullscreen ? "h-full" : "h-[60vh] min-h-[380px] rounded-2xl border border-white/10"
+        fullscreen ? "h-full" : "h-[60vh] min-h-[380px] rounded-2xl border border-line"
       }`}
     >
       {isText ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#0e0e10] p-8 text-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-panel p-8 text-center">
           <div className="text-3xl sm:text-5xl">
             <Stage componentId={componentId} values={values} />
           </div>
@@ -116,20 +116,20 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
       <div className="flex flex-wrap items-center justify-between gap-3">
         <a
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-white/60 transition hover:text-white"
+          className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-fg"
         >
           <ArrowLeft className="h-4 w-4" /> Galería
         </a>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setValues(defaultsFromProps(propDefs))}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Reset
           </button>
           <button
             onClick={() => setFullscreen((f) => !f)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
           >
             {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
             Pantalla completa
@@ -151,22 +151,22 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
         stage
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#141416]">
+      <div className="overflow-hidden rounded-2xl border border-line bg-panel">
         <button
           onClick={() => setPanelOpen((o) => !o)}
           className="flex w-full items-center justify-between px-4 py-3 text-left"
         >
-          <span className="inline-flex items-center gap-2 text-sm font-medium text-white">
-            <SlidersHorizontal className="h-4 w-4" style={{ color: accent ?? "#ffffff" }} />
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-fg">
+            <SlidersHorizontal className="h-4 w-4" style={{ color: accent ?? "currentColor" }} />
             Controles ({propDefs.length})
           </span>
-          <ChevronDown className={`h-4 w-4 text-white/50 transition ${panelOpen ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-4 w-4 text-faint transition ${panelOpen ? "rotate-180" : ""}`} />
         </button>
 
         {panelOpen && (
-          <div className="border-t border-white/10 p-4">
+          <div className="border-t border-line p-4">
             {propDefs.length === 0 ? (
-              <p className="text-sm text-white/50">Este componente no expone props configurables.</p>
+              <p className="text-sm text-faint">Este componente no expone props configurables.</p>
             ) : (
               <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
                 {propDefs.map((p) => (
@@ -178,18 +178,18 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#141416]">
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <span className="text-sm font-medium text-white">Código de uso</span>
+      <div className="overflow-hidden rounded-2xl border border-line bg-panel">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+          <span className="text-sm font-medium text-fg">Código de uso</span>
           <button
             onClick={copy}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
           >
             {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? "Copiado" : "Copiar"}
           </button>
         </div>
-        <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-emerald-200/90">
+        <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-[color:var(--code-fg)]">
           <code>{snippet}</code>
         </pre>
       </div>
@@ -214,9 +214,9 @@ function Control({
 
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="flex items-center justify-between text-xs text-white/60">
+      <span className="flex items-center justify-between text-xs text-muted">
         <span>{label}</span>
-        {def.type === "number" && <span className="font-mono text-white/40">{String(value)}</span>}
+        {def.type === "number" && <span className="font-mono text-faint">{String(value)}</span>}
       </span>
 
       {def.type === "number" && (
@@ -227,7 +227,7 @@ function Control({
           step={def.step ?? 1}
           value={Number(value)}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-white"
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-line-strong accent-fg"
         />
       )}
 
@@ -236,7 +236,7 @@ function Control({
           type="checkbox"
           checked={Boolean(value)}
           onChange={(e) => onChange(e.target.checked)}
-          className="h-4 w-4 accent-white"
+          className="h-4 w-4 accent-fg"
         />
       )}
 
@@ -244,10 +244,10 @@ function Control({
         <select
           value={String(value ?? "")}
           onChange={(e) => onChange(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-white/30"
+          className="rounded-lg border border-line bg-subtle px-3 py-1.5 text-sm text-fg outline-none focus:border-line-strong"
         >
           {(def.options ?? []).map((o) => (
-            <option key={o} value={o} className="bg-[#141416]">
+            <option key={o} value={o} className="bg-panel">
               {o}
             </option>
           ))}
@@ -260,13 +260,13 @@ function Control({
             type="color"
             value={isHex(value) ? value.trim() : "#000000"}
             onChange={(e) => onChange(e.target.value)}
-            className="h-8 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+            className="h-8 w-10 cursor-pointer rounded border border-line bg-transparent"
           />
           <input
             type="text"
             value={String(value ?? "")}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-white/30"
+            className="flex-1 rounded-lg border border-line bg-subtle px-3 py-1.5 font-mono text-xs text-fg outline-none focus:border-line-strong"
           />
         </div>
       )}
@@ -283,7 +283,7 @@ function Control({
                 .filter(Boolean)
             )
           }
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-white/30"
+          className="rounded-lg border border-line bg-subtle px-3 py-1.5 font-mono text-xs text-fg outline-none focus:border-line-strong"
         />
       )}
     </label>
@@ -310,7 +310,7 @@ function TextControl({
 
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-xs text-white/60">{def.label ?? def.name}</span>
+      <span className="text-xs text-muted">{def.label ?? def.name}</span>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -322,13 +322,13 @@ function TextControl({
           type="text"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-white/30"
+          className="w-full rounded-lg border border-line bg-subtle px-3 py-1.5 text-sm text-fg outline-none focus:border-line-strong"
         />
         <button
           type="submit"
           disabled={!dirty}
           aria-label="Aplicar texto"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-subtle text-fg/70 transition hover:border-line-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ArrowRight className="h-4 w-4" />
         </button>
