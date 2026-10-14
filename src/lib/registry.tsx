@@ -16,6 +16,9 @@ import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
 import TriangleBackground2 from "../components/backgrounds/TriangleBackground2";
 import WarpGridBackground from "../components/backgrounds/WarpGridBackground";
 import FlipText from "../components/texts/FlipText";
+import Button from "../components/ui/Button";
+import IconButton from "../components/ui/IconButton";
+import ThemeToggle from "../components/ui/ThemeToggle";
 
 /** Maps the `component` field from experiment frontmatter to a React component. */
 export const registry: Record<string, ComponentType<any>> = {
@@ -36,6 +39,9 @@ export const registry: Record<string, ComponentType<any>> = {
   TriangleBackground2,
   WarpGridBackground,
   FlipText,
+  Button,
+  IconButton,
+  ThemeToggle,
 };
 
 export function getComponent(id: string): ComponentType<any> | undefined {

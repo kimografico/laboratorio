@@ -18,6 +18,9 @@ interface ExperimentPreviewProps {
   propDefs: PropDef[];
   category: string;
   accent?: string;
+  backHref?: string;
+  backLabel?: string;
+  allowFullscreen?: boolean;
 }
 
 function isHex(v: unknown): v is string {
@@ -30,7 +33,13 @@ function formatValue(v: unknown): string {
   return String(v);
 }
 
-function buildSnippet(componentId: string, propDefs: PropDef[], values: PropValues, isText: boolean): string {
+function importPath(category: string, componentId: string): string {
+  if (category === "texts") return `@/components/texts/${componentId}`;
+  if (category === "backgrounds") return `@/components/backgrounds/${componentId}`;
+  return `@/components/ui/${componentId}`;
+}
+
+function buildSnippet(componentId: string, propDefs: PropDef[], values: PropValues, category: string): string {
   const attrs: string[] = [];
   let child = "";
   for (const p of propDefs) {
@@ -45,22 +54,32 @@ function buildSnippet(componentId: string, propDefs: PropDef[], values: PropValu
       attrs.push(`\n  ${p.name}={${formatValue(v)}}`);
     }
   }
-  if (isText) {
-    return `import ${componentId} from "@/components/texts/${componentId}";\n\n<${componentId}${attrs.join("")}>\n  ${child}\n</${componentId}>`;
+  const path = importPath(category, componentId);
+  if (category === "texts") {
+    return `import ${componentId} from "${path}";\n\n<${componentId}${attrs.join("")}>\n  ${child}\n</${componentId}>`;
   }
-  return `import ${componentId} from "@/components/backgrounds/${componentId}";\n\n<${componentId}${attrs.join("")} />\n`;
+  return `import ${componentId} from "${path}";\n\n<${componentId}${attrs.join("")} />\n`;
 }
 
-export default function ExperimentPreview({ componentId, propDefs, category, accent }: ExperimentPreviewProps) {
+export default function ExperimentPreview({
+  componentId,
+  propDefs,
+  category,
+  accent,
+  backHref = "/",
+  backLabel = "Galería",
+  allowFullscreen = true,
+}: ExperimentPreviewProps) {
   const [values, setValues] = useState<PropValues>(() => defaultsFromProps(propDefs));
   const [fullscreen, setFullscreen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [copied, setCopied] = useState(false);
 
   const isText = category === "texts";
+  const isBackground = category === "backgrounds";
   const snippet = useMemo(
-    () => buildSnippet(componentId, propDefs, values, isText),
-    [componentId, propDefs, values, isText]
+    () => buildSnippet(componentId, propDefs, values, category),
+    [componentId, propDefs, values, category]
   );
   const themed = useMemo(
     () => propDefs.filter((p) => p.type === "color" && values[p.name] === p.default).map((p) => p.name),
@@ -85,13 +104,7 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
         fullscreen ? "h-full" : "h-[60vh] min-h-[380px] rounded-2xl border border-line"
       }`}
     >
-      {isText ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-panel p-8 text-center">
-          <div className="text-3xl sm:text-5xl">
-            <Stage componentId={componentId} values={values} themed={themed} />
-          </div>
-        </div>
-      ) : (
+      {isBackground ? (
         <>
           <Stage componentId={componentId} values={values} themed={themed} />
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5 px-6 text-center">
@@ -111,6 +124,12 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
             </div>
           </div>
         </>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-panel p-8 text-center">
+          <div className={isText ? "text-3xl sm:text-5xl" : ""}>
+            <Stage componentId={componentId} values={values} themed={themed} />
+          </div>
+        </div>
       )}
     </div>
   );
@@ -119,10 +138,10 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <a
-          href="/"
+          href={backHref}
           className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-fg"
         >
-          <ArrowLeft className="h-4 w-4" /> Galería
+          <ArrowLeft className="h-4 w-4" /> {backLabel}
         </a>
         <div className="flex items-center gap-2">
           <button
@@ -131,13 +150,15 @@ export default function ExperimentPreview({ componentId, propDefs, category, acc
           >
             <RotateCcw className="h-3.5 w-3.5" /> Reset
           </button>
-          <button
-            onClick={() => setFullscreen((f) => !f)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
-          >
-            {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-            Pantalla completa
-          </button>
+          {allowFullscreen && (
+            <button
+              onClick={() => setFullscreen((f) => !f)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
+            >
+              {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+              Pantalla completa
+            </button>
+          )}
         </div>
       </div>
 

@@ -25,4 +25,15 @@ const experiments = defineCollection({
   }),
 });
 
-export const collections = { experiments };
+const ui = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/ui" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    category: z.string().default("buttons"),
+    component: z.string(),
+    props: z.array(propSchema).default([]),
+  }),
+});
+
+export const collections = { experiments, ui };

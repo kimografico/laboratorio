@@ -15,6 +15,7 @@ export interface ExperimentMeta {
 
 interface GalleryProps {
   experiments: ExperimentMeta[];
+  basePath?: string;
 }
 
 function LazyPreview({
@@ -51,30 +52,41 @@ function LazyPreview({
   }, []);
 
   const isText = category === "texts";
+  const isBackground = category === "backgrounds";
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden">
       {visible &&
-        (isText ? (
-          <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
-            <div className="[--flip-duration:5s]">
-              <Stage componentId={componentId} values={values} themed={themed} />
-            </div>
-          </div>
-        ) : (
+        (isBackground ? (
           <Stage componentId={componentId} values={values} themed={themed} />
+        ) : (
+          <div
+            className={`absolute inset-0 flex items-center justify-center p-4 text-center ${
+              isText ? "" : "pointer-events-none bg-surface"
+            }`}
+          >
+            {isText ? (
+              <div className="[--flip-duration:5s]">
+                <Stage componentId={componentId} values={values} themed={themed} />
+              </div>
+            ) : (
+              <Stage componentId={componentId} values={values} themed={themed} />
+            )}
+          </div>
         ))}
     </div>
   );
 }
 
-export default function Gallery({ experiments }: GalleryProps) {
+export default function Gallery({ experiments, basePath = "/experiment" }: GalleryProps) {
   const [category, setCategory] = useState<string>("all");
 
   const categories = useMemo(() => {
     const set = new Set(experiments.map((e) => e.category));
     return ["all", ...Array.from(set)];
   }, [experiments]);
+
+  const hasFilter = categories.length > 2;
 
   const counts = useMemo(() => {
     return experiments.reduce<Record<string, number>>((acc, e) => {
@@ -90,35 +102,37 @@ export default function Gallery({ experiments }: GalleryProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-24">
-      <div className="sticky top-0 z-20 -mx-5 mb-8 border-b border-line bg-surface/85 px-5 py-4 backdrop-blur">
-        <div className="flex flex-wrap items-center gap-3">
-          <SlidersHorizontal className="h-4 w-4 text-faint" />
-          {categories.map((c) => {
-            const count = c === "all" ? experiments.length : counts[c] ?? 0;
-            const active = category === c;
-            return (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition ${
-                  active
-                    ? "border-fg bg-fg text-surface"
-                    : "border-line-strong bg-subtle text-muted hover:border-fg/40"
-                }`}
-              >
-                {c === "all" ? "Todos" : c}
-                <span
-                  className={`rounded-full px-1.5 text-xs ${
-                    active ? "bg-surface/20 text-surface/70" : "bg-subtle-strong text-faint"
+      {hasFilter && (
+        <div className="sticky top-0 z-20 -mx-5 mb-8 border-b border-line bg-surface/85 px-5 py-4 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-3">
+            <SlidersHorizontal className="h-4 w-4 text-faint" />
+            {categories.map((c) => {
+              const count = c === "all" ? experiments.length : counts[c] ?? 0;
+              const active = category === c;
+              return (
+                <button
+                  key={c}
+                  onClick={() => setCategory(c)}
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition ${
+                    active
+                      ? "border-fg bg-fg text-surface"
+                      : "border-line-strong bg-subtle text-muted hover:border-fg/40"
                   }`}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+                  {c === "all" ? "Todos" : c}
+                  <span
+                    className={`rounded-full px-1.5 text-xs ${
+                      active ? "bg-surface/20 text-surface/70" : "bg-subtle-strong text-faint"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {filtered.length === 0 ? (
         <p className="py-24 text-center text-sm text-faint">Sin resultados.</p>
@@ -127,14 +141,16 @@ export default function Gallery({ experiments }: GalleryProps) {
           {filtered.map((exp) => (
             <a
               key={exp.id}
-              href={`/experiment/${exp.id}`}
+              href={`${basePath}/${exp.id}`}
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-2xl hover:shadow-black/40"
             >
               <div className="relative h-44 w-full overflow-hidden border-b border-line">
                 <LazyPreview componentId={exp.component} props={exp.props} category={exp.category} />
-                <span className="absolute right-3 top-3 z-10 rounded-full bg-surface/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted backdrop-blur">
-                  {exp.category}
-                </span>
+                {hasFilter && (
+                  <span className="absolute right-3 top-3 z-10 rounded-full bg-surface/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted backdrop-blur">
+                    {exp.category}
+                  </span>
+                )}
               </div>
               <div className="relative z-10 flex flex-1 flex-col gap-2 p-4">
                 <div className="flex items-center gap-2">

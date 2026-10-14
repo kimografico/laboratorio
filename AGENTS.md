@@ -13,11 +13,16 @@ Showcase de **fondos interactivos y efectos de texto** en React, servido con Ast
 
 - `src/components/backgrounds/*.tsx` — experimentos de fondo (React, canvas).
 - `src/components/texts/*.tsx` — experimentos de texto (React).
-- `src/components/ui/` — UI de la galería (`Gallery`, `ExperimentPreview`, `Stage`).
+- `src/components/ui/` — UI de la galería (`Gallery`, `ExperimentPreview`, `Stage`) y piezas
+  de interfaz (`Button`, `IconButton`, `ThemeToggle`).
+- `src/components/ui/icons/*.astro` — iconos animados reutilizables.
 - `src/content/experiments/*.md` — metadatos de cada experimento (frontmatter + uso).
+- `src/content/ui/*.md` — metadatos de cada pieza de interfaz (frontmatter + uso).
 - `src/lib/registry.tsx` — mapa `component` (string) → componente React.
 - `src/lib/props.ts` — tipos del playground de props (`PropDef`).
 - `src/lib/theme.ts` — tema activo (`useTheme`), resolución de colores y `applyTheme` para las previews.
+- `src/pages/experiment/[id].astro` — detalle de experimento (playground + snippet).
+- `src/pages/ui/index.astro` + `src/pages/ui/[id].astro` — listado y detalle de piezas de interfaz.
 - `src/styles/global.css` — Tailwind + tokens de tema + clase compartida `.bg-canvas` + estilos de markdown.
 - `src/components/ui/ThemeToggle.tsx` — toggle claro/oscuro (persiste en `localStorage`).
 - `+/*.astro` — material original (no se compila; excluido en `tsconfig.json`).
@@ -26,7 +31,9 @@ Showcase de **fondos interactivos y efectos de texto** en React, servido con Ast
 
 - Componentes de canvas usan el wrapper `<div className="bg-canvas">` y limpian
   `ResizeObserver`, listeners de `window` y `requestAnimationFrame` en el cleanup del `useEffect`.
-- Cada componente nuevo debe registrarse en `src/lib/registry.tsx` y tener su `.md` en `src/content/experiments/`.
+- Cada componente nuevo debe registrarse en `src/lib/registry.tsx`; los experimentos llevan su `.md`
+  en `src/content/experiments/` y las piezas de interfaz en `src/content/ui/`. El listado de piezas
+  reutiliza `Gallery` con `basePath="/ui"`.
 - En frontmatter YAML, cita cualquier valor que contenga `: `.
 - UI con temas: usa tokens semánticos (`bg-surface`, `bg-panel`, `text-fg`, `text-muted`,
   `text-faint`, `bg-subtle`, `bg-subtle-strong`, `border-line`, `border-line-strong`) definidos
