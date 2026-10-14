@@ -42,6 +42,7 @@ export default function FlipText({
 
   return (
     <div
+      key={`${text}|${duration}|${delay}|${loop}|${separator}|${together}`}
       className={`flip-text-wrapper ${className ?? ""}`.trim()}
       aria-label={text}
       style={

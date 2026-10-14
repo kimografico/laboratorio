@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Check,
   Copy,
   Maximize2,
@@ -205,6 +206,10 @@ function Control({
   value: unknown;
   onChange: (v: unknown) => void;
 }) {
+  if (def.type === "text") {
+    return <TextControl def={def} value={value} onChange={onChange} />;
+  }
+
   const label = def.label ?? def.name;
 
   return (
@@ -232,15 +237,6 @@ function Control({
           checked={Boolean(value)}
           onChange={(e) => onChange(e.target.checked)}
           className="h-4 w-4 accent-white"
-        />
-      )}
-
-      {def.type === "text" && (
-        <input
-          type="text"
-          value={String(value ?? "")}
-          onChange={(e) => onChange(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-white/30"
         />
       )}
 
@@ -290,6 +286,53 @@ function Control({
           className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-white/30"
         />
       )}
+    </label>
+  );
+}
+
+function TextControl({
+  def,
+  value,
+  onChange,
+}: {
+  def: PropDef;
+  value: unknown;
+  onChange: (v: unknown) => void;
+}) {
+  const current = String(value ?? "");
+  const [draft, setDraft] = useState(current);
+
+  useEffect(() => {
+    setDraft(String(value ?? ""));
+  }, [value]);
+
+  const dirty = draft !== current;
+
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-xs text-white/60">{def.label ?? def.name}</span>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (dirty) onChange(draft);
+        }}
+        className="flex items-center gap-2"
+      >
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-white/30"
+        />
+        <button
+          type="submit"
+          disabled={!dirty}
+          aria-label="Aplicar texto"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </form>
     </label>
   );
 }
