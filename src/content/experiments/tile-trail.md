@@ -3,7 +3,6 @@ title: Tile Trail
 description: Rejilla de baldosas que se iluminan al paso del puntero y se apagan dejando estela.
 category: backgrounds
 component: TileBackground
-accent: "#000000"
 props:
   - name: size
     label: Celda (px)

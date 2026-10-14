@@ -3,7 +3,6 @@ title: Flip Text
 description: Texto que se voltea carácter a carácter con un efecto de cubo 3D, sin JavaScript en cliente.
 category: texts
 component: FlipText
-accent: "#2b4eff"
 props:
   - name: children
     label: Texto

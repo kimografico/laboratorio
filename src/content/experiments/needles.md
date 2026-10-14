@@ -3,7 +3,6 @@ title: Needles
 description: Agujas que apuntan hacia el puntero y se alargan al acercarse, con giro suave.
 category: backgrounds
 component: NeedleBackground
-accent: "#000000"
 props:
   - name: size
     label: Separación (px)

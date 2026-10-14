@@ -3,7 +3,6 @@ title: Aurora
 description: Manchas de color que flotan en órbitas suaves y huyen del puntero como una aurora.
 category: backgrounds
 component: AuroraBackground
-accent: "#2b4eff"
 props:
   - name: colors
     label: Colores

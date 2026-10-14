@@ -3,7 +3,6 @@ title: Ridges
 description: Cordilleras de líneas que se elevan bajo el puntero; de colinas suaves a montañas con ruido.
 category: backgrounds
 component: RidgeBackground
-accent: "#000000"
 props:
   - name: spacing
     label: Separación (px)

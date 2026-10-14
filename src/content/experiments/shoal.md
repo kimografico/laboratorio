@@ -3,7 +3,6 @@ title: Cardumen
 description: Banco de peces que forma un cardumen y huye del puntero, con profundidad simulada.
 category: backgrounds
 component: ShoalBackground
-accent: "#000000"
 props:
   - name: count
     label: Peces

@@ -3,7 +3,6 @@ title: Matrix Rain
 description: Lluvia de caracteres estilo terminal que también cae alrededor del puntero.
 category: backgrounds
 component: MatrixBackground
-accent: "#3ddc84"
 props:
   - name: size
     label: Celda (px)

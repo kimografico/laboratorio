@@ -3,7 +3,6 @@ title: Network II
 description: Red de puntos conectados con una capa extra de puntos sueltos que flotan sin conectarse y una rejilla espacial para más rendimiento.
 category: backgrounds
 component: NetworkBackground2
-accent: "#000000"
 props:
   - name: density
     label: Conectados

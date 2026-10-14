@@ -3,7 +3,6 @@ title: Tile Spin
 description: Baldosas que se encogen y giran al paso del puntero, cada una con su propio sentido e intensidad.
 category: backgrounds
 component: TileSpinBackground
-accent: "#000000"
 props:
   - name: size
     label: Celda (px)

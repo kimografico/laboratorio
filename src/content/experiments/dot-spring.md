@@ -3,7 +3,6 @@ title: Dot Spring
 description: "Malla de puntos con muelles: el puntero los repele y vuelven a su sitio con rebote."
 category: backgrounds
 component: DotBackground
-accent: "#000000"
 props:
   - name: size
     label: Separación (px)

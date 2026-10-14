@@ -3,7 +3,6 @@ title: Isolíneas
 description: Curvas de nivel (marching squares) sobre un campo de ruido que se abomba bajo el puntero.
 category: backgrounds
 component: ContourBackground
-accent: "#000000"
 props:
   - name: cell
     label: Celda (px)

@@ -18,7 +18,6 @@ interface ExperimentPreviewProps {
   componentId: string;
   propDefs: PropDef[];
   category: string;
-  accent?: string;
   backHref?: string;
   backLabel?: string;
   allowFullscreen?: boolean;
@@ -66,7 +65,6 @@ export default function ExperimentPreview({
   componentId,
   propDefs,
   category,
-  accent,
   backHref = "/",
   backLabel = "Galería",
   allowFullscreen = true,
@@ -183,7 +181,7 @@ export default function ExperimentPreview({
           className="flex w-full items-center justify-between px-4 py-3 text-left"
         >
           <span className="inline-flex items-center gap-2 text-sm font-medium text-fg">
-            <SlidersHorizontal className="h-4 w-4" style={{ color: accent ?? "currentColor" }} />
+            <SlidersHorizontal className="h-4 w-4 text-faint" />
             Controles ({propDefs.length})
           </span>
           <ChevronDown className={`h-4 w-4 text-faint transition ${panelOpen ? "rotate-180" : ""}`} />

@@ -3,7 +3,6 @@ title: Parallax Rings
 description: Anillos a distintas profundidades que se desplazan con el puntero creando paralaje.
 category: backgrounds
 component: RingsBackground
-accent: "#000000"
 props:
   - name: count
     label: Anillos

@@ -12,7 +12,6 @@ const experiments: ExperimentMeta[] = entries
     description: entry.data.description,
     category: entry.data.category,
     component: entry.data.component,
-    accent: entry.data.accent,
     props: entry.data.props,
   }))
   .sort((a, b) => a.title.localeCompare(b.title));

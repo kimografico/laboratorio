@@ -3,7 +3,6 @@ title: Plancton
 description: Partículas a la deriva que brillan y reaccionan a la estela del puntero.
 category: backgrounds
 component: PlanktonBackground
-accent: "#000000"
 props:
   - name: density
     label: Densidad

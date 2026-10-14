@@ -3,7 +3,6 @@ title: Tentacles
 description: Tentáculos que cuelgan y siguen al puntero con ventosas, profundidad y ondulación.
 category: backgrounds
 component: TentacleBackground
-accent: "#000000"
 props:
   - name: near
     label: Cercanos

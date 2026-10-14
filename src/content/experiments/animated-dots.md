@@ -3,7 +3,6 @@ title: Animated Dots
 description: Rejilla de círculos que crecen bajo el puntero y revelan una imagen (o quedan en color sólido).
 category: backgrounds
 component: AnimatedBackground
-accent: "#e0dad5"
 props:
   - name: image
     label: Imagen (URL)

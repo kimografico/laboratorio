@@ -10,7 +10,6 @@ export interface ExperimentMeta {
   description: string;
   category: "backgrounds" | "texts" | string;
   component: string;
-  accent?: string;
   props: PropDef[];
 }
 
@@ -156,13 +155,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
                 )}
               </div>
               <div className="relative z-10 flex flex-1 flex-col gap-2 p-4">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: exp.accent ?? "currentColor" }}
-                  />
-                  <h3 className="text-base font-semibold text-fg">{exp.title}</h3>
-                </div>
+                <h3 className="text-base font-semibold text-fg">{exp.title}</h3>
                 <p className="line-clamp-2 text-sm text-muted">{exp.description}</p>
               </div>
             </a>

@@ -20,7 +20,6 @@ const experiments = defineCollection({
     description: z.string(),
     category: z.enum(["backgrounds", "texts"]),
     component: z.string(),
-    accent: z.string().optional(),
     props: z.array(propSchema).default([]),
   }),
 });
