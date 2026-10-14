@@ -11,6 +11,10 @@ const {
   title = "Laboratorio · Interactive Backgrounds",
   description = "Colección de fondos interactivos y componentes de texto hechos en React, listos para Astro y otros frameworks.",
 } = Astro.props;
+
+const path = Astro.url.pathname;
+const isExperiments = path === "/" || path.startsWith("/experiment");
+const isUi = path.startsWith("/ui");
 ---
 
 <!doctype html>
@@ -31,6 +35,22 @@ const {
             Laboratorio<span class="text-white/40">.components</span>
           </span>
         </a>
+        <nav class="flex items-center gap-1 text-sm">
+          <a
+            href="/"
+            class={`rounded-lg px-3 py-1.5 transition ${
+              isExperiments ? "font-semibold text-white" : "text-white/60 hover:text-white"
+            }`}
+            >Experimentos</a
+          >
+          <a
+            href="/ui"
+            class={`rounded-lg px-3 py-1.5 transition ${
+              isUi ? "font-semibold text-white" : "text-white/60 hover:text-white"
+            }`}
+            >UI</a
+          >
+        </nav>
       </div>
     </header>
 

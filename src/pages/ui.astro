@@ -1,0 +1,46 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ThemeToggle from "../components/ui/ThemeToggle";
+import GridIcon from "../components/ui/icons/GridIcon.astro";
+import AtomIcon from "../components/ui/icons/AtomIcon.astro";
+
+const icons = [
+  { name: "Grid", Icon: GridIcon },
+  { name: "Atom", Icon: AtomIcon },
+];
+---
+
+<Layout
+  title="Piezas de Interfaz · Laboratorio"
+  description="Botones e iconos animados reutilizables del Laboratorio.">
+  <section class="mx-auto max-w-6xl px-5 pb-10 pt-16">
+    <h1 class="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
+      Piezas de Interfaz
+    </h1>
+    <p class="mt-4 max-w-2xl text-base text-white/55">
+      Piezas de interfaz reutilizables, listas para incrustarse en cualquier proyecto React o Astro.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pb-16">
+    <h2 class="text-2xl font-semibold text-white">Botones</h2>
+    <div class="mt-6 grid grid-cols-4 gap-6">
+      <div class="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-[#141416] p-8 text-center">
+        <ThemeToggle client:load />
+        <h3 class="text-base font-semibold text-white">Toggle de tema</h3>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pb-24">
+    <h2 class="text-2xl font-semibold text-white">Iconos</h2>
+    <div class="mt-6 grid grid-cols-6 gap-6">
+      {icons.map(({ name, Icon }) => (
+        <div class="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-[#141416] p-8 text-center text-white">
+          <Icon class="h-12 w-12" />
+          <h3 class="text-base font-semibold text-white">{name}</h3>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
