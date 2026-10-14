@@ -19,9 +19,17 @@ export {
   type DotBackgroundProps,
 } from "../components/backgrounds/DotBackground";
 export {
+  default as FlatCausticsBackground,
+  type FlatCausticsBackgroundProps,
+} from "../components/backgrounds/FlatCausticsBackground";
+export {
   default as FlowBackground,
   type FlowBackgroundProps,
 } from "../components/backgrounds/FlowBackground";
+export {
+  default as KelpBackground,
+  type KelpBackgroundProps,
+} from "../components/backgrounds/KelpBackground";
 export {
   default as MantaBackground,
   type MantaBackgroundProps,
@@ -50,6 +58,10 @@ export {
   default as RingsBackground,
   type RingsBackgroundProps,
 } from "../components/backgrounds/RingsBackground";
+export {
+  default as SeigaihaBackground,
+  type SeigaihaBackgroundProps,
+} from "../components/backgrounds/SeigaihaBackground";
 export {
   default as ShoalBackground,
   type ShoalBackgroundProps,

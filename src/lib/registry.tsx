@@ -4,7 +4,9 @@ import AuroraBackground from "../components/backgrounds/AuroraBackground";
 import CrossBackground from "../components/backgrounds/CrossBackground";
 import ContourBackground from "../components/backgrounds/ContourBackground";
 import DotBackground from "../components/backgrounds/DotBackground";
+import FlatCausticsBackground from "../components/backgrounds/FlatCausticsBackground";
 import FlowBackground from "../components/backgrounds/FlowBackground";
+import KelpBackground from "../components/backgrounds/KelpBackground";
 import MantaBackground from "../components/backgrounds/MantaBackground";
 import MatrixBackground from "../components/backgrounds/MatrixBackground";
 import NeedleBackground from "../components/backgrounds/NeedleBackground";
@@ -12,6 +14,7 @@ import NetworkBackground2 from "../components/backgrounds/NetworkBackground2";
 import PlanktonBackground from "../components/backgrounds/PlanktonBackground";
 import RidgeBackground from "../components/backgrounds/RidgeBackground";
 import RingsBackground from "../components/backgrounds/RingsBackground";
+import SeigaihaBackground from "../components/backgrounds/SeigaihaBackground";
 import ShoalBackground from "../components/backgrounds/ShoalBackground";
 import TentacleBackground from "../components/backgrounds/TentacleBackground";
 import TileBackground from "../components/backgrounds/TileBackground";
@@ -29,7 +32,9 @@ export const registry: Record<string, ComponentType<any>> = {
   CrossBackground,
   ContourBackground,
   DotBackground,
+  FlatCausticsBackground,
   FlowBackground,
+  KelpBackground,
   MantaBackground,
   MatrixBackground,
   NeedleBackground,
@@ -37,6 +42,7 @@ export const registry: Record<string, ComponentType<any>> = {
   PlanktonBackground,
   RidgeBackground,
   RingsBackground,
+  SeigaihaBackground,
   ShoalBackground,
   TentacleBackground,
   TileBackground,
