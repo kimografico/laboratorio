@@ -2,14 +2,17 @@ import type { ComponentType } from "react";
 import AnimatedBackground from "../components/backgrounds/AnimatedBackground";
 import AuroraBackground from "../components/backgrounds/AuroraBackground";
 import CrossBackground from "../components/backgrounds/CrossBackground";
+import ContourBackground from "../components/backgrounds/ContourBackground";
 import DotBackground from "../components/backgrounds/DotBackground";
 import FlowBackground from "../components/backgrounds/FlowBackground";
 import MantaBackground from "../components/backgrounds/MantaBackground";
 import MatrixBackground from "../components/backgrounds/MatrixBackground";
 import NeedleBackground from "../components/backgrounds/NeedleBackground";
 import NetworkBackground2 from "../components/backgrounds/NetworkBackground2";
+import PlanktonBackground from "../components/backgrounds/PlanktonBackground";
 import RidgeBackground from "../components/backgrounds/RidgeBackground";
 import RingsBackground from "../components/backgrounds/RingsBackground";
+import ShoalBackground from "../components/backgrounds/ShoalBackground";
 import TentacleBackground from "../components/backgrounds/TentacleBackground";
 import TileBackground from "../components/backgrounds/TileBackground";
 import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
@@ -24,14 +27,17 @@ export const registry: Record<string, ComponentType<any>> = {
   AnimatedBackground,
   AuroraBackground,
   CrossBackground,
+  ContourBackground,
   DotBackground,
   FlowBackground,
   MantaBackground,
   MatrixBackground,
   NeedleBackground,
   NetworkBackground2,
+  PlanktonBackground,
   RidgeBackground,
   RingsBackground,
+  ShoalBackground,
   TentacleBackground,
   TileBackground,
   TileSpinBackground,
