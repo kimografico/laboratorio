@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import AtomIcon from "../components/ui/icons/AtomIcon.astro";
 import ThemeToggle from "../components/ui/ThemeToggle";
+import { base, withBase } from "../lib/base";
 
 interface Props {
   title?: string;
@@ -13,7 +14,7 @@ const {
   description = "Colección de fondos interactivos y componentes de texto hechos en React, listos para Astro y otros frameworks.",
 } = Astro.props;
 
-const path = Astro.url.pathname;
+const path = Astro.url.pathname.slice(base.length) || "/";
 const isExperiments = path === "/" || path.startsWith("/experiment");
 const isUi = path.startsWith("/ui");
 ---
@@ -41,7 +42,7 @@ const isUi = path.startsWith("/ui");
   <body>
     <header class="border-b border-line">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-        <a href="/" class="group inline-flex items-center gap-2.5">
+        <a href={withBase("/")} class="group inline-flex items-center gap-2.5">
           <AtomIcon class="h-8 w-8 text-fg" />
           <span class="text-sm font-semibold tracking-tight text-fg">
             Laboratorio<span class="text-faint">.components</span>
@@ -50,14 +51,14 @@ const isUi = path.startsWith("/ui");
         <div class="flex items-center gap-4">
           <nav class="flex items-center gap-1 text-sm">
             <a
-              href="/"
+              href={withBase("/")}
               class={`rounded-lg px-3 py-1.5 transition ${
                 isExperiments ? "font-semibold text-fg" : "text-muted hover:text-fg"
               }`}
               >Experimentos</a
             >
             <a
-              href="/ui"
+              href={withBase("/ui")}
               class={`rounded-lg px-3 py-1.5 transition ${
                 isUi ? "font-semibold text-fg" : "text-muted hover:text-fg"
               }`}

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Stage from "./Stage";
 import { defaultsFromProps, type PropDef, type PropValues } from "../../lib/props";
+import { withBase } from "../../lib/base";
 
 interface ExperimentPreviewProps {
   componentId: string;
@@ -138,7 +139,7 @@ export default function ExperimentPreview({
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <a
-          href={backHref}
+          href={withBase(backHref)}
           className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-fg"
         >
           <ArrowLeft className="h-4 w-4" /> {backLabel}

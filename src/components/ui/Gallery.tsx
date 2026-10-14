@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
 import { defaultsFromProps, type PropDef } from "../../lib/props";
+import { withBase } from "../../lib/base";
 
 export interface ExperimentMeta {
   id: string;
@@ -143,7 +144,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
           {filtered.map((exp) => (
             <a
               key={exp.id}
-              href={`${basePath}/${exp.id}`}
+              href={withBase(`${basePath}/${exp.id}`)}
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-2xl hover:shadow-black/40"
             >
               <div className="relative h-44 w-full overflow-hidden border-b border-line">
