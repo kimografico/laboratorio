@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 type Size = "xs" | "sm" | "md" | "lg";
+type Shape = "circle" | "rounded" | "squared";
 
 interface ThemeToggleProps {
   size?: Size;
   variant?: "toggle" | "solid" | "mini" | "solid-mini";
+  /** Forma del botón en los modos mini */
+  shape?: Shape;
   /** Si es true, cambia el tema del sitio. Por defecto es solo visual (galería). */
   interactive?: boolean;
 }
@@ -24,9 +27,16 @@ const MINI: Record<Size, { box: string; icon: string }> = {
   lg: { box: "h-12 w-12", icon: "h-6 w-6" },
 };
 
+const RADIUS: Record<Shape, string> = {
+  circle: "rounded-full",
+  rounded: "rounded-xl",
+  squared: "rounded-none",
+};
+
 export default function ThemeToggle({
   size = "md",
   variant = "toggle",
+  shape = "circle",
   interactive = false,
 }: ThemeToggleProps) {
   const [light, setLight] = useState(false);
@@ -55,7 +65,7 @@ export default function ThemeToggle({
         type="button"
         aria-label="Cambiar tema claro/oscuro"
         onClick={toggle}
-        className={`inline-flex items-center justify-center rounded-full border border-line-strong bg-subtle-strong text-fg transition-colors hover:border-fg/40 ${s.box}`}
+        className={`inline-flex items-center justify-center ${RADIUS[shape]} border border-line-strong bg-subtle-strong text-fg transition-colors hover:border-fg/40 ${s.box}`}
       >
         {light ? (
           <Sun className={s.icon} fill={fill} />

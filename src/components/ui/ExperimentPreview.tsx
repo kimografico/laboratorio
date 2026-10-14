@@ -126,7 +126,7 @@ export default function ExperimentPreview({
         </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-panel p-8 text-center">
-          <div className={isText ? "text-3xl sm:text-5xl" : ""}>
+          <div className={isText ? "text-3xl sm:text-5xl" : "w-full"}>
             <Stage componentId={componentId} values={values} themed={themed} />
           </div>
         </div>

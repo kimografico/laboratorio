@@ -70,7 +70,9 @@ function LazyPreview({
                 <Stage componentId={componentId} values={values} themed={themed} />
               </div>
             ) : (
-              <Stage componentId={componentId} values={values} themed={themed} />
+              <div className="w-full">
+                <Stage componentId={componentId} values={values} themed={themed} />
+              </div>
             )}
           </div>
         ))}

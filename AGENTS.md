@@ -14,7 +14,7 @@ Showcase de **fondos interactivos y efectos de texto** en React, servido con Ast
 - `src/components/backgrounds/*.tsx` — experimentos de fondo (React, canvas).
 - `src/components/texts/*.tsx` — experimentos de texto (React).
 - `src/components/ui/` — UI de la galería (`Gallery`, `ExperimentPreview`, `Stage`) y piezas
-  de interfaz (`Button`, `IconButton`, `ThemeToggle`).
+  de interfaz (`Button`, `ThemeToggle`).
 - `src/components/ui/icons/*.astro` — iconos animados reutilizables.
 - `src/content/experiments/*.md` — metadatos de cada experimento (frontmatter + uso).
 - `src/content/ui/*.md` — metadatos de cada pieza de interfaz (frontmatter + uso).
