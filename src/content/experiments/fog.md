@@ -1,15 +1,15 @@
 ---
 title: "Fog"
 description: "Vaho interactivo que se disipa con el puntero y deja gotas que resbalan."
-category: backgrounds
+category: pendiente
 component: FogBackground
 props:
   - name: cell
     label: "Celda"
     type: number
-    default: 6
-    min: 2
-    max: 20
+    default: 1
+    min: 1
+    max: 2
     step: 1
   - name: radius
     label: "Radio de limpieza"
@@ -42,7 +42,7 @@ props:
   - name: color
     label: "Color del vaho"
     type: color
-    default: "#f4f1ee"
+    default: "#282828"
   - name: background
     label: "Fondo"
     type: color
@@ -53,13 +53,13 @@ props:
 El vaho se disipa alrededor del puntero y vuelve a crecer con el tiempo. `cell` controla la resolución del campo (valores más altos lo hacen más rápido y menos definido). `radius` ajusta la zona de limpieza, `regrow` la velocidad con la que se regenera, `drips` la frecuencia de gotas que resbalan dejando un rastro y `opacity` la densidad del velo.
 
 ```tsx
-<FogBackground
-  cell={6}
-  radius={70}
-  regrow={0.003}
-  drips={0.5}
+< FogBackground
+  cell={1}
+  radius={45}
+  regrow={0.004}
+  drips={2}
   opacity={0.85}
-  color="#f4f1ee"
+  color="#282828"
   background="#e0dad5"
 />
 ```

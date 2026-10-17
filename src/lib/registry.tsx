@@ -6,9 +6,7 @@ import BubbleBackground from "../components/backgrounds/BubbleBackground";
 import ChladniBackground from "../components/backgrounds/ChladniBackground";
 import CircuitBackground from "../components/backgrounds/CircuitBackground";
 import ClothBackground from "../components/backgrounds/ClothBackground";
-import ContourBackground from "../components/backgrounds/ContourBackground";
 import Contour2Background from "../components/backgrounds/Contour2Background";
-import Contour3Background from "../components/backgrounds/Contour3Background";
 import CoralBackground from "../components/backgrounds/CoralBackground";
 import CrossBackground from "../components/backgrounds/CrossBackground";
 import DandelionBackground from "../components/backgrounds/DandelionBackground";
@@ -17,23 +15,25 @@ import DotBackground from "../components/backgrounds/DotBackground";
 import FacetBackground from "../components/backgrounds/FacetBackground";
 import FieldLinesBackground from "../components/backgrounds/FieldLinesBackground";
 import FirefliesBackground from "../components/backgrounds/FirefliesBackground";
+import FireworksBackground from "../components/backgrounds/FireworksBackground";
 import FlatCausticsBackground from "../components/backgrounds/FlatCausticsBackground";
 import FlowBackground from "../components/backgrounds/FlowBackground";
 import FogBackground from "../components/backgrounds/FogBackground";
+import GalaxyBackground from "../components/backgrounds/GalaxyBackground";
 import GlobeBackground from "../components/backgrounds/GlobeBackground";
+import HexPulseBackground from "../components/backgrounds/HexPulseBackground";
 import IsoBackground from "../components/backgrounds/IsoBackground";
 import JellyBackground from "../components/backgrounds/JellyBackground";
+import KaleidoscopeBackground from "../components/backgrounds/KaleidoscopeBackground";
 import KelpBackground from "../components/backgrounds/KelpBackground";
 import KoiBackground from "../components/backgrounds/KoiBackground";
-import KoiBackgroundII from "../components/backgrounds/KoiBackgroundII";
 import LavaLampBackground from "../components/backgrounds/LavaLampBackground";
 import LeavesBackground from "../components/backgrounds/LeavesBackground";
 import LifeBackground from "../components/backgrounds/LifeBackground";
 import LilyBackground from "../components/backgrounds/LilyBackground";
-import LissajousBackground from "../components/backgrounds/LissajousBackground";
 import MantaBackground from "../components/backgrounds/MantaBackground";
+import MarblesBackground from "../components/backgrounds/MarblesBackground";
 import MatrixBackground from "../components/backgrounds/MatrixBackground";
-import MoireBackground from "../components/backgrounds/MoireBackground";
 import NeedleBackground from "../components/backgrounds/NeedleBackground";
 import NetworkBackground2 from "../components/backgrounds/NetworkBackground2";
 import OrbitBackground from "../components/backgrounds/OrbitBackground";
@@ -43,13 +43,14 @@ import PlanetsBackground from "../components/backgrounds/PlanetsBackground";
 import PlanetsOrbitsBackground from "../components/backgrounds/PlanetsOrbitsBackground";
 import PlanktonBackground from "../components/backgrounds/PlanktonBackground";
 import PlasmaBackground from "../components/backgrounds/PlasmaBackground";
-import RaysBackground from "../components/backgrounds/RaysBackground";
+import RainRipplesBackground from "../components/backgrounds/RainRipplesBackground";
 import RidgeBackground from "../components/backgrounds/RidgeBackground";
 import RingsBackground from "../components/backgrounds/RingsBackground";
 import SandBackground from "../components/backgrounds/SandBackground";
 import SandDotsBackground from "../components/backgrounds/SandDotsBackground";
 import SeigaihaBackground from "../components/backgrounds/SeigaihaBackground";
 import ShoalBackground from "../components/backgrounds/ShoalBackground";
+import SnowflakeBackground from "../components/backgrounds/SnowflakeBackground";
 import StarfishBackground from "../components/backgrounds/StarfishBackground";
 import StringArtBackground from "../components/backgrounds/StringArtBackground";
 import StringsBackground from "../components/backgrounds/StringsBackground";
@@ -81,9 +82,7 @@ export const registry: Record<string, ComponentType<any>> = {
   CircuitBackground,
   ClothBackground,
   CrossBackground,
-  ContourBackground,
   Contour2Background,
-  Contour3Background,
   CoralBackground,
   DandelionBackground,
   DitherBackground,
@@ -91,23 +90,25 @@ export const registry: Record<string, ComponentType<any>> = {
   FacetBackground,
   FieldLinesBackground,
   FirefliesBackground,
+  FireworksBackground,
   FlatCausticsBackground,
   FlowBackground,
   FogBackground,
+  GalaxyBackground,
   GlobeBackground,
+  HexPulseBackground,
   IsoBackground,
   JellyBackground,
+  KaleidoscopeBackground,
   KelpBackground,
   KoiBackground,
-  KoiBackgroundII,
   LavaLampBackground,
   LeavesBackground,
   LifeBackground,
   LilyBackground,
-  LissajousBackground,
   MantaBackground,
+  MarblesBackground,
   MatrixBackground,
-  MoireBackground,
   NeedleBackground,
   NetworkBackground2,
   OrbitBackground,
@@ -117,13 +118,14 @@ export const registry: Record<string, ComponentType<any>> = {
   PlanetsOrbitsBackground,
   PlanktonBackground,
   PlasmaBackground,
-  RaysBackground,
+  RainRipplesBackground,
   RidgeBackground,
   RingsBackground,
   SandBackground,
   SandDotsBackground,
   SeigaihaBackground,
   ShoalBackground,
+  SnowflakeBackground,
   StarfishBackground,
   StringArtBackground,
   StringsBackground,

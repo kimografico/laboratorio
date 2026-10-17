@@ -32,11 +32,11 @@ type Dot = {
 };
 
 export default function DotBackground({
-  size = 28,
-  radius = 1.5,
+  size = 18,
+  radius = 1,
   proximity = 160,
-  push = 22,
-  stiffness = 0.04,
+  push = 30,
+  stiffness = 0.05,
   damping = 0.85,
   color = "rgba(0, 0, 0, 0.2)",
   background = "#e0dad5",

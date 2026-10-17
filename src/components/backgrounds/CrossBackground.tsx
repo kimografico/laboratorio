@@ -22,11 +22,11 @@ export interface CrossBackgroundProps {
 type Cross = { x: number; y: number; angle: number; extra: number; targetAngle: number; targetExtra: number };
 
 export default function CrossBackground({
-  size = 32,
+  size = 39,
   arm = 6,
   growth = 8,
   proximity = 180,
-  rotation = 90,
+  rotation = 120,
   ease = 0.05,
   lineWidth = 1.5,
   color = "rgba(0, 0, 0, 0.2)",

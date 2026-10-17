@@ -19,11 +19,11 @@ export interface TruchetBackgroundProps {
 }
 
 export default function TruchetBackground({
-  size = 56,
-  band = 0.15,
+  size = 12,
+  band = 0.17,
   radius = 130,
-  heal = 0.96,
-  idle = 3,
+  heal = 0.8,
+  idle = 17,
   alpha = 0.26,
   color,
   className,

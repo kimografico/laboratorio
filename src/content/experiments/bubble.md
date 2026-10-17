@@ -1,27 +1,27 @@
 ---
 title: Burbujas
 description: Burbujas que ascienden con vaivén, se apartan del puntero y reventón al tocarlas.
-category: backgrounds
+category: pendiente
 component: BubbleBackground
 props:
   - name: count
     label: Número de burbujas
     type: number
-    default: 26
+    default: 70
     min: 0
     max: 80
     step: 1
   - name: size
     label: Radio medio (px)
     type: number
-    default: 22
+    default: 28
     min: 4
     max: 80
     step: 1
   - name: rise
     label: Ascenso
     type: number
-    default: 0.45
+    default: 0.75
     min: 0
     max: 2
     step: 0.05
@@ -59,5 +59,5 @@ props:
 Por defecto no dibuja fondo y hereda el color de la página (`currentColor`). Opcionalmente fija `color` o define `--bubble-color` y `--bubble-opacity` en CSS.
 
 ```tsx
-<BubbleBackground count={26} size={22} rise={0.45} reach={60} pop={true} alpha={0.3} lineWidth={1.2} />
+<BubbleBackground count={70} size={28} rise={0.75} reach={60} pop={true} alpha={0.3} lineWidth={1.2} />
 ```

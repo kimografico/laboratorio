@@ -11,7 +11,7 @@ props:
   - name: size
     label: Tamaño de mancha
     type: number
-    default: 0.55
+    default: 0.75
     min: 0.1
     max: 1.5
     step: 0.05
@@ -25,14 +25,14 @@ props:
   - name: ease
     label: Suavizado
     type: number
-    default: 0.012
+    default: 0.05
     min: 0.002
     max: 0.08
     step: 0.002
   - name: avoid
     label: Huida del puntero
     type: number
-    default: 0.8
+    default: 1
     min: 0
     max: 2
     step: 0.1
@@ -47,5 +47,5 @@ props:
 Cada color genera una mancha que sigue su propia órbita. Cuanto más bajo `ease`, más larga la estela entre manchas.
 
 ```tsx
-<AuroraBackground colors={["#ee3d3d", "#f5a623", "#2b4eff"]} size={0.55} avoid={0.8} />
+<AuroraBackground colors={["#ee3d3d", "#f5a623", "#2b4eff"]} size={0.75} avoid={1} />
 ```

@@ -1,7 +1,7 @@
 ---
 title: Globo
 description: Esfera de alambre en wireframe que gira sola y se abomba hacia el puntero.
-category: backgrounds
+category: pendiente
 component: GlobeBackground
 props:
   - name: lat

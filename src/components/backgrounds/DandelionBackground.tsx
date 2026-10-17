@@ -33,11 +33,11 @@ type Seed = {
 };
 
 export default function DandelionBackground({
-  near = 22,
-  far = 16,
+  near = 35,
+  far = 29,
   size = 30,
   wind = 1,
-  gust = 1,
+  gust = 0.5,
   alpha = 0.34,
   lineWidth = 1,
   color,
@@ -115,7 +115,8 @@ export default function DandelionBackground({
         const d = Math.hypot(dx, dy) || 1;
         const R = 170 + s.L;
         if (d < R) {
-          const f = Math.pow(1 - d / R, 1.5) * gust;
+          const g = gust * (s.far ? 0.5 : 1);
+          const f = Math.pow(1 - d / R, 1.5) * g;
           s.vx += pvx * f * 0.05 + (dx / d) * f * 0.12;
           s.vy += pvy * f * 0.05 + (dy / d) * f * 0.12;
           s.av += ((dx * pvy - dy * pvx) / (d * R)) * f * 0.02;

@@ -7,42 +7,42 @@ props:
   - name: strings
     label: Cuerdas
     type: number
-    default: 36
+    default: 40
     min: 4
     max: 100
     step: 1
   - name: tension
     label: Tensión
     type: number
-    default: 0.18
+    default: 0.15
     min: 0.05
     max: 0.25
     step: 0.01
   - name: decay
     label: Amortiguación
     type: number
-    default: 0.985
+    default: 0.95
     min: 0.9
     max: 0.999
     step: 0.005
   - name: pluck
     label: Pulsado
     type: number
-    default: 14
+    default: 30
     min: 0
     max: 60
     step: 1
   - name: ambient
     label: Vibración ambiente
     type: number
-    default: 0.6
+    default: 4
     min: 0
     max: 5
     step: 0.1
   - name: segment
     label: Segmentos
     type: number
-    default: 10
+    default: 15
     min: 4
     max: 40
     step: 1
@@ -68,5 +68,5 @@ props:
 Cada cuerda es una cadena de segmentos con tensión (`tension`), amortiguación (`decay`) y un lazo de afinación que la devuelve a su línea recta; el puntero la desplaza al pasar (`pluck`) y `ambient` mantiene una vibración mínima para que nunca queden totalmente quietas.
 
 ```tsx
-<StringsBackground strings={36} tension={0.18} decay={0.985} pluck={14} segment={10} />
+<StringsBackground strings={40} tension={0.15} decay={0.95} pluck={30} ambient={4} segment={15} />
 ```

@@ -7,14 +7,14 @@ props:
   - name: size
     label: Separación (px)
     type: number
-    default: 28
+    default: 18
     min: 12
     max: 80
     step: 1
   - name: radius
     label: Radio base (px)
     type: number
-    default: 1.5
+    default: 1
     min: 0.5
     max: 8
     step: 0.5
@@ -28,14 +28,14 @@ props:
   - name: push
     label: Empuje (px)
     type: number
-    default: 22
+    default: 30
     min: 0
     max: 80
     step: 1
   - name: stiffness
     label: Rigidez
     type: number
-    default: 0.04
+    default: 0.05
     min: 0.005
     max: 0.2
     step: 0.005
@@ -61,5 +61,5 @@ props:
 `stiffness` controla la velocidad de retorno y `damping` el rebote: cerca de 0.99 rebota mucho.
 
 ```tsx
-<DotBackground size={28} push={22} stiffness={0.04} damping={0.85} />
+<DotBackground size={18} radius={1} proximity={160} push={30} stiffness={0.05} damping={0.85} />
 ```

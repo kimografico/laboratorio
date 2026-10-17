@@ -20,12 +20,12 @@ export interface StringsBackgroundProps {
 }
 
 export default function StringsBackground({
-  strings = 36,
-  tension = 0.18,
-  decay = 0.985,
-  pluck = 14,
-  ambient = 0.6,
-  segment = 10,
+  strings = 40,
+  tension = 0.15,
+  decay = 0.95,
+  pluck = 30,
+  ambient = 4,
+  segment = 15,
   lineWidth = 1,
   color = "rgba(0, 0, 0, 0.3)",
   background = "#e0dad5",

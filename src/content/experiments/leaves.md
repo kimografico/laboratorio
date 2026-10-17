@@ -1,7 +1,7 @@
 ---
 title: Leaves
 description: Ramas que entran desde los bordes con hojas que aletean con el viento y se apartan del puntero.
-category: backgrounds
+category: pendiente
 component: LeavesBackground
 props:
   - name: near

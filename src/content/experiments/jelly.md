@@ -1,7 +1,7 @@
 ---
 title: Medusas
 description: Medusas que ascienden a impulsos con la campana contrayéndose, tentáculos colgantes y profundidad.
-category: backgrounds
+category: pendiente
 component: JellyBackground
 props:
   - name: near

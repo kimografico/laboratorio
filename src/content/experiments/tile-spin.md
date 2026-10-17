@@ -1,7 +1,7 @@
 ---
 title: Tile Spin
 description: Baldosas que se encogen y giran al paso del puntero, cada una con su propio sentido e intensidad.
-category: backgrounds
+category: pendiente
 component: TileSpinBackground
 props:
   - name: size

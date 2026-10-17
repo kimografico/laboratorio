@@ -1,9 +1,34 @@
 import type { CSSProperties } from "react";
-import { ArrowRight, Check, Download, Heart, Plus, Search, type LucideIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Copy,
+  Download,
+  Heart,
+  Maximize2,
+  Minimize2,
+  Plus,
+  RotateCcw,
+  Search,
+  type LucideIcon,
+} from "lucide-react";
 
 type Size = "xs" | "sm" | "md" | "lg";
 type Variant = "solid" | "outline" | "ghost";
-type IconName = "none" | "arrow-right" | "plus" | "check" | "download" | "search" | "heart";
+type IconName =
+  | "none"
+  | "arrow-left"
+  | "arrow-right"
+  | "plus"
+  | "check"
+  | "download"
+  | "search"
+  | "heart"
+  | "rotate-ccw"
+  | "maximize"
+  | "minimize"
+  | "copy";
 
 export interface ButtonProps {
   /** Texto del botón (ignorado en modo solo icono) */
@@ -14,23 +39,32 @@ export interface ButtonProps {
   iconPosition?: "left" | "right";
   /** Renderiza solo el icono, sin texto */
   iconOnly?: boolean;
-  /** Forma en modo solo icono */
+  /** Forma del botón (borde redondeado, pill o cuadrado) */
   shape?: "circle" | "rounded" | "squared";
+  /** Distintivo numérico o de texto que se muestra junto a la etiqueta */
+  badge?: string | number;
   fullWidth?: boolean;
   /** Color personalizado (hex). Vacío = usa los tokens del tema */
   color?: string;
   disabled?: boolean;
   className?: string;
+  /** Si se define, el botón se renderiza como enlace (`<a>`) */
+  href?: string;
   onClick?: () => void;
 }
 
 const ICONS: Record<string, LucideIcon> = {
+  "arrow-left": ArrowLeft,
   "arrow-right": ArrowRight,
   plus: Plus,
   check: Check,
   download: Download,
   search: Search,
   heart: Heart,
+  "rotate-ccw": RotateCcw,
+  maximize: Maximize2,
+  minimize: Minimize2,
+  copy: Copy,
 };
 
 const TEXT_SIZE: Record<Size, string> = {
@@ -75,6 +109,18 @@ const CUSTOM_VARIANTS: Record<Variant, string> = {
   ghost: "text-[color:var(--btn)] enabled:hover:bg-[color:var(--btn-soft)]",
 };
 
+const BADGE: Record<Variant, string> = {
+  solid: "bg-surface/20 text-surface/70",
+  outline: "bg-subtle-strong text-faint",
+  ghost: "bg-subtle-strong text-faint",
+};
+
+const CUSTOM_BADGE: Record<Variant, string> = {
+  solid: "bg-[color:var(--btn-on)]/20 text-[color:var(--btn-on)]/70",
+  outline: "bg-[color:var(--btn-soft)] text-[color:var(--btn)]",
+  ghost: "bg-[color:var(--btn-soft)] text-[color:var(--btn)]",
+};
+
 const RADIUS: Record<NonNullable<ButtonProps["shape"]>, string> = {
   circle: "rounded-full",
   rounded: "rounded-xl",
@@ -105,10 +151,12 @@ export default function Button({
   iconPosition = "right",
   iconOnly = false,
   shape = "circle",
+  badge,
   fullWidth = false,
   color = "",
   disabled = false,
   className,
+  href,
   onClick,
 }: ButtonProps) {
   const rgb = parseHex(color);
@@ -129,11 +177,55 @@ export default function Button({
     : {};
 
   const variantClass = custom ? CUSTOM_VARIANTS[variant] : THEMED_VARIANTS[variant];
-  const radius = iconOnly ? RADIUS[shape] : "rounded-full";
+  const radius = RADIUS[shape];
   const sizing = iconOnly ? ICON_BOX[size] : TEXT_SIZE[size];
   const interaction =
     "px-[var(--pad-x)] py-[var(--pad-y)] " +
     "enabled:active:px-[calc(var(--pad-x)_-_1px)] enabled:active:py-[calc(var(--pad-y)_-_1px)] enabled:active:m-[1px]";
+
+  const baseClasses = [
+    "inline-flex items-center justify-center font-medium transition",
+    radius,
+    sizing,
+    fullWidth ? "w-full" : "",
+    className ?? "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const badgeNode =
+    badge !== undefined && badge !== null && badge !== "" ? (
+      <span
+        className={`rounded-full px-1.5 text-xs ${custom ? CUSTOM_BADGE[variant] : BADGE[variant]}`}
+      >
+        {badge}
+      </span>
+    ) : null;
+
+  const content =
+    iconOnly ?
+      Icon && <Icon className={glyph} />
+    : <>
+        {Icon && iconPosition === "left" && <Icon className={glyph} />}
+        <span>{label}</span>
+        {badgeNode}
+        {Icon && iconPosition === "right" && <Icon className={glyph} />}
+      </>;
+
+  if (href !== undefined && !disabled) {
+    const linkHover = variantClass.split("enabled:").join("");
+    const linkInteraction = interaction.split("enabled:").join("");
+    return (
+      <a
+        href={href}
+        aria-label={iconOnly ? label || icon : undefined}
+        style={style}
+        className={[baseClasses, linkInteraction, linkHover].filter(Boolean).join(" ")}
+      >
+        {content}
+      </a>
+    );
+  }
 
   return (
     <button
@@ -143,26 +235,15 @@ export default function Button({
       aria-label={iconOnly ? label || icon : undefined}
       style={style}
       className={[
-        "inline-flex items-center justify-center font-medium transition",
+        baseClasses,
         "disabled:cursor-not-allowed disabled:opacity-40 disabled:transition-none",
-        radius,
-        sizing,
         interaction,
         variantClass,
-        fullWidth ? "w-full" : "",
-        className ?? "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      {iconOnly ?
-        Icon && <Icon className={glyph} />
-      : <>
-          {Icon && iconPosition === "left" && <Icon className={glyph} />}
-          <span>{label}</span>
-          {Icon && iconPosition === "right" && <Icon className={glyph} />}
-        </>
-      }
+      {content}
     </button>
   );
 }

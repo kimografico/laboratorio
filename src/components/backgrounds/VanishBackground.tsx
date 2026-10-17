@@ -18,10 +18,10 @@ export interface VanishBackgroundProps {
 }
 
 export default function VanishBackground({
-  count = 180,
-  speed = 0.0003,
-  focal = 0.4,
-  streak = 6,
+  count = 600,
+  speed = 0.0006,
+  focal = 0.25,
+  streak = 2,
   ease = 0.05,
   lineWidth = 1,
   color = "rgba(0, 0, 0, 0.55)",

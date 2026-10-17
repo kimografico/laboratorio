@@ -1,7 +1,7 @@
 ---
 title: Órbitas
 description: Partículas que orbitan un centro de gravedad que sigue al puntero, con estelas que se desvanecen.
-category: backgrounds
+category: pendiente
 component: OrbitBackground
 props:
   - name: count

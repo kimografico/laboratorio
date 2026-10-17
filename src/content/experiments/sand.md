@@ -7,21 +7,21 @@ props:
   - name: spacing
     label: Separación (px)
     type: number
-    default: 14
+    default: 10
     min: 6
     max: 40
     step: 1
   - name: ripples
     label: Ondulación (px)
     type: number
-    default: 4
+    default: 15
     min: 0
     max: 20
     step: 1
   - name: rake
     label: Rastrillo
     type: number
-    default: 1
+    default: 0.5
     min: 0
     max: 2
     step: 0.1
@@ -42,7 +42,7 @@ props:
   - name: stones
     label: Piedras
     type: number
-    default: 3
+    default: 2
     min: 0
     max: 12
     step: 1
@@ -67,5 +67,5 @@ props:
 `spacing` y `ripples` dibujan las líneas base; `rake`, `radius` y `heal` gobiernan el surco que deja el puntero (fuerza, anchura y velocidad de cicatrización), mientras `stones` reparte las piedras que las líneas rodean. No lleva `background`: hereda el color del CSS de la página y se puede ajustar con `--sand-color` y `--sand-opacity` (o con la prop `color`).
 
 ```tsx
-<SandBackground spacing={14} ripples={4} rake={1} heal={0.985} stones={3} />
+<SandBackground spacing={10} ripples={15} rake={0.5} heal={0.985} stones={2} />
 ```

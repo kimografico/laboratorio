@@ -1,7 +1,7 @@
 ---
 title: Tortugas
 description: Tortugas que nadan en dos planos de profundidad, huyen del puntero y salen a romper la superficie.
-category: backgrounds
+category: pendiente
 component: TurtleBackground
 props:
   - name: near

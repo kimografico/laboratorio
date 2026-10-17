@@ -20,11 +20,11 @@ export interface StringArtBackgroundProps {
 }
 
 export default function StringArtBackground({
-  points = 220,
-  circles = 2,
-  radius = 0.62,
+  points = 250,
+  circles = 3,
+  radius = 0.9,
   speed = 1,
-  follow = 1,
+  follow = 0.5,
   alpha = 0.07,
   lineWidth = 1,
   color,

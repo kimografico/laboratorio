@@ -42,13 +42,13 @@ const UP = -Math.PI / 2;
 const diff = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 
 export default function KelpBackground({
-  near = 14,
-  far = 10,
-  length = 0.5,
-  width = 16,
-  segments = 24,
-  current = 1,
-  avoid = 150,
+  near = 16,
+  far = 27,
+  length = 0.85,
+  width = 25,
+  segments = 45,
+  current = 1.3,
+  avoid = 180,
   alpha = 0.28,
   lineWidth = 1.1,
   color,

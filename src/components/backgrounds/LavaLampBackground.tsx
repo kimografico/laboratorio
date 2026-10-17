@@ -7,14 +7,12 @@ export interface LavaLampBackgroundProps {
   size?: number;
   /** Velocidad del tiempo */
   speed?: number;
-  /** Cuánto calienta el puntero a las burbujas cercanas (0 = nada): las calentadas suben */
+  /** Cuánto calienta el puntero a las burbujas cercanas (0 = nada). Mantén pulsado para triplicar el calor */
   heat?: number;
   /** Suavidad del borde de la cera (0.01 = nítido, 0.2 = difuso) */
   softness?: number;
   /** Intensidad del halo tenue alrededor de la cera (0-0.6) */
   glow?: number;
-  /** Píxeles por muestra del cálculo: más alto, más rápido pero menos definido */
-  scale?: number;
   /** Charcos de cera fijos abajo y arriba, de los que se desprenden las burbujas */
   pool?: boolean;
   /** Opacidad de la cera (0-1) */
@@ -41,17 +39,16 @@ function parseColor(color: string): [number, number, number] {
 }
 
 export default function LavaLampBackground({
-  count = 8,
-  size = 0.11,
-  speed = 1,
-  heat = 1,
-  softness = 0.05,
+  count = 12,
+  size = 0.09,
+  speed = 3,
+  heat = 5,
+  softness = 0.01,
   glow = 0.18,
-  scale = 4,
   pool = true,
-  opacity = 0.75,
-  color = "#e8643c",
-  core = "#f7b267",
+  opacity = 0.15,
+  color = "#ffffff",
+  core = "#ffffff",
   background = "#e0dad5",
   className,
 }: LavaLampBackgroundProps) {
@@ -79,6 +76,7 @@ export default function LavaLampBackground({
     let tx = OFF;
     let ty = OFF;
     let last = -1;
+    let pressed = false;
     let blobs: Blob[] = [];
     let raf = 0;
 
@@ -100,8 +98,8 @@ export default function LavaLampBackground({
       height = canvas.clientHeight;
       canvas.width = width;
       canvas.height = height;
-      off.width = Math.max(1, Math.ceil(width / scale));
-      off.height = Math.max(1, Math.ceil(height / scale));
+      off.width = Math.max(1, width);
+      off.height = Math.max(1, height);
       build();
     }
 
@@ -117,17 +115,15 @@ export default function LavaLampBackground({
 
     // Dibuja una burbuja como degradado radial que aproxima el campo 1/d² de una metabola
     function splat(x: number, y: number, r: number) {
-      const R = (r * 1.9) / scale;
-      const gx = x / scale;
-      const gy = y / scale;
-      const g = octx!.createRadialGradient(gx, gy, 0, gx, gy, R);
+      const R = r * 1.9;
+      const g = octx!.createRadialGradient(x, y, 0, x, y, R);
       g.addColorStop(0, "rgba(255,255,255,1)");
       g.addColorStop(0.35, "rgba(255,255,255,0.75)");
       g.addColorStop(0.6, "rgba(255,255,255,0.38)");
       g.addColorStop(0.8, "rgba(255,255,255,0.12)");
       g.addColorStop(1, "rgba(255,255,255,0)");
       octx!.fillStyle = g;
-      octx!.fillRect(gx - R, gy - R, R * 2, R * 2);
+      octx!.fillRect(x - R, y - R, R * 2, R * 2);
     }
 
     function animate(time: number) {
@@ -151,7 +147,8 @@ export default function LavaLampBackground({
 
         if (px !== OFF && heat > 0) {
           const d = Math.hypot(b.x - px, b.y - py);
-          if (d < reach) b.temp += heat * 0.03 * (1 - d / reach) * dt;
+          const h = pressed ? heat * 3 : heat;
+          if (d < reach) b.temp += h * 0.03 * (1 - d / reach) * dt;
         }
         b.temp = Math.max(-1, Math.min(1, b.temp));
 
@@ -182,14 +179,31 @@ export default function LavaLampBackground({
       for (const b of blobs) splat(b.x, b.y, b.r);
 
       if (pool) {
-        const R = m * 0.22;
-        for (let i = 0; i < 3; i++) {
-          splat(
-            width * (0.2 + 0.3 * i) + Math.sin(time * 0.0003 + i * 2) * width * 0.03,
-            height + R * 0.15 - (0.5 + 0.5 * Math.sin(time * 0.0005 + i)) * R * 0.12,
-            R * (1 + 0.05 * Math.sin(time * 0.0007 + i)),
-          );
+        // Ola ancha y poco profunda ocupando toda la parte inferior
+        const depth = m * 0.12;
+        const amp = depth * 0.45;
+        const top = height - depth;
+        const path = new Path2D();
+        path.moveTo(0, height);
+        const steps = 48;
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const y =
+            top +
+            Math.sin(t * Math.PI * 2 + time * 0.0007) * amp +
+            Math.sin(t * Math.PI * 5 - time * 0.0011) * amp * 0.35;
+          path.lineTo(width * t, y);
         }
+        path.lineTo(width, height);
+        path.closePath();
+
+        const poolGrad = octx!.createLinearGradient(0, top - amp, 0, height);
+        poolGrad.addColorStop(0, "rgba(255,255,255,0.8)");
+        poolGrad.addColorStop(0.6, "rgba(255,255,255,0.95)");
+        poolGrad.addColorStop(1, "rgba(255,255,255,1)");
+        octx!.fillStyle = poolGrad;
+        octx!.fill(path);
+
         const T = m * 0.16;
         for (let i = 0; i < 2; i++) {
           splat(width * (0.3 + 0.4 * i) + Math.sin(time * 0.00035 + i) * width * 0.03, -T * 0.25, T);
@@ -235,8 +249,19 @@ export default function LavaLampBackground({
 
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
+    const onDown = () => {
+      pressed = true;
+    };
+    const onUp = () => {
+      pressed = false;
+    };
     window.addEventListener("mousemove", onMouse);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("mouseup", onUp);
     window.addEventListener("touchmove", onTouch, { passive: true });
+    window.addEventListener("touchstart", onTouch, { passive: true });
+    window.addEventListener("touchend", onUp);
+    window.addEventListener("blur", onUp);
 
     resize();
     raf = requestAnimationFrame(animate);
@@ -245,9 +270,14 @@ export default function LavaLampBackground({
       cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener("mousemove", onMouse);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mouseup", onUp);
       window.removeEventListener("touchmove", onTouch);
+      window.removeEventListener("touchstart", onTouch);
+      window.removeEventListener("touchend", onUp);
+      window.removeEventListener("blur", onUp);
     };
-  }, [count, size, speed, heat, softness, glow, scale, pool, opacity, color, core]);
+  }, [count, size, speed, heat, softness, glow, pool, opacity, color, core]);
 
   return (
     <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>

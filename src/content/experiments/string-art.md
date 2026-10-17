@@ -7,21 +7,21 @@ props:
   - name: points
     label: Puntos
     type: number
-    default: 220
+    default: 250
     min: 40
     max: 600
     step: 10
   - name: circles
     label: Círculos
     type: number
-    default: 2
+    default: 3
     min: 1
     max: 6
     step: 1
   - name: radius
     label: Radio
     type: number
-    default: 0.62
+    default: 0.9
     min: 0.1
     max: 1
     step: 0.02
@@ -35,7 +35,7 @@ props:
   - name: follow
     label: Seguimiento
     type: number
-    default: 1
+    default: 0.5
     min: 0
     max: 1
     step: 0.05
@@ -60,5 +60,5 @@ props:
 Los puntos se reparten en `circles` anillos concéntricos y cada hilo une dos puntos separados por un salto constante; el anillo gira con `speed` y el puntero atrae los puntos con `follow`, deformando toda la malla. Hereda el color de la página o se fija con `--string-color` y `--string-opacity` en CSS.
 
 ```tsx
-<StringArtBackground points={220} circles={2} radius={0.62} speed={1} follow={1} />
+<StringArtBackground points={250} circles={3} radius={0.9} speed={1} follow={0.5} />
 ```

@@ -36,14 +36,14 @@ const DIRS = [
 const TAU = Math.PI * 2;
 
 export default function CircuitBackground({
-  grid = 18,
-  speed = 14,
-  maxLen = 45,
+  grid = 10,
+  speed = 25,
+  maxLen = 60,
   ambient = 1.2,
-  spawnDist = 70,
-  fade = 4,
-  maxTraces = 80,
-  lineWidth = 1.2,
+  spawnDist = 30,
+  fade = 5,
+  maxTraces = 200,
+  lineWidth = 1.3,
   color = "rgba(0, 0, 0, 0.4)",
   background = "#e0dad5",
   className,

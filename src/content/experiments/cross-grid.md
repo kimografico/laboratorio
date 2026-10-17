@@ -68,5 +68,5 @@ props:
 `rotation={45}` convierte las cruces en aspas; `rotation={90}` da un cuarto de vuelta completo.
 
 ```tsx
-<CrossBackground size={32} rotation={90} proximity={180} color="rgba(0,0,0,0.2)" />
+<CrossBackground size={39} arm={6} growth={8} proximity={180} rotation={120} ease={0.05} lineWidth={1.5} />
 ```

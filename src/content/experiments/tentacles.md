@@ -1,7 +1,7 @@
 ---
 title: Tentacles
 description: Tentáculos que cuelgan y siguen al puntero con ventosas, profundidad y ondulación.
-category: backgrounds
+category: pendiente
 component: TentacleBackground
 props:
   - name: near

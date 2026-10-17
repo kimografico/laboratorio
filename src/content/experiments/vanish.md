@@ -7,28 +7,28 @@ props:
   - name: count
     label: Estrellas
     type: number
-    default: 180
-    min: 20
-    max: 600
+    default: 600
+    min: 50
+    max: 2000
     step: 10
   - name: speed
     label: Velocidad
     type: number
-    default: 0.0003
+    default: 0.0006
     min: 0.0001
     max: 0.002
     step: 0.0001
   - name: focal
     label: Punto focal
     type: number
-    default: 0.4
+    default: 0.25
     min: 0.1
     max: 1
     step: 0.05
   - name: streak
     label: Estela
     type: number
-    default: 6
+    default: 2
     min: 1
     max: 30
     step: 1
@@ -61,5 +61,5 @@ props:
 Cada estrella se mueve radialmente desde el punto focal con velocidad proporcional a su distancia; `streak` estira el trazo en dirección al movimiento y `ease` suaviza el retargeting cuando sigue al puntero. Al salir del lienzo reaparecen en el centro con `speed`.
 
 ```tsx
-<VanishBackground count={180} speed={0.0003} focal={0.4} streak={6} ease={0.05} />
+<VanishBackground count={600} speed={0.0006} focal={0.25} streak={2} ease={0.05} />
 ```

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
+import Button from "./Button";
 import { defaultsFromProps, type PropDef } from "../../lib/props";
 import { withBase } from "../../lib/base";
 
@@ -103,7 +104,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-24">
+    <div className="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pb-24">
       {hasFilter && (
         <div className="sticky top-0 z-20 -mx-5 mb-8 border-b border-line bg-surface/85 px-5 py-4 backdrop-blur">
           <div className="flex flex-wrap items-center gap-3">
@@ -112,24 +113,14 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
               const count = c === "all" ? experiments.length : counts[c] ?? 0;
               const active = category === c;
               return (
-                <button
+                <Button
                   key={c}
+                  variant={active ? "solid" : "outline"}
+                  label={c === "all" ? "Todos" : c}
+                  badge={count}
                   onClick={() => setCategory(c)}
-                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition ${
-                    active
-                      ? "border-fg bg-fg text-surface"
-                      : "border-line-strong bg-subtle text-muted hover:border-fg/40"
-                  }`}
-                >
-                  {c === "all" ? "Todos" : c}
-                  <span
-                    className={`rounded-full px-1.5 text-xs ${
-                      active ? "bg-surface/20 text-surface/70" : "bg-subtle-strong text-faint"
-                    }`}
-                  >
-                    {count}
-                  </span>
-                </button>
+                  className="capitalize"
+                />
               );
             })}
           </div>
@@ -139,7 +130,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
       {filtered.length === 0 ? (
         <p className="py-24 text-center text-sm text-faint">Sin resultados.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((exp) => (
             <a
               key={exp.id}

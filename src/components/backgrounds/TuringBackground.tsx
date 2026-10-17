@@ -35,11 +35,11 @@ const DU = 1;
 const DV = 0.5;
 
 export default function TuringBackground({
-  cell = 6,
+  cell = 2,
   steps = 6,
   feed = 0.0545,
   kill = 0.062,
-  brush = 3,
+  brush = 5,
   spark = 0.15,
   opacity = 0.8,
   color = "#3b2f2a",

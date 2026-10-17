@@ -1,7 +1,7 @@
 ---
 title: Tela
 description: Red de malla simulada que cuelga, ondea con el viento y responde al puntero.
-category: backgrounds
+category: pendiente
 component: ClothBackground
 props:
   - name: spacing

@@ -1,16 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Copy,
-  Maximize2,
-  Minimize2,
-  RotateCcw,
-  SlidersHorizontal,
-  ChevronDown,
-} from "lucide-react";
+import { ArrowLeft, ChevronDown, SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
+import Button from "./Button";
 import { defaultsFromProps, type PropDef, type PropValues } from "../../lib/props";
 import { withBase } from "../../lib/base";
 
@@ -114,12 +105,8 @@ export default function ExperimentPreview({
               Mueve el cursor sobre el lienzo para explorar el efecto en vivo.
             </p>
             <div className="pointer-events-auto flex gap-3">
-              <button className="rounded-full bg-fg px-5 py-2 text-sm font-medium text-surface transition hover:bg-fg/90">
-                Empezar
-              </button>
-              <button className="rounded-full border border-line-strong px-5 py-2 text-sm font-medium text-muted transition hover:border-fg/60">
-                Ver más
-              </button>
+              <Button variant="solid" size="md" label="Empezar" />
+              <Button variant="outline" size="md" label="Ver más" />
             </div>
           </div>
         </>
@@ -143,20 +130,23 @@ export default function ExperimentPreview({
           <ArrowLeft className="h-4 w-4" /> {backLabel}
         </a>
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            size="sm"
+            variant="outline"
+            icon="rotate-ccw"
+            iconPosition="left"
+            label="Reset"
             onClick={() => setValues(defaultsFromProps(propDefs))}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
-          >
-            <RotateCcw className="h-3.5 w-3.5" /> Reset
-          </button>
+          />
           {allowFullscreen && (
-            <button
+            <Button
+              size="sm"
+              variant="outline"
+              icon={fullscreen ? "minimize" : "maximize"}
+              iconPosition="left"
+              label="Pantalla completa"
               onClick={() => setFullscreen((f) => !f)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
-            >
-              {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-              Pantalla completa
-            </button>
+            />
           )}
         </div>
       </div>
@@ -164,12 +154,15 @@ export default function ExperimentPreview({
       {fullscreen ? (
         <div className="fixed inset-0 z-50 bg-surface">
           <div className="h-full w-full">{stage}</div>
-          <button
+          <Button
+            size="sm"
+            variant="outline"
+            icon="minimize"
+            iconPosition="left"
+            label="Salir"
             onClick={() => setFullscreen(false)}
-            className="absolute right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-lg border border-line-strong bg-surface/60 px-3 py-1.5 text-xs text-fg backdrop-blur transition hover:bg-surface/80"
-          >
-            <Minimize2 className="h-3.5 w-3.5" /> Salir
-          </button>
+            className="absolute right-5 top-5 z-10 bg-surface/60 backdrop-blur"
+          />
         </div>
       ) : (
         stage
@@ -205,13 +198,14 @@ export default function ExperimentPreview({
       <div className="overflow-hidden rounded-2xl border border-line bg-panel">
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <span className="text-sm font-medium text-fg">Código de uso</span>
-          <button
+          <Button
+            size="sm"
+            variant="outline"
+            icon={copied ? "check" : "copy"}
+            iconPosition="left"
+            label={copied ? "Copiado" : "Copiar"}
             onClick={copy}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-1.5 text-xs text-fg/70 transition hover:border-line-strong hover:text-fg"
-          >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-            {copied ? "Copiado" : "Copiar"}
-          </button>
+          />
         </div>
         <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-[color:var(--code-fg)]">
           <code>{snippet}</code>
@@ -348,14 +342,16 @@ function TextControl({
           onChange={(e) => setDraft(e.target.value)}
           className="w-full rounded-lg border border-line bg-subtle px-3 py-1.5 text-sm text-fg outline-none focus:border-line-strong"
         />
-        <button
-          type="submit"
+        <Button
+          iconOnly
+          icon="arrow-right"
+          size="sm"
+          label="Aplicar texto"
           disabled={!dirty}
-          aria-label="Aplicar texto"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-subtle text-fg/70 transition hover:border-line-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <ArrowRight className="h-4 w-4" />
-        </button>
+          onClick={() => {
+            if (dirty) onChange(draft);
+          }}
+        />
       </form>
     </label>
   );

@@ -59,13 +59,13 @@ function march(out: number[], cell: number, x0: number, y0: number, a: number, b
 }
 
 export default function CoralBackground({
-  res = 7,
+  res = 3,
   steps = 5,
   feed = 0.0545,
   kill = 0.062,
   erode = 0.0006,
   brush = 4,
-  alpha = 0.24,
+  alpha = 0.2,
   lineWidth = 1.2,
   color,
   className,

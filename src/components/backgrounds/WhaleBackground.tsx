@@ -9,8 +9,10 @@ export interface WhaleBackgroundProps {
   size?: number;
   /** Velocidad de nado (px por fotograma): son lentas */
   speed?: number;
-  /** Distancia a la que notan el puntero: se sumergen (se desvanecen) y se apartan despacio (px) */
+  /** Distancia a la que notan el puntero: se sumergen (se desvanecen y encogen) y se apartan despacio (px) */
   dive?: number;
+  /** Rapidez de la inmersión y la emersión al notar el puntero (mayor = más rápido) */
+  sink?: number;
   /** Opacidad del contorno de las cercanas (0-1) */
   alpha?: number;
   lineWidth?: number;
@@ -37,10 +39,11 @@ const diff = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - 
 
 export default function WhaleBackground({
   near = 2,
-  far = 3,
-  size = 540,
-  speed = 0.3,
-  dive = 260,
+  far = 1,
+  size = 300,
+  speed = 1,
+  dive = 250,
+  sink = 0.012,
   alpha = 0.3,
   lineWidth = 1.3,
   color,
@@ -110,7 +113,7 @@ export default function WhaleBackground({
           turn += diff(f.h, Math.atan2(head.y - py, head.x - px)) * 0.012 * targetSub;
         }
       }
-      f.sub += (targetSub - f.sub) * 0.02; // se hunde rápido... y emerge despacio, con easing
+      f.sub += (targetSub - f.sub) * sink; // se hunde y emerge con easing
       const m = f.L * 0.35;
       if (head.x < m || head.x > w - m || head.y < m * 0.6 || head.y > h - m * 0.6) {
         turn += diff(f.h, Math.atan2(h / 2 - head.y, w / 2 - head.x)) * 0.008;
@@ -135,15 +138,20 @@ export default function WhaleBackground({
     const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
 
     function draw(f: Whale) {
-      // Al sumergirse, la ballena se desvanece y se encoge un poco
+      // Al sumergirse, la ballena se desvanece y se encoge sobre su propio centro
       const a = alpha * mul * (0.12 + 0.88 * Math.pow(f.depth, 1.5)) * (1 - 0.8 * f.sub);
-      const shrink = 1 - 0.07 * f.sub;
+      const shrink = 1 - 0.42 * f.sub;
+      const c = f.pts[Math.floor(N / 2)];
+      ctx!.save();
+      ctx!.translate(c.x, c.y);
+      ctx!.scale(shrink, shrink);
+      ctx!.translate(-c.x, -c.y);
       const xs: number[] = [];
       const ys: number[] = [];
       const hw: number[] = [];
       const nx: number[] = [];
       const ny: number[] = [];
-      const W = f.L * 0.11 * shrink;
+      const W = f.L * 0.11;
       for (let i = 0; i <= N; i++) {
         const p0 = f.pts[Math.max(0, i - 1)];
         const p1 = f.pts[Math.min(N, i + 1)];
@@ -191,7 +199,7 @@ export default function WhaleBackground({
         const fx = (xs[e - 1] - xs[e]) / f.seg;
         const fy = (ys[e - 1] - ys[e]) / f.seg;
         const lf = f.L * 0.16;
-        const wid = f.L * 0.17 * shrink;
+        const wid = f.L * 0.17;
         const sway = Math.sin(f.phase - N * 0.3 + 0.8) * lf * 0.35;
         const bx0 = xs[e];
         const by0 = ys[e];
@@ -240,6 +248,7 @@ export default function WhaleBackground({
         setAlpha(a * 0.8);
         ctx!.fill();
       }
+      ctx!.restore();
     }
 
     function animate(time: number) {
@@ -276,7 +285,7 @@ export default function WhaleBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [near, far, size, speed, dive, alpha, lineWidth]);
+  }, [near, far, size, speed, dive, sink, alpha, lineWidth]);
 
   return (
     <div

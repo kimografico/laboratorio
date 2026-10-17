@@ -1,7 +1,7 @@
 ---
 title: Gotas líquidas
 description: Gotas que flotan y se funden entre sí con un efecto de metal líquido que el puntero atrae.
-category: backgrounds
+category: pendiente
 component: BlobBackground
 props:
   - name: large

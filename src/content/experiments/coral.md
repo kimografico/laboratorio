@@ -1,5 +1,5 @@
 ---
-title: Coral
+title: Coral de Turing II
 description: Colonias de coral que crecen con una reacción-difusión de Gray-Scott y se abren a su paso por el puntero.
 category: backgrounds
 component: CoralBackground
@@ -7,7 +7,7 @@ props:
   - name: res
     label: Resolución de celda (px)
     type: number
-    default: 7
+    default: 3
     min: 3
     max: 16
     step: 1
@@ -49,7 +49,7 @@ props:
   - name: alpha
     label: Opacidad
     type: number
-    default: 0.24
+    default: 0.2
     min: 0.02
     max: 1
     step: 0.02
@@ -69,5 +69,5 @@ El patrón crece con los parámetros de Gray-Scott: `feed` y `kill` cambian la f
 Por defecto no dibuja fondo y hereda el color de la página. Opcionalmente fija `color` o define `--coral-color` y `--coral-opacity` en CSS.
 
 ```tsx
-<CoralBackground res={7} steps={5} feed={0.0545} kill={0.062} erode={0.0006} brush={4} alpha={0.24} lineWidth={1.2} />
+<CoralBackground res={3} steps={5} feed={0.0545} kill={0.062} erode={0.0006} brush={4} alpha={0.2} lineWidth={1.2} />
 ```

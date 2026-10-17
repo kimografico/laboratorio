@@ -31,12 +31,12 @@ function parseColor(color: string): [number, number, number] {
 }
 
 export default function FogBackground({
-  cell = 6,
-  radius = 70,
-  regrow = 0.003,
-  drips = 0.5,
+  cell = 1,
+  radius = 45,
+  regrow = 0.004,
+  drips = 2,
   opacity = 0.85,
-  color = "#f4f1ee",
+  color = "#282828",
   background = "#e0dad5",
   className,
 }: FogBackgroundProps) {

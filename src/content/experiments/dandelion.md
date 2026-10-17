@@ -60,5 +60,5 @@ props:
 Por defecto no dibuja fondo y hereda el color de la página (`currentColor`). `near`/`far` reparten las semillas en dos capas de profundidad, `size` escala el paracaídas de las cercanas, `wind` controla la deriva constante y `gust` cuánto las sopla el puntero al pasar cerca; `alpha` y `lineWidth` ajustan el trazo de las cercanas. Opcionalmente fija `color` o define `--dandelion-color` y `--dandelion-opacity` en CSS.
 
 ```tsx
-<DandelionBackground near={22} far={16} size={30} wind={1} gust={1} alpha={0.34} />
+<DandelionBackground near={35} far={29} size={30} wind={1} gust={0.5} alpha={0.34} />
 ```

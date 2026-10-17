@@ -7,21 +7,21 @@ props:
   - name: count
     label: Peces
     type: number
-    default: 70
+    default: 500
     min: 10
-    max: 200
+    max: 750
     step: 1
   - name: size
     label: Tamaño (px)
     type: number
-    default: 14
+    default: 15
     min: 6
     max: 32
     step: 1
   - name: speed
     label: Velocidad
     type: number
-    default: 1.3
+    default: 1.5
     min: 0.4
     max: 4
     step: 0.1
@@ -35,7 +35,7 @@ props:
   - name: cohesion
     label: Cohesión
     type: number
-    default: 1
+    default: 1.2
     min: 0
     max: 3
     step: 0.1
@@ -68,5 +68,5 @@ props:
 Simula un cardumen con reglas de separación, alineación y cohesión. El puntero actúa como depredador: cada pez lo evita dentro de `avoid`.
 
 ```tsx
-<ShoalBackground count={70} size={14} speed={1.3} avoid={150} />
+<ShoalBackground count={500} size={15} speed={1.5} avoid={150} />
 ```

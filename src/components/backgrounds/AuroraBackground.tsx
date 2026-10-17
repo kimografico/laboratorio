@@ -24,10 +24,10 @@ function hexToRgb(hex: string) {
 
 export default function AuroraBackground({
   colors = ["#ee3d3d", "#f5a623", "#2b4eff"],
-  size = 0.55,
+  size = 0.75,
   opacity = 0.5,
-  ease = 0.012,
-  avoid = 0.8,
+  ease = 0.05,
+  avoid = 1,
   background = "#e0dad5",
   className,
 }: AuroraBackgroundProps) {

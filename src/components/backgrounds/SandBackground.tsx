@@ -26,12 +26,12 @@ const GS = 16; // celda de la rejilla donde se guarda la huella del puntero (px)
 type Stone = { x: number; y: number; r: number; k: number };
 
 export default function SandBackground({
-  spacing = 14,
-  ripples = 4,
-  rake = 1,
+  spacing = 10,
+  ripples = 15,
+  rake = 0.5,
   radius = 110,
   heal = 0.985,
-  stones = 3,
+  stones = 2,
   alpha = 0.3,
   lineWidth = 1,
   color,

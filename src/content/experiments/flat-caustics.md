@@ -7,35 +7,35 @@ props:
   - name: scale
     label: Celda (px)
     type: number
-    default: 100
+    default: 60
     min: 30
     max: 220
     step: 5
   - name: speed
     label: Velocidad
     type: number
-    default: 1
+    default: 0.3
     min: 0
     max: 4
     step: 0.1
   - name: gap
     label: Canal (px)
     type: number
-    default: 9
+    default: 8
     min: 0
     max: 40
     step: 1
   - name: smooth
     label: Suavizado
     type: number
-    default: 3
+    default: 4
     min: 0
     max: 4
     step: 1
   - name: push
     label: Empuje (px)
     type: number
-    default: 45
+    default: 60
     min: 0
     max: 150
     step: 5
@@ -49,7 +49,7 @@ props:
   - name: alpha
     label: Opacidad
     type: number
-    default: 0.2
+    default: 0.15
     min: 0.03
     max: 1
     step: 0.01
@@ -62,5 +62,5 @@ Cada celda es el recinto de Voronoi de una semilla que orbita despacio; el punte
 Por defecto no dibuja fondo y hereda el color de la página (`currentColor`), con tres niveles de opacidad derivados de `alpha`. Opcionalmente fija `color` o define `--flat-caustics-color`, `--flat-caustics-opacity` y una paleta `--flat-caustics-tone-1/2/3` en CSS.
 
 ```tsx
-<FlatCausticsBackground scale={100} speed={1} gap={9} push={45} alpha={0.2} />
+<FlatCausticsBackground scale={60} speed={0.3} gap={8} smooth={4} push={60} radius={200} alpha={0.15} />
 ```

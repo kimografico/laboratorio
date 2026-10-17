@@ -34,9 +34,9 @@ type Pop = { x: number; y: number; r: number; age: number };
 const POP_LIFE = 26; // fotogramas que dura el reventón
 
 export default function BubbleBackground({
-  count = 26,
-  size = 22,
-  rise = 0.45,
+  count = 70,
+  size = 28,
+  rise = 0.75,
   reach = 60,
   pop = true,
   alpha = 0.3,

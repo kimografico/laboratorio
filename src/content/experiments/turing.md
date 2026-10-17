@@ -1,5 +1,5 @@
 ---
-title: Turing
+title: Coral de Turing I
 description: Manchas que reaccionan a su vecindad según un modelo de reactividad-difusión y generan patrones vivos.
 category: backgrounds
 component: TuringBackground
@@ -7,9 +7,9 @@ props:
   - name: cell
     label: Celda (px)
     type: number
-    default: 6
-    min: 2
-    max: 16
+    default: 2
+    min: 1
+    max: 2
     step: 1
   - name: steps
     label: Pasos por fotograma
@@ -35,7 +35,7 @@ props:
   - name: brush
     label: Pincel (px)
     type: number
-    default: 3
+    default: 5
     min: 0
     max: 12
     step: 1
@@ -68,5 +68,5 @@ props:
 Dos campos (activador e inhibidor) se difunden y se alimentan a distinta velocidad; `feed` y `kill` deciden qué patrón sobrevive (manchas, laberintos, coral). El puntero siembra activador con su pincel (`brush`, `spark`) y las semillas iniciales se generan solas.
 
 ```tsx
-<TuringBackground cell={6} steps={6} feed={0.0545} kill={0.062} brush={3} />
+<TuringBackground cell={2} steps={6} feed={0.0545} kill={0.062} brush={5} />
 ```

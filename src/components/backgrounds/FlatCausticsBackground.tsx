@@ -71,13 +71,13 @@ function chaikin(src: Float64Array, n: number, dst: Float64Array) {
 }
 
 export default function FlatCausticsBackground({
-  scale = 100,
-  speed = 1,
-  gap = 9,
-  smooth = 3,
-  push = 45,
+  scale = 60,
+  speed = 0.3,
+  gap = 8,
+  smooth = 4,
+  push = 60,
   radius = 200,
-  alpha = 0.2,
+  alpha = 0.15,
   color,
   className,
 }: FlatCausticsBackgroundProps) {

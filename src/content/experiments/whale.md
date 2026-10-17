@@ -14,31 +14,38 @@ props:
   - name: far
     label: Ballenas fondo
     type: number
-    default: 3
+    default: 1
     min: 0
     max: 10
     step: 1
   - name: size
     label: Tamaño (px)
     type: number
-    default: 540
+    default: 300
     min: 100
     max: 1200
     step: 20
   - name: speed
     label: Velocidad
     type: number
-    default: 0.3
+    default: 1
     min: 0.02
     max: 1.5
     step: 0.02
   - name: dive
     label: Inmersión (px)
     type: number
-    default: 260
+    default: 250
     min: 0
     max: 800
     step: 10
+  - name: sink
+    label: Velocidad de inmersión
+    type: number
+    default: 0.012
+    min: 0.002
+    max: 0.06
+    step: 0.002
   - name: alpha
     label: Opacidad
     type: number
@@ -57,8 +64,8 @@ props:
 
 ## Uso
 
-Cada ballena es una columna de segmentos con aleteo sinusoidal que persigue su rumbo, se desvía de sus compañeras y del puntero y asciende a romper la superficie según su reloj de inmersión (`dive`). Las del fondo son más lentas y están más desenfocadas. Hereda el color de la página o se fija con `--whale-color` y `--whale-opacity` en CSS.
+Cada ballena es una columna de segmentos con aleteo sinusoidal que persigue su rumbo, se desvía de sus compañeras y del puntero y asciende a romper la superficie según su reloj de inmersión (`dive`). Al sumergirse se desvanece y encoge sobre su propio centro; `sink` regula la rapidez con la que se hunde y emerge. Las del fondo son más lentas y están más desenfocadas. Hereda el color de la página o se fija con `--whale-color` y `--whale-opacity` en CSS.
 
 ```tsx
-<WhaleBackground near={2} far={3} size={540} speed={0.3} dive={260} />
+<WhaleBackground near={2} far={1} size={300} speed={1} dive={250} sink={0.012} />
 ```

@@ -33,11 +33,11 @@ type Fish = {
 };
 
 export default function ShoalBackground({
-  count = 70,
-  size = 14,
-  speed = 1.3,
+  count = 500,
+  size = 15,
+  speed = 1.5,
   avoid = 150,
-  cohesion = 1,
+  cohesion = 1.2,
   alpha = 0.32,
   lineWidth = 1,
   color = "#000000",

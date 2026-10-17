@@ -1,6 +1,6 @@
 ---
 title: Botón
-description: "Botón configurable: variantes, tamaños, color, icono, estado pulsado y modo solo icono."
+description: "Botón configurable: variantes, tamaños, color, icono, distintivo, estado pulsado y modo solo icono."
 category: buttons
 component: Button
 props:
@@ -22,7 +22,7 @@ props:
     label: Icono
     type: select
     default: none
-    options: [none, arrow-right, plus, check, download, search, heart]
+    options: [none, arrow-left, arrow-right, plus, check, download, search, heart, rotate-ccw, maximize, minimize, copy]
   - name: iconPosition
     label: Posición del icono
     type: select
@@ -33,7 +33,7 @@ props:
     type: boolean
     default: false
   - name: shape
-    label: Forma (solo icono)
+    label: Forma
     type: select
     default: circle
     options: [circle, rounded, squared]
@@ -41,6 +41,10 @@ props:
     label: Ancho completo
     type: boolean
     default: false
+  - name: badge
+    label: Distintivo
+    type: text
+    default: ""
   - name: color
     label: Color (vacío = tema)
     type: color
@@ -53,9 +57,12 @@ props:
 
 ## Uso
 
-`iconOnly` convierte el botón en un botón de icono. `color` acepta un hex; si se deja vacío usa los
-tokens del tema. Cuando `disabled` no hay hover ni animación al pulsar.
+`iconOnly` convierte el botón en un botón de icono. `shape` controla el redondeo tanto con texto
+como en modo icono. `badge` añade un distintivo junto a la etiqueta. `href` renderiza el botón como
+enlace. `color` acepta un hex; si se deja vacío usa los tokens del tema. Cuando `disabled` no hay
+hover ni animación al pulsar.
 
 ```tsx
 <Button variant="solid" size="md" label="Empezar" icon="arrow-right" />
+<Button label="Copiar" icon="copy" variant="outline" badge={3} />
 ```

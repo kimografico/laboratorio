@@ -27,17 +27,9 @@ export {
   type ClothBackgroundProps,
 } from "../components/backgrounds/ClothBackground";
 export {
-  default as ContourBackground,
-  type ContourBackgroundProps,
-} from "../components/backgrounds/ContourBackground";
-export {
   default as Contour2Background,
   type Contour2BackgroundProps,
 } from "../components/backgrounds/Contour2Background";
-export {
-  default as Contour3Background,
-  type Contour3BackgroundProps,
-} from "../components/backgrounds/Contour3Background";
 export {
   default as CoralBackground,
   type CoralBackgroundProps,
@@ -71,6 +63,10 @@ export {
   type FirefliesBackgroundProps,
 } from "../components/backgrounds/FirefliesBackground";
 export {
+  default as FireworksBackground,
+  type FireworksBackgroundProps,
+} from "../components/backgrounds/FireworksBackground";
+export {
   default as FlatCausticsBackground,
   type FlatCausticsBackgroundProps,
 } from "../components/backgrounds/FlatCausticsBackground";
@@ -83,9 +79,17 @@ export {
   type FogBackgroundProps,
 } from "../components/backgrounds/FogBackground";
 export {
+  default as GalaxyBackground,
+  type GalaxyBackgroundProps,
+} from "../components/backgrounds/GalaxyBackground";
+export {
   default as GlobeBackground,
   type GlobeBackgroundProps,
 } from "../components/backgrounds/GlobeBackground";
+export {
+  default as HexPulseBackground,
+  type HexPulseBackgroundProps,
+} from "../components/backgrounds/HexPulseBackground";
 export {
   default as IsoBackground,
   type IsoBackgroundProps,
@@ -95,6 +99,10 @@ export {
   type JellyBackgroundProps,
 } from "../components/backgrounds/JellyBackground";
 export {
+  default as KaleidoscopeBackground,
+  type KaleidoscopeBackgroundProps,
+} from "../components/backgrounds/KaleidoscopeBackground";
+export {
   default as KelpBackground,
   type KelpBackgroundProps,
 } from "../components/backgrounds/KelpBackground";
@@ -102,10 +110,6 @@ export {
   default as KoiBackground,
   type KoiBackgroundProps,
 } from "../components/backgrounds/KoiBackground";
-export {
-  default as KoiBackgroundII,
-  type KoiBackgroundIIProps,
-} from "../components/backgrounds/KoiBackgroundII";
 export {
   default as LavaLampBackground,
   type LavaLampBackgroundProps,
@@ -123,21 +127,17 @@ export {
   type LilyBackgroundProps,
 } from "../components/backgrounds/LilyBackground";
 export {
-  default as LissajousBackground,
-  type LissajousBackgroundProps,
-} from "../components/backgrounds/LissajousBackground";
-export {
   default as MantaBackground,
   type MantaBackgroundProps,
 } from "../components/backgrounds/MantaBackground";
 export {
+  default as MarblesBackground,
+  type MarblesBackgroundProps,
+} from "../components/backgrounds/MarblesBackground";
+export {
   default as MatrixBackground,
   type MatrixBackgroundProps,
 } from "../components/backgrounds/MatrixBackground";
-export {
-  default as MoireBackground,
-  type MoireBackgroundProps,
-} from "../components/backgrounds/MoireBackground";
 export {
   default as NeedleBackground,
   type NeedleBackgroundProps,
@@ -175,9 +175,9 @@ export {
   type PlasmaBackgroundProps,
 } from "../components/backgrounds/PlasmaBackground";
 export {
-  default as RaysBackground,
-  type RaysBackgroundProps,
-} from "../components/backgrounds/RaysBackground";
+  default as RainRipplesBackground,
+  type RainRipplesBackgroundProps,
+} from "../components/backgrounds/RainRipplesBackground";
 export {
   default as RidgeBackground,
   type RidgeBackgroundProps,
@@ -202,6 +202,10 @@ export {
   default as ShoalBackground,
   type ShoalBackgroundProps,
 } from "../components/backgrounds/ShoalBackground";
+export {
+  default as SnowflakeBackground,
+  type SnowflakeBackgroundProps,
+} from "../components/backgrounds/SnowflakeBackground";
 export {
   default as StarfishBackground,
   type StarfishBackgroundProps,

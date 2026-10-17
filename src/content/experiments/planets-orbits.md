@@ -1,7 +1,7 @@
 ---
 title: Órbitas elásticas
 description: Elipses que siguen al puntero con retardo progresivo; cada planeta se queda atrás cuanto más lejana es su órbita.
-category: backgrounds
+category: pendiente
 component: PlanetsOrbitsBackground
 props:
   - name: orbits

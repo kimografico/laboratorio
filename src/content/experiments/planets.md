@@ -1,7 +1,7 @@
 ---
 title: Planetas
 description: Planetas en órbita kepleriana alrededor del cursor, perturbados por su gravedad y asidos a su elipse preferida.
-category: backgrounds
+category: pendiente
 component: PlanetsBackground
 props:
   - name: orbits
