@@ -1,0 +1,47 @@
+/*
+ * _shared.css — estructura común de los textos animados.
+ *
+ * Cada efecto lo importa con:  @import "./_shared.css";
+ * Comparten la estructura .tx-word / .tx-char / .tx-sep y las variables
+ * --tx-* definidas inline desde cada componente.
+ */
+
+.fadeup-text,
+.blurin-text,
+.scalein-text,
+.tiltin-text,
+.wave-text,
+.typewriter-text {
+  display: inline-block;
+  line-height: 1.15;
+}
+
+.fadeup-text .tx-word,
+.blurin-text .tx-word,
+.scalein-text .tx-word,
+.tiltin-text .tx-word,
+.wave-text .tx-word,
+.typewriter-text .tx-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.fadeup-text .tx-sep,
+.blurin-text .tx-sep,
+.scalein-text .tx-sep,
+.tiltin-text .tx-sep,
+.wave-text .tx-sep,
+.typewriter-text .tx-sep {
+  display: inline-block;
+  white-space: pre;
+}
+
+.fadeup-text .tx-char,
+.blurin-text .tx-char,
+.scalein-text .tx-char,
+.tiltin-text .tx-char,
+.wave-text .tx-char,
+.typewriter-text .tx-char {
+  display: inline-block;
+  white-space: pre;
+}

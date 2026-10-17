@@ -56,7 +56,6 @@ Rutas habituales que debes confirmar en el repositorio antes de usarlas:
 - `src/content/experiments/<slug>.md`: página y configuración del playground de cada experimento.
 - `src/content.config.ts`: esquema del frontmatter.
 - `src/lib/registry.tsx`: relación entre el nombre `component` del frontmatter y el componente React.
-- `src/lib/index.ts`: exports públicos de la biblioteca.
 - `src/lib/props.ts`: esquema de controles del playground.
 - `src/styles/theme.css` y `src/lib/theme.ts`: tokens y comportamiento de temas, si existen.
 
@@ -69,16 +68,15 @@ Apóyate en el skill `publish-tsx-experiment`
 deterministas e idempotentes. **Carga el skill** para ver el detalle del spec y
 del flujo.
 
-- `scripts/inventory.ps1` — inventario de `+/`, claves del registry, exports del
-  barrel, slugs/`component` de los `.md` y colisiones candidato vs. repo (solo lectura).
-- `scripts/scaffold.ps1` — inserta import + entrada en `src/lib/registry.tsx`, el
-  export en `src/lib/index.ts` y crea el `.md`, ordenado e idempotente.
+- `scripts/inventory.ps1` — inventario de `+/`, claves del registry, slugs/`component`
+  de los `.md` y colisiones candidato vs. repo (solo lectura).
+- `scripts/scaffold.ps1` — inserta import + entrada en `src/lib/registry.tsx` y crea
+  el `.md`, ordenado e idempotente.
 - `scripts/verify.ps1` — integridad y, con `-Run`, `check`/`build`/`build:lib`
   más rutas `dist-site` (`-Slugs`).
 
-Úsalos en lugar de editar a mano el registro, el barrel y las páginas. El
-criterio (auditoría, duplicados, adaptación, conflictos, props y uso) sigue
-siendo tuyo.
+Úsalos en lugar de editar a mano el registro y las páginas. El criterio (auditoría,
+duplicados, adaptación, conflictos, props y uso) sigue siendo tuyo.
 
 # Flujo de trabajo obligatorio
 
@@ -254,9 +252,9 @@ Para arrays usados como dependencias, no utilices de forma automática `join(","
 - No añadas dependencias sin necesidad y autorización.
 - No cambies nombres de props públicas sin autorización explícita.
 
-## Registro, exports y página (delega en el script)
+## Registro y página (delega en el script)
 
-La mecánica de registrar el componente, exportarlo y crear su página la hace
+La mecánica de registrar el componente y crear su página la hace
 `scaffold.ps1` del skill `publish-tsx-experiment`, de forma idempotente:
 
 ```powershell
@@ -268,11 +266,9 @@ Construye un spec JSON con una entrada por candidato aprobado: `kind`
 `props` y `usage`. El script:
 
 - Inserta el import y la entrada en `src/lib/registry.tsx` respetando el orden.
-- Inserta el export en `src/lib/index.ts` (multilínea para fondos, una línea
-  para el resto).
 - Crea `src/content/experiments/<slug>.md` (o `src/content/ui/<slug>.md`) y
   **nunca sobrescribe un `.md` existente**.
-- Es idempotente: repetirlo no duplica imports, exports ni páginas.
+- Es idempotente: repetirlo no duplica imports ni páginas.
 
 Consulta el `SKILL.md` del skill para el detalle del spec y los parámetros
 (`-DryRun`, `-Root`).
@@ -290,11 +286,10 @@ Contratos que siguen siendo tuyos:
 - En YAML, entrecomilla los escalares que contengan `: ` y conserva los acentos (UTF-8).
 - No sobrescribas páginas existentes sin autorización: si el `.md` ya existe, el
   script lo omite y decides tú.
-- Exporta componentes de UI reutilizables cuando proceda.
 
 ## Idempotencia antes y después de escribir
 
-`scaffold.ps1` ya es idempotente para el registro, el barrel y las páginas. Aun así, antes de escribir cualquier otro destino, vuelve a comprobar su estado actual para no sobrescribir cambios que hayan aparecido desde la auditoría.
+`scaffold.ps1` ya es idempotente para el registro y las páginas. Aun así, antes de escribir cualquier otro destino, vuelve a comprobar su estado actual para no sobrescribir cambios que hayan aparecido desde la auditoría.
 
 Si ya existe una parte válida de la integración, reutilízala o reconcilia solo la diferencia necesaria. No añadas texto o código al final de un archivo sin revisar su estructura.
 

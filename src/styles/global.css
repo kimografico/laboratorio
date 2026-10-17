@@ -1,5 +1,18 @@
 @import "tailwindcss";
 @import "./theme.css";
+@import "../components/backgrounds/base.css";
+@import "../components/texts/_shared.css";
+@import "../components/texts/FadeUpText.css";
+@import "../components/texts/BlurInText.css";
+@import "../components/texts/ScaleInText.css";
+@import "../components/texts/TiltInText.css";
+@import "../components/texts/TrackingInText.css";
+@import "../components/texts/WaveText.css";
+@import "../components/texts/ShineText.css";
+@import "../components/texts/GlowText.css";
+@import "../components/texts/GlitchText.css";
+@import "../components/texts/TypewriterText.css";
+@import "../components/texts/FlipText.css";
 
 @theme {
   --color-ink: #0b0b0c;

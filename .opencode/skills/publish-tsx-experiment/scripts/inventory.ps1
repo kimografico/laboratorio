@@ -37,14 +37,6 @@ function Get-RegistryKeys([string]$registryPath) {
   return $keys
 }
 
-function Get-BarrelExports([string]$barrelPath) {
-  $names = New-Object System.Collections.Generic.List[string]
-  foreach ($l in (Get-Content -LiteralPath $barrelPath)) {
-    foreach ($m in [regex]::Matches($l, 'default as ([A-Za-z0-9_]+)')) { $names.Add($m.Groups[1].Value) }
-  }
-  return $names
-}
-
 function Get-ComponentValues([string]$glob) {
   $rows = New-Object System.Collections.Generic.List[object]
   foreach ($f in (Get-ChildItem -Path $glob -ErrorAction SilentlyContinue)) {
@@ -62,7 +54,6 @@ function Duplicates($items) {
 $repoRoot = if ($Root) { (Resolve-Path -LiteralPath $Root).Path } else { Find-RepoRoot $PSScriptRoot }
 
 $registryPath = Join-Path $repoRoot 'src/lib/registry.tsx'
-$barrelPath = Join-Path $repoRoot 'src/lib/index.ts'
 $expGlob = Join-Path $repoRoot 'src/content/experiments/*.md'
 $uiGlob = Join-Path $repoRoot 'src/content/ui/*.md'
 $srcRoot = Join-Path $repoRoot $SourceDir
@@ -90,20 +81,17 @@ if (-not (Test-Path -LiteralPath $srcRoot)) {
 }
 
 $registryKeys = Get-RegistryKeys $registryPath
-$barrelExports = Get-BarrelExports $barrelPath
 $expRows = Get-ComponentValues $expGlob
 $uiRows = Get-ComponentValues $uiGlob
 
 Write-Output ''
 Write-Output '== Estado actual =='
 Write-Output ("  registry.tsx keys : {0}" -f $registryKeys.Count)
-Write-Output ("  barrel exports    : {0}" -f $barrelExports.Count)
 Write-Output ("  experiments .md   : {0}" -f $expRows.Count)
 Write-Output ("  ui .md            : {0}" -f $uiRows.Count)
 
 $problems = @()
 $dupKeys = Duplicates $registryKeys
-$dupExports = Duplicates $barrelExports
 $dupExpSlugs = Duplicates ($expRows | ForEach-Object { $_.Slug })
 $dupUiSlugs = Duplicates ($uiRows | ForEach-Object { $_.Slug })
 $allSlugs = @($expRows.Slug) + @($uiRows.Slug)
@@ -112,7 +100,6 @@ $missingExp = @($expRows | Where-Object { $_.Component -ne '<falta>' -and $regis
 $missingUi = @($uiRows | Where-Object { $_.Component -ne '<falta>' -and $registryKeys -notcontains $_.Component })
 
 if ($dupKeys) { $problems += "registry.tsx: claves duplicadas -> $($dupKeys -join ', ')" }
-if ($dupExports) { $problems += "index.ts: exports duplicados -> $($dupExports -join ', ')" }
 if ($dupExpSlugs) { $problems += "experiments: slugs duplicados -> $($dupExpSlugs -join ', ')" }
 if ($dupUiSlugs) { $problems += "ui: slugs duplicados -> $($dupUiSlugs -join ', ')" }
 if ($dupAllSlugs) { $problems += "slug en experiments y ui a la vez -> $($dupAllSlugs -join ', ')" }
@@ -140,7 +127,6 @@ if ($candidates.Count -eq 0) {
   foreach ($c in $candidates) {
     $hits = @()
     if ($registryKeys -contains $c) { $hits += 'registry' }
-    if ($barrelExports -contains $c) { $hits += 'barrel' }
     if (@($expRows.Component) -contains $c) { $hits += 'experiments.md' }
     if (@($uiRows.Component) -contains $c) { $hits += 'ui.md' }
     if ($hits.Count -gt 0) { Write-Output ('  {0,-32} -> ya existe en: {1}' -f $c, ($hits -join ', ')) }

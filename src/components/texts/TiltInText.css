@@ -1,0 +1,25 @@
+@import "./_shared.css";
+
+/* TiltInText */
+.tiltin-text .tx-char {
+  transform-origin: 50% 100%;
+  animation: tx-tiltin var(--tx-duration) cubic-bezier(0.2, 0.7, 0.2, 1) var(--tx-char-delay)
+    var(--tx-iteration) both;
+}
+
+@keyframes tx-tiltin {
+  from {
+    opacity: 0;
+    transform: rotate(var(--tx-angle)) translateY(0.25em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tiltin-text .tx-char {
+    animation: none !important;
+  }
+}

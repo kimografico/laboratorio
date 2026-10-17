@@ -1,0 +1,22 @@
+@import "./_shared.css";
+
+/* WaveText */
+.wave-text .tx-char {
+  animation: tx-wave var(--tx-duration) ease-in-out var(--tx-char-delay) var(--tx-iteration) both;
+}
+
+@keyframes tx-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--tx-amplitude)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-text .tx-char {
+    animation: none !important;
+  }
+}

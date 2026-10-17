@@ -1,0 +1,25 @@
+@import "./_shared.css";
+
+/* TrackingInText */
+.tracking-text {
+  display: inline-block;
+  line-height: 1.15;
+  animation: tx-tracking var(--tx-duration) ease-out var(--tx-delay) var(--tx-iteration) both;
+}
+
+@keyframes tx-tracking {
+  from {
+    opacity: 0;
+    letter-spacing: var(--tx-spread);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tracking-text {
+    animation: none !important;
+  }
+}

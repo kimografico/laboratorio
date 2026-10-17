@@ -1,0 +1,78 @@
+/*
+ * FlipText.css — estilos de FlipText.
+ *
+ * Importar una vez si usas FlipText:
+ *
+ *   @import "@kimografico/laboratorio/texts/FlipText.css";
+ */
+@property --flip-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.flip-text-wrapper {
+  display: inline-block;
+  line-height: 1;
+  perspective: 1000px;
+}
+
+.flip-text-wrapper .word {
+  display: inline-block;
+  white-space: nowrap;
+  transform-style: preserve-3d;
+}
+
+.flip-text-wrapper .separator {
+  display: inline-block;
+  white-space: pre;
+}
+
+.flip-text-wrapper .flip-char {
+  display: inline-block;
+  position: relative;
+  white-space: pre;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50% -0.5em;
+  transform: rotateX(calc(var(--flip-p) * 90deg));
+  animation: flip-roll var(--flip-duration) cubic-bezier(0.65, 0, 0.35, 1)
+    var(--flip-delay) var(--flip-iteration) both;
+}
+
+.flip-text-wrapper .face {
+  display: inline-block;
+  backface-visibility: hidden;
+  opacity: calc(1 - var(--flip-p) * 1.2);
+}
+
+.flip-text-wrapper .flip-char::after {
+  content: attr(data-char);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  transform-origin: top;
+  transform: rotateX(-90deg);
+  backface-visibility: hidden;
+  opacity: calc(var(--flip-p) * 1.2 - 0.2);
+}
+
+@keyframes flip-roll {
+  0% {
+    --flip-p: 0;
+  }
+  30% {
+    --flip-p: 1;
+  }
+  30.01% {
+    --flip-p: 0;
+  }
+  100% {
+    --flip-p: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-text-wrapper .flip-char {
+    animation: none;
+  }
+}

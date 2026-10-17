@@ -1,0 +1,23 @@
+@import "./_shared.css";
+
+/* BlurInText */
+.blurin-text .tx-char {
+  animation: tx-blurin var(--tx-duration) ease-out var(--tx-char-delay) var(--tx-iteration) both;
+}
+
+@keyframes tx-blurin {
+  from {
+    opacity: 0;
+    filter: blur(var(--tx-blur));
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blurin-text .tx-char {
+    animation: none !important;
+  }
+}

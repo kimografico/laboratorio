@@ -1,0 +1,80 @@
+@import "./_shared.css";
+
+/* GlitchText */
+.glitch-text {
+  position: relative;
+  display: inline-block;
+  line-height: 1.15;
+  white-space: pre;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.glitch-text::before {
+  color: #ff4d6d;
+  clip-path: inset(0 0 55% 0);
+  animation: tx-glitch-a var(--tx-duration) steps(1, end) var(--tx-delay) var(--tx-iteration) both;
+}
+
+.glitch-text::after {
+  color: #4dd0ff;
+  clip-path: inset(55% 0 0 0);
+  animation: tx-glitch-b var(--tx-duration) steps(1, end) var(--tx-delay) var(--tx-iteration) both;
+}
+
+@keyframes tx-glitch-a {
+  0%,
+  88%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  89% {
+    opacity: 0.7;
+    transform: translateX(calc(-2px * var(--tx-intensity)));
+  }
+  92% {
+    opacity: 0.7;
+    transform: translateX(calc(2px * var(--tx-intensity)));
+  }
+  95% {
+    opacity: 0;
+  }
+}
+
+@keyframes tx-glitch-b {
+  0%,
+  88%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  90% {
+    opacity: 0.7;
+    transform: translateX(calc(2px * var(--tx-intensity)));
+  }
+  93% {
+    opacity: 0.7;
+    transform: translateX(calc(-2px * var(--tx-intensity)));
+  }
+  96% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-text::before,
+  .glitch-text::after {
+    animation: none !important;
+    opacity: 0;
+  }
+}

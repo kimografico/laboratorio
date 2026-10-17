@@ -1,0 +1,24 @@
+@import "./_shared.css";
+
+/* FadeUpText */
+.fadeup-text .tx-char {
+  animation: tx-fadeup var(--tx-duration) cubic-bezier(0.2, 0.7, 0.2, 1) var(--tx-char-delay)
+    var(--tx-iteration) both;
+}
+
+@keyframes tx-fadeup {
+  from {
+    opacity: 0;
+    transform: translateY(var(--tx-distance));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fadeup-text .tx-char {
+    animation: none !important;
+  }
+}

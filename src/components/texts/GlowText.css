@@ -1,0 +1,26 @@
+@import "./_shared.css";
+
+/* GlowText */
+.glow-text {
+  display: inline-block;
+  line-height: 1.15;
+  animation: tx-glow var(--tx-duration) ease-in-out var(--tx-delay) var(--tx-iteration) both;
+}
+
+@keyframes tx-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 calc(0.12em * var(--tx-intensity)) currentColor;
+  }
+  50% {
+    text-shadow:
+      0 0 calc(0.5em * var(--tx-intensity)) currentColor,
+      0 0 calc(0.2em * var(--tx-intensity)) currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-text {
+    animation: none !important;
+  }
+}

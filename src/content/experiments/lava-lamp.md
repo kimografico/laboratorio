@@ -75,7 +75,7 @@ props:
 Simula una lámpara de lava con burbujas que suben y bajan según su temperatura. El puntero calienta las burbujas cercanas, haciendo que asciendan; mantén pulsado para triplicar el calor. Ajusta `count`, `size`, `speed`, `heat`, `softness`, `glow`, `pool` y `opacity` para afinar el efecto. Usa `color`, `core` y `background` para personalizar la paleta.
 
 ```tsx
-import { LavaLampBackground } from "@kimografico/laboratorio";
+import LavaLampBackground from "@kimografico/laboratorio/backgrounds/LavaLampBackground";
 
 export default function Example() {
   return (

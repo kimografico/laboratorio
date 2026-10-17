@@ -2,7 +2,6 @@
 # Andamiaje idempotente para registrar experimentos/piezas nuevas:
 #   - crea el .md de contenido (NUNCA sobrescribe uno existente)
 #   - inserta el import + la entrada en src/lib/registry.tsx (ordenado por categoría)
-#   - inserta el export en src/lib/index.ts (multilínea para fondos, 1 línea para el resto)
 #
 # Todo experimento nuevo (fondos y textos) entra SIEMPRE con `category: pendiente`.
 # Las piezas de UI usan su propia categoría de la colección ui (por defecto "buttons").
@@ -154,51 +153,6 @@ function Add-RegistryEntry($lines, [string]$component, [string]$folder) {
   return $true
 }
 
-function Get-ExportUnits($lines) {
-  $units = @()
-  for ($i = 0; $i -lt $lines.Count; $i++) {
-    $l = $lines[$i]
-    if ($l -match '^export \{[^}]*\} from "\.\./components/([a-zA-Z0-9_\-]+)/([A-Za-z0-9_]+)";') {
-      $units += [pscustomobject]@{ Name = $Matches[2]; Folder = $Matches[1]; Start = $i; End = $i }
-    } elseif ($l -match '^export \{\s*$') {
-      $j = $i
-      while ($j -lt $lines.Count -and $lines[$j] -notmatch 'from "\.\./components/([a-zA-Z0-9_\-]+)/([A-Za-z0-9_]+)";') { $j++ }
-      if ($j -lt $lines.Count) {
-        $m = [regex]::Match($lines[$j], 'from "\.\./components/([a-zA-Z0-9_\-]+)/([A-Za-z0-9_]+)";')
-        if ($m.Success) {
-          $units += [pscustomobject]@{ Name = $m.Groups[2].Value; Folder = $m.Groups[1].Value; Start = $i; End = $j }
-          $i = $j
-        }
-      }
-    }
-  }
-  return $units
-}
-
-function Add-BarrelExport($lines, [string]$component, [string]$folder) {
-  if ($lines | Where-Object { $_ -match ('default as ' + [regex]::Escape($component) + '\b') }) { return $false }
-  if ($folder -eq 'backgrounds') {
-    $unit = @(
-      'export {'
-      "  default as $component,"
-      "  type ${component}Props,"
-      "} from `"../components/$folder/$component`";"
-    )
-  } else {
-    $unit = @("export { default as $component, type ${component}Props } from `"../components/$folder/$component`";")
-  }
-  $units = Get-ExportUnits $lines
-  $same = @($units | Where-Object { $_.Folder -eq $folder })
-  if ($units.Count -eq 0) { $insertAt = 0 }
-  elseif ($same.Count -eq 0) { $insertAt = ($units | Measure-Object -Property End -Maximum).Maximum + 1 }
-  else {
-    $target = $same | Where-Object { [string]::Compare($_.Name, $component, [System.StringComparison]::OrdinalIgnoreCase) -gt 0 } | Sort-Object Start | Select-Object -First 1
-    $insertAt = if ($target) { $target.Start } else { ($same | Measure-Object -Property End -Maximum).Maximum + 1 }
-  }
-  for ($k = $unit.Count - 1; $k -ge 0; $k--) { $lines.Insert($insertAt, $unit[$k]) }
-  return $true
-}
-
 # ---- Carga del spec ----------------------------------------------------------
 if (-not $Spec -and -not $Json) { throw 'Indica -Spec <archivo.json> o -Json ''[...]''.' }
 $raw = if ($Spec) { Get-Content -Raw -LiteralPath $Spec } else { $Json }
@@ -207,14 +161,11 @@ if ($entries.Count -eq 0) { throw 'El spec está vacío.' }
 
 $repoRoot = if ($Root) { (Resolve-Path -LiteralPath $Root).Path } else { Find-RepoRoot $PSScriptRoot }
 $registryPath = Join-Path $repoRoot 'src/lib/registry.tsx'
-$barrelPath = Join-Path $repoRoot 'src/lib/index.ts'
 $expDir = Join-Path $repoRoot 'src/content/experiments'
 $uiDir = Join-Path $repoRoot 'src/content/ui'
 
 $reg = Read-Lines $registryPath
-$bar = Read-Lines $barrelPath
 $regChanged = $false
-$barChanged = $false
 $report = New-Object System.Collections.Generic.List[string]
 
 foreach ($e in $entries) {
@@ -268,16 +219,10 @@ foreach ($e in $entries) {
   $ent = Add-RegistryEntry $reg.Lines $component $folder
   if ($ent) { $regChanged = $true }
   $report.Add("REG    registry.tsx: import=$(if ($imp) { 'añadido' } else { 'ya estaba' }), entry=$(if ($ent) { 'añadida' } else { 'ya estaba' })")
-
-  # 3) index.ts
-  $exp = Add-BarrelExport $bar.Lines $component $folder
-  if ($exp) { $barChanged = $true }
-  $report.Add("BARREL index.ts: $component $(if ($exp) { 'añadido' } else { 'ya estaba' })")
 }
 
 if (-not $DryRun -and $regChanged) { Write-Text $registryPath (($reg.Lines -join $reg.Newline) + $reg.Newline) }
-if (-not $DryRun -and $barChanged) { Write-Text $barrelPath (($bar.Lines -join $bar.Newline) + $bar.Newline) }
 
 Write-Output ("== scaffold " + $(if ($DryRun) { '(dry-run, sin escribir)' } else { 'aplicado' }) + " ==")
 foreach ($r in $report) { Write-Output "  $r" }
-if ($DryRun) { Write-Output '  (dry-run: registry.tsx e index.ts NO se han modificado)' }
+if ($DryRun) { Write-Output '  (dry-run: registry.tsx NO se ha modificado)' }

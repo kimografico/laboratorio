@@ -60,7 +60,7 @@ props:
 `count` y `size` controlan cuántos nenúfares hay y su radio medio (cada uno varía entre 0.55× y 1.4×). `push` y `reach` ajustan cómo el puntero los empuja, los aparta y hace girar (con `push = 0` no los toca); `flowers` es la fracción de nenúfares con flor, `alpha` la opacidad del contorno y `lineWidth` el grosor de línea. El color se hereda del CSS de la página; puedes forzarlo con la prop opcional `color` o con las variables `--lily-color` / `--lily-opacity`.
 
 ```tsx
-import { LilyBackground } from "@kimografico/laboratorio";
+import LilyBackground from "@kimografico/laboratorio/backgrounds/LilyBackground";
 
 export function Demo() {
   return (

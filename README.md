@@ -34,24 +34,33 @@ npm install @kimografico/laboratorio
 
 ### 1. CSS
 
-Importa el tema después de Tailwind. `theme.css` aporta los tokens (`--surface`, `--fg`, …),
-`.bg-canvas` y los estilos de `FlipText`:
+Importa el tema (tokens) después de Tailwind y, por cada componente que uses, su CSS. La
+librería se importa por subrutas (un archivo por componente), así que solo traes lo que usas:
 
 ```css
 /* tu CSS principal */
 @import "tailwindcss";
 @import "@kimografico/laboratorio/theme.css";
 
+/* fondos canvas (común a todos los *Background) */
+@import "@kimografico/laboratorio/backgrounds/base.css";
+
+/* textos animados: importa solo los que uses (FlipText, FadeUpText, …) */
+@import "@kimografico/laboratorio/texts/FlipText.css";
+
 /* deja que Tailwind escanee las clases que vienen compiladas en la librería */
 @source "../node_modules/@kimografico/laboratorio/dist";
 ```
+
+`theme.css` aporta los tokens (`--surface`, `--fg`, …) y las utilidades del tema; cada
+componente trae su propio CSS junto al componente.
 
 ### 2. Fondos (canvas)
 
 Necesitan un contenedor con tamaño y `position: relative`:
 
 ```tsx
-import { AuroraBackground } from "@kimografico/laboratorio";
+import AuroraBackground from "@kimografico/laboratorio/backgrounds/AuroraBackground";
 
 export function Hero() {
   return (
@@ -67,7 +76,7 @@ En **Astro**:
 
 ```astro
 ---
-import { AuroraBackground } from "@kimografico/laboratorio";
+import AuroraBackground from "@kimografico/laboratorio/backgrounds/AuroraBackground";
 ---
 <div class="relative h-96 overflow-hidden rounded-2xl">
   <AuroraBackground client:visible />
@@ -79,7 +88,7 @@ En **Next.js** (App Router) el archivo debe llevar `"use client"` (los fondos us
 ### 3. Botón
 
 ```tsx
-import { Button } from "@kimografico/laboratorio";
+import Button from "@kimografico/laboratorio/ui/Button";
 
 <Button label="Descargar" icon="download" />
 
@@ -98,7 +107,7 @@ Props: `label`, `variant` (`solid` | `outline` | `ghost`), `size` (`xs` | `sm` |
 ### 4. Texto
 
 ```tsx
-import { FlipText } from "@kimografico/laboratorio";
+import FlipText from "@kimografico/laboratorio/texts/FlipText";
 
 <FlipText duration={4.5} loop>
   Hola mundo
@@ -108,7 +117,7 @@ import { FlipText } from "@kimografico/laboratorio";
 ### 5. ThemeToggle
 
 ```tsx
-import { ThemeToggle } from "@kimografico/laboratorio";
+import ThemeToggle from "@kimografico/laboratorio/ui/ThemeToggle";
 
 <ThemeToggle size="sm" variant="toggle" shape="circle" interactive />
 ```
@@ -120,7 +129,7 @@ para los tokens). Sin `interactive` es solo visual.
 
 ```bash
 npm run dev        # showcase en http://localhost:4321
-npm run build:lib  # librería  -> dist/        (dist/index.js + dist/index.d.ts)
+npm run build:lib  # librería  -> dist/        (un archivo + tipos por componente)
 npm run build      # showcase  -> dist-site/
 npm run check      # astro check
 ```

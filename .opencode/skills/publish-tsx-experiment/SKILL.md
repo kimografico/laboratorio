@@ -3,7 +3,7 @@ name: publish-tsx-experiment
 description: >-
   Publica componentes React (.tsx) existentes en el directorio +/ como
   experimentos del showcase y de la librería @kimografico/laboratorio: registra
-  el componente, lo exporta y crea su página .md. Incluye scripts deterministas
+  el componente y crea su página .md. Incluye scripts deterministas
   para inventariar, andamiar y verificar. Úsalo al integrar .tsx de +/, junto al
   agente tsx-to-experiment o por sí solo.
 ---
@@ -41,14 +41,14 @@ Las piezas de UI (`src/content/ui/`) usan su propia categoría de colección
    Esto es criterio de diseño; lo decide el agente, no el script.
 
 3. **Andamiaje.** Con un spec JSON (ver abajo), inserta import + entrada en
-   `src/lib/registry.tsx`, el export en `src/lib/index.ts` y crea el `.md`:
+   `src/lib/registry.tsx` y crea el `.md`:
 
    ```powershell
    pwsh .opencode/skills/publish-tsx-experiment/scripts/scaffold.ps1 -Spec spec.json
    pwsh .opencode/skills/publish-tsx-experiment/scripts/scaffold.ps1 -Spec spec.json -DryRun
    ```
 
-   Es idempotente: una segunda pasada no duplica imports, exports ni `.md`, y
+   Es idempotente: una segunda pasada no duplica imports ni `.md`, y
    nunca sobrescribe un `.md` existente.
 
 4. **Verificar.** Chequeos estáticos y, opcionalmente, build + rutas:
@@ -63,11 +63,11 @@ Las piezas de UI (`src/content/ui/`) usan su propia categoría de colección
 ## Scripts
 
 - `scripts/inventory.ps1` — solo lectura. Lista `+/`, claves del registry,
-  exports del barrel, slugs/`component` de los `.md` y colisiones candidato vs.
+  slugs/`component` de los `.md` y colisiones candidato vs.
   repo. Parámetros: `-Root`, `-SourceDir` (por defecto `+`).
-- `scripts/scaffold.ps1` — idempotente. Crea el `.md` y edita `registry.tsx` +
-  `index.ts` (ordenados por categoría: multilínea para fondos, una línea para
-  el resto). Parámetros: `-Spec <json>` o `-Json '<json>'`, `-Root`, `-DryRun`.
+- `scripts/scaffold.ps1` — idempotente. Crea el `.md` y edita `registry.tsx`
+  (ordenado por categoría). Parámetros: `-Spec <json>` o `-Json '<json>'`,
+  `-Root`, `-DryRun`.
 - `scripts/verify.ps1` — duplicados, referencias rotas y, con `-Run`,
   `npm run check/build/build:lib` y comprobación de rutas `dist-site`. Params:
   `-Root`, `-Run`, `-Slugs`.
@@ -120,5 +120,5 @@ siempre. Ejemplo:
 ## Qué NO hace el scaffold
 
 - No escribe ni adapta el componente `.tsx` (eso es criterio).
-- No sobrescribe `.md` existentes ni pisa imports/exports ya presentes.
+- No sobrescribe `.md` existentes ni pisa imports ya presentes.
 - No inventa props, valores ni textos de uso.

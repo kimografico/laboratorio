@@ -4,17 +4,26 @@
   "description": "Fondos interactivos (canvas) y componentes de UI en React para Astro, Next.js o Vite.",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "./package.json": "./package.json",
+    "./theme.css": "./src/styles/theme.css",
+    "./backgrounds/base.css": "./src/components/backgrounds/base.css",
+    "./texts/*.css": "./src/components/texts/*.css",
+    "./backgrounds/*": {
+      "types": "./dist/backgrounds/*.d.ts",
+      "import": "./dist/backgrounds/*.js"
     },
-    "./theme.css": "./src/styles/theme.css"
+    "./texts/*": {
+      "types": "./dist/texts/*.d.ts",
+      "import": "./dist/texts/*.js"
+    },
+    "./ui/*": {
+      "types": "./dist/ui/*.d.ts",
+      "import": "./dist/ui/*.js"
+    }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "src/components/**/*.css",
     "src/styles/theme.css",
     "README.md"
   ],

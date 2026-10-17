@@ -41,14 +41,6 @@ function Get-RegistryKeys([string]$registryPath) {
   return $keys
 }
 
-function Get-BarrelExports([string]$barrelPath) {
-  $names = New-Object System.Collections.Generic.List[string]
-  foreach ($l in (Get-Content -LiteralPath $barrelPath)) {
-    foreach ($m in [regex]::Matches($l, 'default as ([A-Za-z0-9_]+)')) { $names.Add($m.Groups[1].Value) }
-  }
-  return $names
-}
-
 function Get-ContentRows([string]$glob) {
   $rows = New-Object System.Collections.Generic.List[object]
   foreach ($f in (Get-ChildItem -Path $glob -ErrorAction SilentlyContinue)) {
@@ -66,14 +58,11 @@ $repoRoot = if ($Root) { (Resolve-Path -LiteralPath $Root).Path } else { Find-Re
 $errors = New-Object System.Collections.Generic.List[string]
 
 $registryKeys = Get-RegistryKeys (Join-Path $repoRoot 'src/lib/registry.tsx')
-$barrelExports = Get-BarrelExports (Join-Path $repoRoot 'src/lib/index.ts')
 $expRows = Get-ContentRows (Join-Path $repoRoot 'src/content/experiments/*.md')
 $uiRows = Get-ContentRows (Join-Path $repoRoot 'src/content/ui/*.md')
 
 $dupKeys = @($registryKeys | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
 if ($dupKeys) { $errors.Add("registry.tsx: claves duplicadas -> $($dupKeys -join ', ')") }
-$dupExports = @($barrelExports | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
-if ($dupExports) { $errors.Add("index.ts: exports duplicados -> $($dupExports -join ', ')") }
 $dupExp = @($expRows.Slug | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
 if ($dupExp) { $errors.Add("experiments: slugs duplicados -> $($dupExp -join ', ')") }
 $dupUi = @($uiRows.Slug | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })

@@ -1,0 +1,52 @@
+@import "./_shared.css";
+
+/* TypewriterText */
+.typewriter-text {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.typewriter-text .tw-inner {
+  display: inline-block;
+  white-space: pre;
+  overflow: hidden;
+  vertical-align: bottom;
+  width: auto;
+  animation: tx-type var(--tx-duration) steps(var(--tx-chars), end) var(--tx-delay) 1 both;
+}
+
+.typewriter-text.has-caret .tw-inner {
+  animation:
+    tx-type var(--tx-duration) steps(var(--tx-chars), end) var(--tx-delay) 1 both,
+    tx-caret 1s steps(1, end) infinite;
+}
+
+@keyframes tx-type {
+  from {
+    width: 0;
+  }
+  to {
+    width: calc(var(--tx-chars) * 1ch);
+  }
+}
+
+@keyframes tx-caret {
+  0%,
+  50% {
+    border-color: currentColor;
+  }
+  50.01%,
+  100% {
+    border-color: transparent;
+  }
+}
+
+.typewriter-text.has-caret .tw-inner {
+  border-right: 0.08em solid currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-text .tw-inner {
+    animation: none !important;
+    width: auto;
+  }
+}

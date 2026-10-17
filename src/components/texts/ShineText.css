@@ -1,0 +1,37 @@
+@import "./_shared.css";
+
+/* ShineText */
+.shine-text {
+  display: inline-block;
+  line-height: 1.15;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(
+    var(--tx-angle),
+    currentColor 40%,
+    color-mix(in srgb, currentColor 52%, white) 50%,
+    currentColor 60%
+  );
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  background-position: 200% center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: tx-shine var(--tx-duration) linear var(--tx-delay) var(--tx-iteration) both;
+}
+
+@keyframes tx-shine {
+  from {
+    background-position: 200% center;
+  }
+  to {
+    background-position: -200% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shine-text {
+    animation: none !important;
+    -webkit-text-fill-color: currentColor;
+    background-image: none;
+  }
+}

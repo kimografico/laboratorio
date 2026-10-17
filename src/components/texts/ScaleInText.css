@@ -1,0 +1,24 @@
+@import "./_shared.css";
+
+/* ScaleInText */
+.scalein-text .tx-char {
+  animation: tx-scalein var(--tx-duration) cubic-bezier(0.2, 0.8, 0.2, 1) var(--tx-char-delay)
+    var(--tx-iteration) both;
+}
+
+@keyframes tx-scalein {
+  from {
+    opacity: 0;
+    transform: scale(var(--tx-from));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scalein-text .tx-char {
+    animation: none !important;
+  }
+}
