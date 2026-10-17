@@ -7,7 +7,6 @@ props:
   - name: children
     label: Texto
     type: text
-    default: "Your amazing text here"
   - name: duration
     label: Duración (s)
     type: number
@@ -41,6 +40,6 @@ props:
 El texto se divide en caracteres y anima con CSS puro (`@property --flip-p`). `together` elimina el stagger.
 
 ```tsx
-<FlipText duration={4.5} loop>Your amazing text here</FlipText>
+<FlipText duration={4.5} loop>Dale vida a tus interfaces</FlipText>
 <FlipText duration={1.6} loop={false} together>Todo a la vez</FlipText>
 ```

@@ -275,7 +275,17 @@ export {
   type WhaleBackgroundProps,
 } from "../components/backgrounds/WhaleBackground";
 
+export { default as BlurInText, type BlurInTextProps } from "../components/texts/BlurInText";
+export { default as FadeUpText, type FadeUpTextProps } from "../components/texts/FadeUpText";
 export { default as FlipText, type FlipTextProps } from "../components/texts/FlipText";
+export { default as GlitchText, type GlitchTextProps } from "../components/texts/GlitchText";
+export { default as GlowText, type GlowTextProps } from "../components/texts/GlowText";
+export { default as ScaleInText, type ScaleInTextProps } from "../components/texts/ScaleInText";
+export { default as ShineText, type ShineTextProps } from "../components/texts/ShineText";
+export { default as TiltInText, type TiltInTextProps } from "../components/texts/TiltInText";
+export { default as TrackingInText, type TrackingInTextProps } from "../components/texts/TrackingInText";
+export { default as TypewriterText, type TypewriterTextProps } from "../components/texts/TypewriterText";
+export { default as WaveText, type WaveTextProps } from "../components/texts/WaveText";
 
 export { default as Button, type ButtonProps } from "../components/ui/Button";
 export { default as ThemeToggle } from "../components/ui/ThemeToggle";

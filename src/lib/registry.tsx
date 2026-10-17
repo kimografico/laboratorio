@@ -68,7 +68,17 @@ import WarpGridBackground from "../components/backgrounds/WarpGridBackground";
 import WaterBackground from "../components/backgrounds/WaterBackground";
 import WaveLayersBackground from "../components/backgrounds/WaveLayersBackground";
 import WhaleBackground from "../components/backgrounds/WhaleBackground";
+import BlurInText from "../components/texts/BlurInText";
+import FadeUpText from "../components/texts/FadeUpText";
 import FlipText from "../components/texts/FlipText";
+import GlitchText from "../components/texts/GlitchText";
+import GlowText from "../components/texts/GlowText";
+import ScaleInText from "../components/texts/ScaleInText";
+import ShineText from "../components/texts/ShineText";
+import TiltInText from "../components/texts/TiltInText";
+import TrackingInText from "../components/texts/TrackingInText";
+import TypewriterText from "../components/texts/TypewriterText";
+import WaveText from "../components/texts/WaveText";
 import Button from "../components/ui/Button";
 import ThemeToggle from "../components/ui/ThemeToggle";
 
@@ -143,7 +153,17 @@ export const registry: Record<string, ComponentType<any>> = {
   WaterBackground,
   WaveLayersBackground,
   WhaleBackground,
+  BlurInText,
+  FadeUpText,
   FlipText,
+  GlitchText,
+  GlowText,
+  ScaleInText,
+  ShineText,
+  TiltInText,
+  TrackingInText,
+  TypewriterText,
+  WaveText,
   Button,
   ThemeToggle,
 };

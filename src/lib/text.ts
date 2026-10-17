@@ -3,12 +3,19 @@ import type { PropValues } from "./props";
 
 /** Frases de ejemplo para los experimentos de texto. */
 export const PHRASES: string[] = [
-  "Construye héroes que reaccionan",
-  "Dale vida a tus interfaces",
-  "Detalles que dejan huella",
-  "Movimiento con propósito",
+  "Tu idea increíble aquí",
+  "Siente el impacto visual",
+  "Escribe tu mensaje aquí",
+  "Dale vida a tu mensaje",
   "Diseño que se siente vivo",
-  "Cada píxel cuenta",
+  "Potencia tu gran idea",
+  "Personaliza tu texto ahora",
+  "Insert tremendo mensaje here",
+  "Crea un efecto visual único",
+  "Crea un título épico",
+  "Haz brillar tus palabras",
+  "Prueba tu nuevo texto",
+  "¡Tu texto cobra vida!",
 ];
 
 /** Clave de localStorage donde se guarda el texto compartido (override global). */
