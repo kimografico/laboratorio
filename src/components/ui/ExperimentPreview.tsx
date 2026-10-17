@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronDown, SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
 import Button from "./Button";
 import { defaultsFromProps, type PropDef, type PropValues } from "../../lib/props";
+import { applySharedText, resolveSharedText, setSharedText } from "../../lib/text";
 import { withBase } from "../../lib/base";
 
 interface ExperimentPreviewProps {
@@ -12,6 +13,8 @@ interface ExperimentPreviewProps {
   backHref?: string;
   backLabel?: string;
   allowFullscreen?: boolean;
+  prevHref?: string;
+  nextHref?: string;
 }
 
 function isHex(v: unknown): v is string {
@@ -59,8 +62,12 @@ export default function ExperimentPreview({
   backHref = "/",
   backLabel = "Galería",
   allowFullscreen = true,
+  prevHref,
+  nextHref,
 }: ExperimentPreviewProps) {
-  const [values, setValues] = useState<PropValues>(() => defaultsFromProps(propDefs));
+  const [values, setValues] = useState<PropValues>(() =>
+    applySharedText(defaultsFromProps(propDefs), category, resolveSharedText())
+  );
   const [fullscreen, setFullscreen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -76,7 +83,12 @@ export default function ExperimentPreview({
     [propDefs, values]
   );
 
-  const update = (name: string, value: unknown) => setValues((prev) => ({ ...prev, [name]: value }));
+  const update = (name: string, value: unknown) => {
+    setValues((prev) => ({ ...prev, [name]: value }));
+    if (category === "texts" && name === "children" && typeof value === "string") {
+      setSharedText(value);
+    }
+  };
 
   const copy = async () => {
     try {
@@ -130,13 +142,37 @@ export default function ExperimentPreview({
           <ArrowLeft className="h-4 w-4" /> {backLabel}
         </a>
         <div className="flex items-center gap-2">
+          {prevHref && (
+            <Button
+              size="sm"
+              variant="outline"
+              iconOnly
+              icon="arrow-left"
+              label="Experimento anterior"
+              href={prevHref}
+            />
+          )}
+          {nextHref && (
+            <Button
+              size="sm"
+              variant="outline"
+              iconOnly
+              icon="arrow-right"
+              label="Experimento siguiente"
+              href={nextHref}
+            />
+          )}
           <Button
             size="sm"
             variant="outline"
             icon="rotate-ccw"
             iconPosition="left"
             label="Reset"
-            onClick={() => setValues(defaultsFromProps(propDefs))}
+            onClick={() =>
+              setValues(
+                applySharedText(defaultsFromProps(propDefs), category, resolveSharedText())
+              )
+            }
           />
           {allowFullscreen && (
             <Button

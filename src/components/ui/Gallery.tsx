@@ -3,6 +3,7 @@ import { SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
 import Button from "./Button";
 import { defaultsFromProps, type PropDef } from "../../lib/props";
+import { applySharedText, useSharedText } from "../../lib/text";
 import { withBase } from "../../lib/base";
 
 export interface ExperimentMeta {
@@ -30,7 +31,11 @@ function LazyPreview({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const values = useMemo(() => defaultsFromProps(props), [props]);
+  const sharedText = useSharedText();
+  const values = useMemo(
+    () => applySharedText(defaultsFromProps(props), category, sharedText),
+    [props, category, sharedText]
+  );
   const themed = useMemo(
     () => props.filter((p) => p.type === "color").map((p) => p.name),
     [props]

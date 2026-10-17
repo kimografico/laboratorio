@@ -17,10 +17,10 @@ description: >-
   'pendientes'", "mueve estos a backgrounds", "pásalos a texts", etc.
 - Pide reclasificar uno o varios experimentos.
 
-No es para crear experimentos nuevos (eso lo hace el agente
-`.opencode/agent/tsx-to-experiment.md`) ni para las piezas de
-`src/content/ui/` (tienen su propio `category`, string libre, por defecto
-`buttons`; **no las toques**).
+No es para crear experimentos nuevos (eso lo hacen el agente
+`.opencode/agent/tsx-to-experiment.md` y el skill `publish-tsx-experiment`) ni
+para las piezas de `src/content/ui/` (tienen su propio `category`, string libre,
+por defecto `buttons`; **no las toques**).
 
 ## Atajo: si te dan el slug (más rápido y barato)
 
@@ -76,9 +76,10 @@ Reglas:
   `src/content.config.ts`** (usa singular, p. ej. `pendiente`). Una categoría
   nueva pasa a ser válida en cuanto aparece ahí; no hay que registrarla en
   ningún otro sitio. Si el enum no contempla el valor, `npm run check` fallará.
-- `pendiente` es la categoría de entrada/revisión (ver
-  `.opencode/agent/tsx-to-experiment.md`). Frase como "añádelos a pendientes"
-  significa poner `category: pendiente`.
+- `pendiente` es la categoría de entrada/revisión: todo experimento nuevo entra
+  así y se reclasifica después (ver `.opencode/agent/tsx-to-experiment.md` y el
+  skill `publish-tsx-experiment`). Frase como "añádelos a pendientes" significa
+  poner `category: pendiente`.
 - El script sirve para cualquier categoría futura sin tocarlo: extrae el enum y
   cuenta las que estén en uso dinámicamente.
 

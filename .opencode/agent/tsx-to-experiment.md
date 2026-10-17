@@ -16,6 +16,7 @@ permission:
     "npm run build:lib": allow
     "npm run check": allow
     "npx astro check": allow
+    "pwsh .opencode/skills/publish-tsx-experiment/scripts/*": allow
     "*": ask
 ---
 
@@ -61,12 +62,31 @@ Rutas habituales que debes confirmar en el repositorio antes de usarlas:
 
 El repositorio y su configuración real prevalecen sobre esta descripción. No asumas que estas rutas, convenciones o scripts siguen vigentes sin comprobarlos.
 
+## Herramientas: skill `publish-tsx-experiment`
+
+Apóyate en el skill `publish-tsx-experiment`
+(`.opencode/skills/publish-tsx-experiment/SKILL.md`), que aporta scripts
+deterministas e idempotentes. **Carga el skill** para ver el detalle del spec y
+del flujo.
+
+- `scripts/inventory.ps1` — inventario de `+/`, claves del registry, exports del
+  barrel, slugs/`component` de los `.md` y colisiones candidato vs. repo (solo lectura).
+- `scripts/scaffold.ps1` — inserta import + entrada en `src/lib/registry.tsx`, el
+  export en `src/lib/index.ts` y crea el `.md`, ordenado e idempotente.
+- `scripts/verify.ps1` — integridad y, con `-Run`, `check`/`build`/`build:lib`
+  más rutas `dist-site` (`-Slugs`).
+
+Úsalos en lugar de editar a mano el registro, el barrel y las páginas. El
+criterio (auditoría, duplicados, adaptación, conflictos, props y uso) sigue
+siendo tuyo.
+
 # Flujo de trabajo obligatorio
 
 ## Fase 1 — Inventario completo de `+/` (solo lectura)
 
 Antes de crear, editar, mover o borrar archivos:
 
+0. Ejecuta `pwsh .opencode/skills/publish-tsx-experiment/scripts/inventory.ps1` como punto de partida y usa su salida para el inventario y la detección de colisiones.
 1. Enumera recursivamente todos los archivos de `+/`, incluidos archivos anidados, estilos, assets, módulos auxiliares y configuraciones.
 2. Identifica todos los candidatos `.tsx`.
 3. Lee cada candidato `.tsx` completo y examina sus imports locales relevantes, estilos, assets y utilidades compartidas.
@@ -234,55 +254,47 @@ Para arrays usados como dependencias, no utilices de forma automática `join(","
 - No añadas dependencias sin necesidad y autorización.
 - No cambies nombres de props públicas sin autorización explícita.
 
-## Registro de componentes
+## Registro, exports y página (delega en el script)
 
-Actualiza `src/lib/registry.tsx` solo según la estructura real del proyecto.
+La mecánica de registrar el componente, exportarlo y crear su página la hace
+`scaffold.ps1` del skill `publish-tsx-experiment`, de forma idempotente:
 
-- Añade el import y la entrada de registro que correspondan.
-- Mantén la convención de orden existente.
-- Reutiliza entradas válidas y evita claves o imports duplicados.
-- El identificador `component` del Markdown debe coincidir exactamente con la clave de registro.
-- No alteres entradas no relacionadas.
-
-## Exports públicos
-
-Actualiza `src/lib/index.ts` con el export del componente y el tipo público, siguiendo las convenciones del proyecto. Reutiliza exports existentes y no dupliques identificadores ni expongas helpers internos innecesarios.
-
-Ejemplo orientativo:
-
-```ts
-export {
-  default as ExampleBackground,
-  type ExampleBackgroundProps,
-} from "../components/backgrounds/ExampleBackground";
+```powershell
+pwsh .opencode/skills/publish-tsx-experiment/scripts/scaffold.ps1 -Spec spec.json
 ```
 
-Adapta el ejemplo a la ruta y los nombres reales. Exporta componentes de UI reutilizables cuando proceda.
+Construye un spec JSON con una entrada por candidato aprobado: `kind`
+(`background`|`text`|`ui`), `component`, `slug`, `title`, `description`,
+`props` y `usage`. El script:
 
-## Página Markdown y playground
+- Inserta el import y la entrada en `src/lib/registry.tsx` respetando el orden.
+- Inserta el export en `src/lib/index.ts` (multilínea para fondos, una línea
+  para el resto).
+- Crea `src/content/experiments/<slug>.md` (o `src/content/ui/<slug>.md`) y
+  **nunca sobrescribe un `.md` existente**.
+- Es idempotente: repetirlo no duplica imports, exports ni páginas.
 
-Crea `src/content/experiments/<slug>.md` únicamente si el slug no existe y el candidato ha sido aprobado.
+Consulta el `SKILL.md` del skill para el detalle del spec y los parámetros
+(`-DryRun`, `-Root`).
 
-Antes de escribir, consulta `src/content.config.ts` y páginas vecinas. Respeta el esquema real del frontmatter. La estructura habitual puede incluir `title`, `description`, `category`, `component` y `props`, pero la configuración del repositorio es la autoridad.
+Contratos que siguen siendo tuyos:
 
-**Categoría por defecto:** todo experimento que se añada en `src/content/experiments/` debe usar `category: pendiente`, sin importar su técnica de renderizado. `pendiente` es la categoría de entrada y revisión: no la cambies a `backgrounds` ni `texts` por tu cuenta; esa reclasificación la hace una persona más adelante. El valor debe existir en el enum de `src/content.config.ts`.
-
-- Usa el nombre de componente exacto que espera el registro.
-- Añade un control por cada prop configurable que deba mostrarse y que el esquema admita.
-- No inventes props, opciones ni valores.
-- Para valores numéricos, elige rangos razonables a partir del valor por defecto y de ejemplos existentes.
+- El `component` del Markdown debe coincidir exactamente con la clave del registro.
 - Los valores por defecto del playground deben coincidir con los del componente.
+- No inventes props, opciones ni valores; no expongas detalles internos.
 - Respeta el contrato de colores y temas descrito arriba.
-- No expongas detalles internos como controles.
-- Si no hay props apropiadas para el playground, no inventes controles artificiales.
-- Incluye una sección `## Uso` breve y un ejemplo TSX representativo.
-- En YAML, entrecomilla los escalares que contengan `: `.
-- Guarda el archivo en UTF-8 y conserva los acentos.
-- No sobrescribas una página existente sin autorización.
+- Incluye una sección `## Uso` breve y un ejemplo TSX representativo (pásalo como `usage`).
+- **Categoría:** todo experimento entra siempre con `category: pendiente` (el
+  script lo hace por ti). No la reclasifiques a `backgrounds`/`texts`; es
+  revisión manual posterior.
+- En YAML, entrecomilla los escalares que contengan `: ` y conserva los acentos (UTF-8).
+- No sobrescribas páginas existentes sin autorización: si el `.md` ya existe, el
+  script lo omite y decides tú.
+- Exporta componentes de UI reutilizables cuando proceda.
 
 ## Idempotencia antes y después de escribir
 
-Antes de escribir cada destino, vuelve a comprobar su estado actual para no sobrescribir cambios que hayan aparecido desde la auditoría.
+`scaffold.ps1` ya es idempotente para el registro, el barrel y las páginas. Aun así, antes de escribir cualquier otro destino, vuelve a comprobar su estado actual para no sobrescribir cambios que hayan aparecido desde la auditoría.
 
 Si ya existe una parte válida de la integración, reutilízala o reconcilia solo la diferencia necesaria. No añadas texto o código al final de un archivo sin revisar su estructura.
 
@@ -308,6 +320,8 @@ Confirma primero los scripts existentes en `package.json`. Cuando estén disponi
 1. `npm run check`
 2. `npm run build`
 3. `npm run build:lib`
+
+Alternativamente, `pwsh .opencode/skills/publish-tsx-experiment/scripts/verify.ps1 -Run -Slugs <slugs>` ejecuta los tres y comprueba que se generan las rutas `dist-site/experiment/<slug>/index.html`.
 
 Si `npm run check` no existe, utiliza `npx astro check` solo si es apropiado para la configuración real del proyecto. Si `npm run build:lib` no existe, no inventes el script ni afirmes que la biblioteca se ha compilado.
 

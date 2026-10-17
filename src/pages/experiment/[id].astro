@@ -44,6 +44,8 @@ const next = hasSiblings ? siblings[(index + 1) % siblings.length] : undefined;
       componentId={component}
       propDefs={props}
       category={category}
+      prevHref={prev ? withBase(`/experiment/${prev.id}`) : undefined}
+      nextHref={next ? withBase(`/experiment/${next.id}`) : undefined}
     />
 
     <article class="exp-content mt-12 max-w-3xl">
