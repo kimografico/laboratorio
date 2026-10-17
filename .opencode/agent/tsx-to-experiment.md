@@ -76,7 +76,7 @@ Antes de crear, editar, mover o borrar archivos:
 Para cada candidato, registra internamente:
 
 - Ruta de origen y nombre del componente exportado.
-- Categoría probable: `background`, `texts` o `ui`.
+- Categoría probable: `background`, `texts` o `ui` (solo para elegir la carpeta de destino; en el frontmatter del experimento la categoría siempre es `pendiente`, ver más abajo).
 - Props, tipos y valores por defecto.
 - Técnica de renderizado: canvas, DOM, SVG, WebGL u otra.
 - Animaciones, interacciones, listeners, timers y observers.
@@ -264,6 +264,8 @@ Adapta el ejemplo a la ruta y los nombres reales. Exporta componentes de UI reut
 Crea `src/content/experiments/<slug>.md` únicamente si el slug no existe y el candidato ha sido aprobado.
 
 Antes de escribir, consulta `src/content.config.ts` y páginas vecinas. Respeta el esquema real del frontmatter. La estructura habitual puede incluir `title`, `description`, `category`, `component` y `props`, pero la configuración del repositorio es la autoridad.
+
+**Categoría por defecto:** todo experimento que se añada en `src/content/experiments/` debe usar `category: pendiente`, sin importar su técnica de renderizado. `pendiente` es la categoría de entrada y revisión: no la cambies a `backgrounds` ni `texts` por tu cuenta; esa reclasificación la hace una persona más adelante. El valor debe existir en el enum de `src/content.config.ts`.
 
 - Usa el nombre de componente exacto que espera el registro.
 - Añade un control por cada prop configurable que deba mostrarse y que el esquema admita.

@@ -4,6 +4,8 @@
 @theme {
   --color-ink: #0b0b0c;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  /* Paso adicional de ancho de contenido para pantallas anchas (1440px). */
+  --container-8xl: 90rem;
 }
 
 html,
@@ -41,18 +43,10 @@ body {
   padding: 0.1rem 0.35rem;
 }
 
+/*
+ * El bloque de código de la sección "Uso" se omite en las páginas de detalle:
+ * el snippet autogenerado ya se muestra en el panel "Código de uso".
+ */
 .exp-content pre {
-  margin: 1rem 0;
-  padding: 1rem;
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: var(--panel);
-}
-
-.exp-content pre code {
-  background: transparent;
-  padding: 0;
-  color: var(--code-fg);
-  font-size: 0.75rem;
+  display: none;
 }

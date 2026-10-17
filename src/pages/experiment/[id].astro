@@ -1,6 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ExperimentPreview from "../../components/ui/ExperimentPreview";
+import Button from "../../components/ui/Button";
+import { withBase } from "../../lib/base";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -14,10 +16,19 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const { title, description, category, component, props } = entry.data;
+
+const siblings = (await getCollection("experiments"))
+  .filter((e) => e.data.category === category)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const index = siblings.findIndex((e) => e.id === entry.id);
+const hasSiblings = siblings.length > 1;
+const prev = hasSiblings ? siblings[(index - 1 + siblings.length) % siblings.length] : undefined;
+const next = hasSiblings ? siblings[(index + 1) % siblings.length] : undefined;
 ---
 
 <Layout title={`${title} · Laboratorio`} description={description}>
-  <section class="mx-auto max-w-6xl px-5 pt-10 pb-16">
+  <section class="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pt-10 pb-16">
     <div class="mb-8 flex flex-col gap-4 border-b border-line pb-8">
       <div class="flex flex-wrap items-center gap-2">
         <span class="text-xs uppercase tracking-wide text-faint">{category}</span>
@@ -38,5 +49,27 @@ const { title, description, category, component, props } = entry.data;
     <article class="exp-content mt-12 max-w-3xl">
       <Content />
     </article>
+
+    {prev && next && (
+      <nav
+        class="mt-12 flex items-center justify-between gap-4 border-t border-line pt-8"
+        aria-label="Navegación entre experimentos"
+      >
+        <Button
+          href={withBase(`/experiment/${prev.id}`)}
+          label="Anterior"
+          icon="arrow-left"
+          iconPosition="left"
+          variant="outline"
+        />
+        <Button
+          href={withBase(`/experiment/${next.id}`)}
+          label="Siguiente"
+          icon="arrow-right"
+          iconPosition="right"
+          variant="outline"
+        />
+      </nav>
+    )}
   </section>
 </Layout>

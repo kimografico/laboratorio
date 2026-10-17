@@ -18,7 +18,7 @@ const experiments = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    category: z.enum(["backgrounds", "texts"]),
+    category: z.enum(["backgrounds", "texts", "pendiente"]),
     component: z.string(),
     props: z.array(propSchema).default([]),
   }),
