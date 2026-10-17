@@ -54,8 +54,3 @@ El mismo repo se publica como **librería** (`@kimografico/laboratorio`): la bui
   Al estar en su valor por defecto, `background` adopta el color de lienzo del tema y `color`/
   `fill` se invierten (manteniendo el alfa) si no encajan con el tema activo. Si el usuario
   cambia un color en el playground, deja de seguir el tema. La lógica vive en `src/lib/theme.ts`.
-
-## Conversión Astro → React
-
-Usa el subagente **`astro-to-react`** (`.opencode/agent/astro-to-react.md`) para
-convertir un `*.astro` a `*.tsx` siguiendo el contrato del proyecto.
