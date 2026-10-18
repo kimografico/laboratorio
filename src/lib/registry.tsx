@@ -31,6 +31,7 @@ import KoiBackground from "../components/backgrounds/KoiBackground";
 import LavaLampBackground from "../components/backgrounds/LavaLampBackground";
 import LeavesBackground from "../components/backgrounds/LeavesBackground";
 import LifeBackground from "../components/backgrounds/LifeBackground";
+import MimosaPudicaBackground from "../components/backgrounds/MimosaPudicaBackground";
 import LilyBackground from "../components/backgrounds/LilyBackground";
 import MantaBackground from "../components/backgrounds/MantaBackground";
 import MarblesBackground from "../components/backgrounds/MarblesBackground";
@@ -118,6 +119,7 @@ export const registry: Record<string, ComponentType<any>> = {
   LavaLampBackground,
   LeavesBackground,
   LifeBackground,
+  MimosaPudicaBackground,
   LilyBackground,
   MantaBackground,
   MarblesBackground,
