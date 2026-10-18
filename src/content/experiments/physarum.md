@@ -1,13 +1,13 @@
 ---
 title: Physarum
 description: Red de venas de moho polimorfo que crece sobre el fondo y converge hacia el alimento del puntero.
-category: pendiente
+category: backgrounds
 component: PhysarumBackground
 props:
   - name: density
     label: Densidad
     type: number
-    default: 8
+    default: 12
     min: 2
     max: 20
     step: 0.5
@@ -21,28 +21,28 @@ props:
   - name: sensor
     label: Sensor (px)
     type: number
-    default: 20
+    default: 40
     min: 4
     max: 60
     step: 1
   - name: turn
     label: Giro (rad)
     type: number
-    default: 0.5
+    default: 0.75
     min: 0.05
     max: 2
     step: 0.05
   - name: persistence
     label: Persistencia
     type: number
-    default: 0.94
+    default: 0.95
     min: 0.85
     max: 0.995
     step: 0.005
   - name: diffusion
     label: Difusión
     type: number
-    default: 0.12
+    default: 0.35
     min: 0
     max: 0.5
     step: 0.01
@@ -63,14 +63,14 @@ props:
   - name: threshold
     label: Umbral
     type: number
-    default: 0.6
+    default: 1.25
     min: 0.1
     max: 1.5
     step: 0.05
   - name: opacity
     label: Opacidad
     type: number
-    default: 0.85
+    default: 0.5
     min: 0
     max: 1
     step: 0.02

@@ -32,12 +32,12 @@ type Plankton = {
 };
 
 export default function PlanktonBackground({
-  density = 1.2,
-  size = 1.8,
-  drift = 0.14,
-  wake = 1,
-  radius = 150,
-  glow = 0.7,
+  density = 8.5,
+  size = 1.5,
+  drift = 0.2,
+  wake = 0.5,
+  radius = 100,
+  glow = 1.25,
   alpha = 0.35,
   color,
   className,

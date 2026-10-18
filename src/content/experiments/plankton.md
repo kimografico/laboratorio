@@ -1,48 +1,48 @@
 ---
 title: Plancton
 description: Partículas a la deriva que brillan y reaccionan a la estela del puntero.
-category: pendiente
+category: backgrounds
 component: PlanktonBackground
 props:
   - name: density
     label: Densidad
     type: number
-    default: 1.2
+    default: 8.5
     min: 0.2
-    max: 5
+    max: 25
     step: 0.1
   - name: size
     label: Tamaño (px)
     type: number
-    default: 1.8
+    default: 1.5
     min: 0.5
     max: 6
     step: 0.1
   - name: drift
     label: Deriva
     type: number
-    default: 0.14
+    default: 0.2
     min: 0
     max: 1
     step: 0.02
   - name: wake
     label: Estela
     type: number
-    default: 1
+    default: 0.5
     min: 0
     max: 4
     step: 0.1
   - name: radius
     label: Radio (px)
     type: number
-    default: 150
+    default: 100
     min: 40
     max: 400
     step: 10
   - name: glow
     label: Brillo
     type: number
-    default: 0.7
+    default: 1.25
     min: 0
     max: 2
     step: 0.05

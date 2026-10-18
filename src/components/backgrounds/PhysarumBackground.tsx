@@ -40,21 +40,21 @@ const TAU = Math.PI * 2;
 const MAX_AGENTS = 20000;
 
 export default function PhysarumBackground({
-  density = 8,
+  density = 12,
   steps = 4,
-  sensor = 20,
+  sensor = 40,
   sensorAngle = 0.6,
-  turn = 0.5,
-  persistence = 0.94,
-  diffusion = 0.12,
+  turn = 0.75,
+  persistence = 0.95,
+  diffusion = 0.35,
   attraction = 1.5,
   reach = 300,
   sink = 12,
   lure = 1.5,
   lureRadius = 30,
-  threshold = 0.6,
+  threshold = 1.25,
   sharpness = 0.8,
-  opacity = 0.85,
+  opacity = 0.5,
   color,
   className,
 }: PhysarumBackgroundProps) {

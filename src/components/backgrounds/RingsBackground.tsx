@@ -5,11 +5,17 @@ export interface RingsBackgroundProps {
   count?: number;
   /** Desplazamiento máximo por paralaje (px) para los anillos más cercanos */
   strength?: number;
+  /** Reparto del paralaje según profundidad: 0 = todos se mueven igual, más alto = más diferencia entre anillos */
+  spread?: number;
   /** Suavizado del paralaje: cuanto más bajo, más lento */
   ease?: number;
   /** Opacidad máxima de los anillos (0-1) */
   alpha?: number;
   lineWidth?: number;
+  /** Diferencia de grosor por profundidad: 0 = mismos grosores, más alto = los anillos cercanos engordan */
+  lineDepth?: number;
+  /** Amplitud de la deriva flotante (1 = la actual) */
+  drift?: number;
   /** Opcional: fija el color de los anillos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
   className?: string;
@@ -18,11 +24,14 @@ export interface RingsBackgroundProps {
 type Ring = { fx: number; fy: number; r: number; z: number; phase: number; filled: boolean };
 
 export default function RingsBackground({
-  count = 14,
-  strength = 80,
+  count = 20,
+  strength = 200,
+  spread = 1.75,
   ease = 0.03,
   alpha = 0.2,
-  lineWidth = 1,
+  lineWidth = 0.5,
+  lineDepth = 3,
+  drift = 1,
   color,
   className,
 }: RingsBackgroundProps) {
@@ -80,10 +89,13 @@ export default function RingsBackground({
       const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
       ctx!.strokeStyle = ink;
       ctx!.fillStyle = ink;
-      ctx!.lineWidth = lineWidth;
       for (const r of rings) {
-        const x = r.fx * width - sx * strength * 2 * r.z + Math.cos(time * 0.00015 + r.phase) * 14;
-        const y = r.fy * height - sy * strength * 2 * r.z + Math.sin(time * 0.00012 + r.phase) * 14;
+        const par = Math.pow(r.z, 1 + spread * 3);
+        const x =
+          r.fx * width - sx * strength * 2 * par + Math.cos(time * 0.00015 + r.phase) * 14 * drift;
+        const y =
+          r.fy * height - sy * strength * 2 * par + Math.sin(time * 0.00012 + r.phase) * 14 * drift;
+        ctx!.lineWidth = lineWidth * (1 + lineDepth * ((r.z - 0.2) / 0.8));
         ctx!.beginPath();
         ctx!.arc(x, y, r.r, 0, Math.PI * 2);
         if (r.filled) {
@@ -114,7 +126,7 @@ export default function RingsBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, strength, ease, alpha, lineWidth]);
+  }, [count, strength, spread, ease, alpha, lineWidth, lineDepth, drift]);
 
   return (
     <div
