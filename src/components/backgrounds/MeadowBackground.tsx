@@ -302,7 +302,7 @@ export default function MeadowBackground({
       className={`bg-canvas ${className ?? ""}`.trim()}
       style={color ? ({ "--meadow-color": color } as React.CSSProperties) : undefined}
     >
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} style={{ backgroundColor: "var(--panel)" }} />
     </div>
   );
 }

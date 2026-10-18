@@ -226,7 +226,7 @@ export default function BevelBackground({
       className={`bg-canvas ${className ?? ""}`.trim()}
       style={color ? ({ "--bevel-color": color } as React.CSSProperties) : undefined}
     >
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} style={{ backgroundColor: "var(--panel)" }} />
     </div>
   );
 }

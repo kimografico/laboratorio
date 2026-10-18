@@ -380,7 +380,7 @@ export default function MimosaPudicaBackground({
       className={`bg-canvas ${className ?? ""}`.trim()}
       style={color ? ({ "--leaves-color": color } as React.CSSProperties) : undefined}
     >
-      <canvas ref={canvasRef} style={{ touchAction: "none", backgroundColor: "var(--surface, var(--panel))" }} />
+      <canvas ref={canvasRef} style={{ touchAction: "none", backgroundColor: "var(--panel)" }} />
     </div>
   );
 }

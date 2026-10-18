@@ -121,17 +121,7 @@ export default function RidgeBackground({
           if (x === -step) ctx!.moveTo(x, y);
           else ctx!.lineTo(x, y);
         }
-        ctx!.lineTo(width + step, y0 + spacing * 0.5);
-        ctx!.lineTo(-step, y0 + spacing * 0.5);
-        ctx!.closePath();
-        // destination-out borra la silueta de lo que hay detrás (sin depender del color de fondo),
-        // luego se pinta el área y el contorno con la tinta viva
-        ctx!.globalCompositeOperation = "destination-out";
-        setAlpha(1);
-        ctx!.fill();
-        ctx!.globalCompositeOperation = "source-over";
         setAlpha(alpha * mul);
-        ctx!.fill();
         ctx!.stroke();
       }
       ctx!.globalAlpha = 1;
