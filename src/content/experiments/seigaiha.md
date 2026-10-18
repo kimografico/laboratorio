@@ -1,13 +1,13 @@
 ---
 title: Seigaiha
 description: El patrón japonés de olas concéntricas que se hinchan al pasar el puntero.
-category: pendiente
+category: backgrounds
 component: SeigaihaBackground
 props:
   - name: size
     label: Radio (px)
     type: number
-    default: 38
+    default: 40
     min: 12
     max: 120
     step: 2
@@ -21,14 +21,14 @@ props:
   - name: swell
     label: Hinchazón
     type: number
-    default: 0.3
+    default: 1
     min: 0
     max: 1
     step: 0.05
   - name: radius
     label: Radio puntero (px)
     type: number
-    default: 180
+    default: 50
     min: 40
     max: 500
     step: 10
@@ -42,7 +42,7 @@ props:
   - name: decay
     label: Persistencia
     type: number
-    default: 0.97
+    default: 0.98
     min: 0.8
     max: 0.995
     step: 0.005

@@ -1,13 +1,13 @@
 ---
 title: Globo
 description: Esfera de alambre en wireframe que gira sola y se abomba hacia el puntero.
-category: pendiente
+category: backgrounds
 component: GlobeBackground
 props:
   - name: lat
     label: Paralelos
     type: number
-    default: 14
+    default: 12
     min: 4
     max: 40
     step: 1
@@ -21,7 +21,7 @@ props:
   - name: size
     label: Tamaño
     type: number
-    default: 0.84
+    default: 0.7
     min: 0.2
     max: 0.9
     step: 0.01
@@ -42,21 +42,21 @@ props:
   - name: spin
     label: Giro
     type: number
-    default: 0.00008
+    default: 0.00025
     min: 0
     max: 0.0005
     step: 0.00001
   - name: ease
     label: Suavizado
     type: number
-    default: 0.08
+    default: 0.2
     min: 0.01
     max: 0.4
     step: 0.01
   - name: lineWidth
     label: Grosor de línea
     type: number
-    default: 1
+    default: 0.5
     min: 0.2
     max: 5
     step: 0.1

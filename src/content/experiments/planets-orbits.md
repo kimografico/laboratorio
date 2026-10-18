@@ -1,48 +1,48 @@
 ---
 title: Órbitas elásticas
 description: Elipses que siguen al puntero con retardo progresivo; cada planeta se queda atrás cuanto más lejana es su órbita.
-category: pendiente
+category: backgrounds
 component: PlanetsOrbitsBackground
 props:
   - name: orbits
     label: Órbitas
     type: number
-    default: 7
+    default: 8
     min: 1
     max: 20
     step: 1
   - name: minRadius
     label: Radio inicial (px)
     type: number
-    default: 50
+    default: 75
     min: 10
     max: 200
     step: 5
   - name: gap
     label: Separación (px)
     type: number
-    default: 38
+    default: 80
     min: 10
     max: 120
     step: 2
   - name: eccentricity
     label: Excentricidad
     type: number
-    default: 0.35
+    default: 0.6
     min: 0
     max: 0.8
     step: 0.05
   - name: lag
     label: Retardo
     type: number
-    default: 0.6
+    default: 2
     min: 0
     max: 3
     step: 0.05
   - name: stiffness
     label: Rigidez
     type: number
-    default: 0.03
+    default: 0.01
     min: 0.005
     max: 0.2
     step: 0.005

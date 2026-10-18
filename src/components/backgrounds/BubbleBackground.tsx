@@ -168,11 +168,6 @@ export default function BubbleBackground({
       const t = p.age / POP_LIFE;
       const e = 1 - Math.pow(1 - t, 2); // sale rápido y frena
       ctx!.lineWidth = lineWidth;
-      // Aro que se abre y se desvanece
-      ctx!.beginPath();
-      ctx!.arc(p.x, p.y, p.r * (1 + 0.55 * e), 0, Math.PI * 2);
-      setAlpha(a * 0.7 * (1 - t));
-      ctx!.stroke();
       // Gotitas: pequeños trazos radiales que salen despedidos
       ctx!.beginPath();
       for (let k = 0; k < 8; k++) {

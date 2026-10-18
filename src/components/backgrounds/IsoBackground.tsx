@@ -24,7 +24,7 @@ export default function IsoBackground({
   speed = 1,
   lift = 120,
   radius = 220,
-  alpha = 0.1,
+  alpha = 0.06,
   color,
   className,
 }: IsoBackgroundProps) {

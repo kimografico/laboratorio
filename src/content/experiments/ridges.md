@@ -1,7 +1,7 @@
 ---
 title: Ridges
 description: Cordilleras de líneas que se elevan bajo el puntero; de colinas suaves a montañas con ruido.
-category: pendiente
+category: backgrounds
 component: RidgeBackground
 props:
   - name: spacing
@@ -14,7 +14,7 @@ props:
   - name: lift
     label: Elevación (px)
     type: number
-    default: 52
+    default: 120
     min: 0
     max: 200
     step: 4
@@ -28,21 +28,21 @@ props:
   - name: roughness
     label: Rugosidad
     type: number
-    default: 0
+    default: 0.75
     min: 0
     max: 1
     step: 0.05
   - name: variation
     label: Variación entre filas
     type: number
-    default: 0.35
+    default: 0.5
     min: 0
     max: 1
     step: 0.05
   - name: idle
     label: Ondulación ambiental
     type: number
-    default: 4
+    default: 14
     min: 0
     max: 30
     step: 1

@@ -1,27 +1,27 @@
 ---
 title: Estanque de carpas
 description: Carpas koi que nadan en profundidad y sienten curiosidad por el puntero, al que rodean sin tocarlo.
-category: pendiente
+category: backgrounds
 component: KoiBackground
 props:
   - name: near
     label: Carpas cercanas
     type: number
-    default: 4
+    default: 6
     min: 0
     max: 20
     step: 1
   - name: far
     label: Carpas lejanas
     type: number
-    default: 4
+    default: 3
     min: 0
     max: 20
     step: 1
   - name: size
     label: Longitud (px)
     type: number
-    default: 190
+    default: 100
     min: 60
     max: 400
     step: 10
@@ -35,14 +35,14 @@ props:
   - name: curiosity
     label: Curiosidad (px)
     type: number
-    default: 460
+    default: 600
     min: 100
     max: 900
     step: 20
   - name: keep
     label: Distancia de respeto (px)
     type: number
-    default: 120
+    default: 100
     min: 20
     max: 400
     step: 10

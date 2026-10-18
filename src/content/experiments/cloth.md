@@ -1,27 +1,27 @@
 ---
 title: Tela
 description: Red de malla simulada que cuelga, ondea con el viento y responde al puntero.
-category: pendiente
+category: backgrounds
 component: ClothBackground
 props:
   - name: spacing
     label: Separación (px)
     type: number
-    default: 34
+    default: 40
     min: 10
     max: 90
     step: 1
   - name: gravity
     label: Gravedad
     type: number
-    default: 0.25
+    default: 0.5
     min: 0
     max: 1
     step: 0.05
   - name: iterations
     label: Iteraciones
     type: number
-    default: 5
+    default: 10
     min: 1
     max: 15
     step: 1
@@ -42,7 +42,7 @@ props:
   - name: push
     label: Empuje
     type: number
-    default: 0.6
+    default: 0.7
     min: 0
     max: 3
     step: 0.1
@@ -63,7 +63,7 @@ props:
   - name: dot
     label: Puntos (px)
     type: number
-    default: 1.2
+    default: 3
     min: 0
     max: 5
     step: 0.1

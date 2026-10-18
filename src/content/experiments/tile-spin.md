@@ -1,7 +1,7 @@
 ---
 title: Tile Spin
 description: Baldosas que se encogen y giran al paso del puntero, cada una con su propio sentido e intensidad.
-category: pendiente
+category: backgrounds
 component: TileSpinBackground
 props:
   - name: size
@@ -21,35 +21,35 @@ props:
   - name: proximity
     label: Influencia (px)
     type: number
-    default: 220
+    default: 125
     min: 20
     max: 500
     step: 5
   - name: shrink
     label: Encogimiento
     type: number
-    default: 0.85
+    default: 1
     min: 0
     max: 1
     step: 0.05
   - name: rotation
     label: Giro máx. (º)
     type: number
-    default: 35
+    default: 180
     min: 0
     max: 180
     step: 5
   - name: decay
     label: Persistencia
     type: number
-    default: 0.97
+    default: 0.98
     min: 0.8
     max: 0.999
     step: 0.005
   - name: randomness
     label: Irregularidad
     type: number
-    default: 0.6
+    default: 0.85
     min: 0
     max: 1
     step: 0.05

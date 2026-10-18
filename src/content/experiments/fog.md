@@ -1,7 +1,7 @@
 ---
 title: "Fog"
 description: "Vaho interactivo que se disipa con el puntero y deja gotas que resbalan."
-category: pendiente
+category: backgrounds
 component: FogBackground
 props:
   - name: cell
@@ -14,7 +14,7 @@ props:
   - name: radius
     label: "Radio de limpieza"
     type: number
-    default: 70
+    default: 30
     min: 20
     max: 160
     step: 5
@@ -28,14 +28,14 @@ props:
   - name: drips
     label: "Gotas/s"
     type: number
-    default: 0.5
+    default: 3
     min: 0
     max: 3
     step: 0.1
   - name: opacity
     label: "Opacidad"
     type: number
-    default: 0.85
+    default: 0.25
     min: 0.1
     max: 1
     step: 0.05

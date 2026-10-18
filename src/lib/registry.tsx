@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import AnimatedBackground from "../components/backgrounds/AnimatedBackground";
 import AuroraBackground from "../components/backgrounds/AuroraBackground";
+import BevelBackground from "../components/backgrounds/BevelBackground";
 import BlobBackground from "../components/backgrounds/BlobBackground";
 import BubbleBackground from "../components/backgrounds/BubbleBackground";
 import ChladniBackground from "../components/backgrounds/ChladniBackground";
@@ -24,6 +25,7 @@ import GlobeBackground from "../components/backgrounds/GlobeBackground";
 import HexPulseBackground from "../components/backgrounds/HexPulseBackground";
 import IsoBackground from "../components/backgrounds/IsoBackground";
 import JellyBackground from "../components/backgrounds/JellyBackground";
+import JuliaBackground from "../components/backgrounds/JuliaBackground";
 import KaleidoscopeBackground from "../components/backgrounds/KaleidoscopeBackground";
 import KelpBackground from "../components/backgrounds/KelpBackground";
 import KoiBackground from "../components/backgrounds/KoiBackground";
@@ -34,12 +36,13 @@ import LilyBackground from "../components/backgrounds/LilyBackground";
 import MantaBackground from "../components/backgrounds/MantaBackground";
 import MarblesBackground from "../components/backgrounds/MarblesBackground";
 import MatrixBackground from "../components/backgrounds/MatrixBackground";
+import MazeBackground from "../components/backgrounds/MazeBackground";
+import MeadowBackground from "../components/backgrounds/MeadowBackground";
 import NeedleBackground from "../components/backgrounds/NeedleBackground";
 import NetworkBackground2 from "../components/backgrounds/NetworkBackground2";
 import OrbitBackground from "../components/backgrounds/OrbitBackground";
 import PendulumWaveBackground from "../components/backgrounds/PendulumWaveBackground";
 import PhysarumBackground from "../components/backgrounds/PhysarumBackground";
-import PlanetsBackground from "../components/backgrounds/PlanetsBackground";
 import PlanetsOrbitsBackground from "../components/backgrounds/PlanetsOrbitsBackground";
 import PlanktonBackground from "../components/backgrounds/PlanktonBackground";
 import PlasmaBackground from "../components/backgrounds/PlasmaBackground";
@@ -48,6 +51,7 @@ import RidgeBackground from "../components/backgrounds/RidgeBackground";
 import RingsBackground from "../components/backgrounds/RingsBackground";
 import SandBackground from "../components/backgrounds/SandBackground";
 import SandDotsBackground from "../components/backgrounds/SandDotsBackground";
+import SandpileBackground from "../components/backgrounds/SandpileBackground";
 import SeigaihaBackground from "../components/backgrounds/SeigaihaBackground";
 import ShoalBackground from "../components/backgrounds/ShoalBackground";
 import SnowflakeBackground from "../components/backgrounds/SnowflakeBackground";
@@ -59,7 +63,9 @@ import ThreadBackground from "../components/backgrounds/ThreadBackground";
 import TileBackground from "../components/backgrounds/TileBackground";
 import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
 import TriangleBackground2 from "../components/backgrounds/TriangleBackground2";
+import TruchetArcsBackground from "../components/backgrounds/TruchetArcsBackground";
 import TruchetBackground from "../components/backgrounds/TruchetBackground";
+import TruchetTilesBackground from "../components/backgrounds/TruchetTilesBackground";
 import TuringBackground from "../components/backgrounds/TuringBackground";
 import TurtleBackground from "../components/backgrounds/TurtleBackground";
 import VanishBackground from "../components/backgrounds/VanishBackground";
@@ -86,6 +92,7 @@ import ThemeToggle from "../components/ui/ThemeToggle";
 export const registry: Record<string, ComponentType<any>> = {
   AnimatedBackground,
   AuroraBackground,
+  BevelBackground,
   BlobBackground,
   BubbleBackground,
   ChladniBackground,
@@ -109,6 +116,7 @@ export const registry: Record<string, ComponentType<any>> = {
   HexPulseBackground,
   IsoBackground,
   JellyBackground,
+  JuliaBackground,
   KaleidoscopeBackground,
   KelpBackground,
   KoiBackground,
@@ -119,12 +127,13 @@ export const registry: Record<string, ComponentType<any>> = {
   MantaBackground,
   MarblesBackground,
   MatrixBackground,
+  MazeBackground,
+  MeadowBackground,
   NeedleBackground,
   NetworkBackground2,
   OrbitBackground,
   PendulumWaveBackground,
   PhysarumBackground,
-  PlanetsBackground,
   PlanetsOrbitsBackground,
   PlanktonBackground,
   PlasmaBackground,
@@ -133,6 +142,7 @@ export const registry: Record<string, ComponentType<any>> = {
   RingsBackground,
   SandBackground,
   SandDotsBackground,
+  SandpileBackground,
   SeigaihaBackground,
   ShoalBackground,
   SnowflakeBackground,
@@ -144,7 +154,9 @@ export const registry: Record<string, ComponentType<any>> = {
   TileBackground,
   TileSpinBackground,
   TriangleBackground2,
+  TruchetArcsBackground,
   TruchetBackground,
+  TruchetTilesBackground,
   TuringBackground,
   TurtleBackground,
   VanishBackground,
@@ -171,3 +183,4 @@ export const registry: Record<string, ComponentType<any>> = {
 export function getComponent(id: string): ComponentType<any> | undefined {
   return registry[id];
 }
+

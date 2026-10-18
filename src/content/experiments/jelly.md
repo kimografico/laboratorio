@@ -1,41 +1,41 @@
 ---
 title: Medusas
 description: Medusas que ascienden a impulsos con la campana contrayéndose, tentáculos colgantes y profundidad.
-category: pendiente
+category: backgrounds
 component: JellyBackground
 props:
   - name: near
     label: Cercanas
     type: number
-    default: 4
+    default: 16
     min: 0
-    max: 12
+    max: 25
     step: 1
   - name: far
     label: Lejanas
     type: number
-    default: 4
+    default: 3
     min: 0
-    max: 12
+    max: 25
     step: 1
   - name: size
     label: Radio de la campana (px)
     type: number
-    default: 70
+    default: 60
     min: 20
     max: 160
     step: 2
   - name: speed
     label: Velocidad
     type: number
-    default: 0.5
+    default: 0.2
     min: 0.1
     max: 2
     step: 0.05
   - name: avoid
     label: Distancia al puntero (px)
     type: number
-    default: 220
+    default: 150
     min: 0
     max: 500
     step: 10
@@ -49,7 +49,7 @@ props:
   - name: lineWidth
     label: Grosor línea
     type: number
-    default: 1.2
+    default: 1
     min: 0.5
     max: 4
     step: 0.1

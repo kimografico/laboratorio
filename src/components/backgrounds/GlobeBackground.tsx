@@ -24,14 +24,14 @@ export interface GlobeBackgroundProps {
 const TAU = Math.PI * 2;
 
 export default function GlobeBackground({
-  lat = 14,
+  lat = 12,
   lon = 24,
-  size = 0.84,
+  size = 0.7,
   bump = 0.35,
   spread = 0.4,
-  spin = 0.00008,
-  ease = 0.08,
-  lineWidth = 1,
+  spin = 0.00025,
+  ease = 0.2,
+  lineWidth = 0.5,
   color = "rgba(0, 0, 0, 0.5)",
   background = "#e0dad5",
   className,

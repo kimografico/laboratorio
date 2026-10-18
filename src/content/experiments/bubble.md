@@ -1,7 +1,7 @@
 ---
 title: Burbujas
 description: Burbujas que ascienden con vaivén, se apartan del puntero y reventón al tocarlas.
-category: pendiente
+category: backgrounds
 component: BubbleBackground
 props:
   - name: count
@@ -54,7 +54,7 @@ props:
 
 ## Uso
 
-`count` reparte las burbujas, `size` fija su radio medio (cada una varía entre 0.3x y 1.6x) y `rise` su velocidad de ascenso, siendo las grandes las que suben más rápido. El puntero las empuja dentro de `reach` y, con `pop` activado, las revienta al tocarlas dejando un aro con gotitas; `alpha` y `lineWidth` controlan el contorno.
+`count` reparte las burbujas, `size` fija su radio medio (cada una varía entre 0.3x y 1.6x) y `rise` su velocidad de ascenso, siendo las grandes las que suben más rápido. El puntero las empuja dentro de `reach` y, con `pop` activado, las revienta al tocarlas dejando salir un puñado de gotitas; `alpha` y `lineWidth` controlan el contorno.
 
 Por defecto no dibuja fondo y hereda el color de la página (`currentColor`). Opcionalmente fija `color` o define `--bubble-color` y `--bubble-opacity` en CSS.
 

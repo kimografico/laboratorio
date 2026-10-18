@@ -39,12 +39,12 @@ const N = 18; // segmentos del cuerpo
 const diff = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 
 export default function KoiBackground({
-  near = 4,
-  far = 4,
-  size = 190,
+  near = 6,
+  far = 3,
+  size = 100,
   speed = 0.7,
-  curiosity = 460,
-  keep = 120,
+  curiosity = 600,
+  keep = 100,
   alpha = 0.3,
   lineWidth = 1.2,
   color,

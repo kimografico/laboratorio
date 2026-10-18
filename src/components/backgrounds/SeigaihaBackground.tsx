@@ -24,12 +24,12 @@ export interface SeigaihaBackgroundProps {
 type Unit = { cx: number; cy: number; level: number; shown: number };
 
 export default function SeigaihaBackground({
-  size = 38,
+  size = 40,
   rings = 4,
-  swell = 0.3,
-  radius = 180,
+  swell = 1,
+  radius = 50,
   wave = 0.05,
-  decay = 0.97,
+  decay = 0.98,
   alpha = 0.25,
   lineWidth = 1,
   color,

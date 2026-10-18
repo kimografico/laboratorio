@@ -28,15 +28,15 @@ export interface ClothBackgroundProps {
 const TAU = Math.PI * 2;
 
 export default function ClothBackground({
-  spacing = 34,
-  gravity = 0.25,
-  iterations = 5,
+  spacing = 40,
+  gravity = 0.5,
+  iterations = 10,
   wind = 0.05,
   radius = 130,
-  push = 0.6,
+  push = 0.7,
   damping = 0.99,
   pin = "top",
-  dot = 1.2,
+  dot = 3,
   lineWidth = 1,
   color = "rgba(0, 0, 0, 0.3)",
   background = "#e0dad5",

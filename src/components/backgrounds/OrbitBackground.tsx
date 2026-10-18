@@ -11,6 +11,8 @@ export interface OrbitBackgroundProps {
   ease?: number;
   /** Suavizado de la gravedad cerca del centro (px): evita que las partículas salgan disparadas */
   soft?: number;
+  /** Fuerza de atracción del centro de gravedad */
+  attract?: number;
   lineWidth?: number;
   color?: string;
   background?: string;
@@ -21,11 +23,12 @@ const TAU = Math.PI * 2;
 const BUCKETS = 4;
 
 export default function OrbitBackground({
-  count = 110,
-  speed = 1.1,
+  count = 1000,
+  speed = 2,
   tail = 28,
-  ease = 0.04,
+  ease = 0.02,
   soft = 60,
+  attract = 1.25,
   lineWidth = 1,
   color = "rgba(0, 0, 0, 0.5)",
   background = "#e0dad5",
@@ -38,7 +41,7 @@ export default function OrbitBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const g = speed * speed;
+    const g = speed * speed * attract;
     const soft2 = soft * soft;
     const xs = new Float32Array(count);
     const ys = new Float32Array(count);
@@ -159,7 +162,7 @@ export default function OrbitBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, speed, tail, ease, soft, lineWidth, color]);
+  }, [count, speed, tail, ease, soft, attract, lineWidth, color]);
 
   return (
     <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>

@@ -1,41 +1,41 @@
 ---
 title: Gotas líquidas
 description: Gotas que flotan y se funden entre sí con un efecto de metal líquido que el puntero atrae.
-category: pendiente
+category: backgrounds
 component: BlobBackground
 props:
   - name: large
     label: Gotas grandes
     type: number
-    default: 8
+    default: 12
     min: 0
     max: 40
     step: 1
   - name: small
     label: Gotas pequeñas
     type: number
-    default: 14
+    default: 25
     min: 0
     max: 60
     step: 1
   - name: size
     label: Tamaño base (px)
     type: number
-    default: 95
+    default: 120
     min: 20
     max: 200
     step: 5
   - name: goo
     label: Desenfoque líquido (px)
     type: number
-    default: 11
+    default: 15
     min: 0
     max: 40
     step: 1
   - name: speed
     label: Velocidad
     type: number
-    default: 1
+    default: 0.5
     min: 0
     max: 4
     step: 0.1
@@ -49,7 +49,7 @@ props:
   - name: radius
     label: Radio del puntero (px)
     type: number
-    default: 260
+    default: 300
     min: 60
     max: 600
     step: 20

@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getEntry, render } from "astro:content";
+
+const entry = await getEntry("pages", "info");
+if (!entry) throw new Error("Falta src/content/pages/info.md");
+
+const { Content } = await render(entry);
+const { title, description } = entry.data;
+---
+
+<Layout title={`${title} · Laboratorio`} description={description}>
+  <section class="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pb-10 pt-16">
+    <h1 class="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-fg sm:text-5xl">
+      {title}
+    </h1>
+    <p class="mt-4 max-w-2xl text-base text-muted">{description}</p>
+  </section>
+
+  <div class="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pb-24">
+    <article class="doc-content max-w-3xl">
+      <Content />
+    </article>
+  </div>
+</Layout>

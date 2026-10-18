@@ -22,6 +22,7 @@ El mismo repo se publica como **librería** (`@kimografico/laboratorio`): la bui
 - `src/components/ui/icons/*.astro` — iconos animados reutilizables.
 - `src/content/experiments/*.md` — metadatos de cada experimento (frontmatter + uso).
 - `src/content/ui/*.md` — metadatos de cada pieza de interfaz (frontmatter + uso).
+- `src/content/pages/*.md` — contenido de las páginas de texto (colección `pages`; p. ej. `info.md`).
 - `src/lib/registry.tsx` — mapa `component` (string) → componente React.
 - `src/lib/base.ts` — `base`/`withBase` (prefijo del `base` de Astro para enlaces internos).
 - `src/lib/props.ts` — tipos del playground de props (`PropDef`).

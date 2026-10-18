@@ -36,4 +36,12 @@ const ui = defineCollection({
   }),
 });
 
-export const collections = { experiments, ui };
+const pages = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/pages" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+  }),
+});
+
+export const collections = { experiments, ui, pages };

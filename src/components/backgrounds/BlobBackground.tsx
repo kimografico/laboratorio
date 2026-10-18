@@ -38,13 +38,13 @@ type Blob = {
 };
 
 export default function BlobBackground({
-  large = 8,
-  small = 14,
-  size = 95,
-  goo = 11,
-  speed = 1,
+  large = 12,
+  small = 25,
+  size = 120,
+  goo = 15,
+  speed = 0.5,
   attract = 0.6,
-  radius = 260,
+  radius = 300,
   alpha = 0.16,
   color,
   className,

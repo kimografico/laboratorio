@@ -20,12 +20,12 @@ export interface SandpileBackgroundProps {
 }
 
 export default function SandpileBackground({
-  cell = 8,
-  rate = 6,
-  sweeps = 4,
-  ambient = 12,
-  erode = 30,
-  flash = "#d9822b",
+  cell = 5,
+  rate = 12,
+  sweeps = 1,
+  ambient = 15,
+  erode = 90,
+  flash = "#96701d",
   color = "rgba(0, 0, 0, 0.5)",
   background = "#e0dad5",
   className,

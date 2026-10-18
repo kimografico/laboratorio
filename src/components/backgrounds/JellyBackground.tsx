@@ -36,13 +36,13 @@ type Jelly = {
 const SEG = 12; // segmentos de cada tentáculo
 
 export default function JellyBackground({
-  near = 4,
-  far = 4,
-  size = 70,
-  speed = 0.5,
-  avoid = 220,
+  near = 16,
+  far = 3,
+  size = 60,
+  speed = 0.2,
+  avoid = 150,
   alpha = 0.3,
-  lineWidth = 1.2,
+  lineWidth = 1,
   color,
   className,
 }: JellyBackgroundProps) {

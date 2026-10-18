@@ -1,7 +1,7 @@
 ---
 title: Tentacles
 description: Tentáculos que cuelgan y siguen al puntero con ventosas, profundidad y ondulación.
-category: pendiente
+category: backgrounds
 component: TentacleBackground
 props:
   - name: near
@@ -21,7 +21,7 @@ props:
   - name: length
     label: Longitud
     type: number
-    default: 0.45
+    default: 0.9
     min: 0.1
     max: 1
     step: 0.05
@@ -35,14 +35,14 @@ props:
   - name: segments
     label: Segmentos
     type: number
-    default: 32
+    default: 50
     min: 8
     max: 80
     step: 1
   - name: chase
     label: Persecución
     type: number
-    default: 0.012
+    default: 0.02
     min: 0.002
     max: 0.06
     step: 0.002
@@ -56,7 +56,7 @@ props:
   - name: curl
     label: Enroscado
     type: number
-    default: 0.12
+    default: 0.3
     min: 0
     max: 0.5
     step: 0.02

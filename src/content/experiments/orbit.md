@@ -1,20 +1,20 @@
 ---
 title: Órbitas
 description: Partículas que orbitan un centro de gravedad que sigue al puntero, con estelas que se desvanecen.
-category: pendiente
+category: backgrounds
 component: OrbitBackground
 props:
   - name: count
     label: Partículas
     type: number
-    default: 110
+    default: 1000
     min: 20
-    max: 400
+    max: 1500
     step: 10
   - name: speed
     label: Velocidad
     type: number
-    default: 1.1
+    default: 2
     min: 0.2
     max: 4
     step: 0.1
@@ -28,7 +28,7 @@ props:
   - name: ease
     label: Suavizado
     type: number
-    default: 0.04
+    default: 0.02
     min: 0.005
     max: 0.2
     step: 0.005
@@ -39,6 +39,13 @@ props:
     min: 0
     max: 300
     step: 5
+  - name: attract
+    label: Atracción
+    type: number
+    default: 1.25
+    min: 0
+    max: 3
+    step: 0.05
   - name: lineWidth
     label: Grosor
     type: number
@@ -58,7 +65,7 @@ props:
 
 ## Uso
 
-Cada partícula es atraída por un centro de gravedad suavizado que sigue al puntero (o que orbita solo si no hay puntero). `soft` evita que las partículas salgan disparadas al pasar muy cerca y `tail` controla la longitud de su estela.
+Cada partícula es atraída por un centro de gravedad que sigue al puntero (o que orbita solo si no hay puntero). `ease` marca qué tan pegado va ese centro: con valores bajos el centro va rezagado, arrastra con retardo y las partículas describen amplias órbitas en espiral; con valores altos casi no se separa del puntero y las órbitas se ciñen a su paso. `soft` evita que las partículas salgan disparadas al pasar muy cerca y `attract` regula la fuerza de atracción del centro.
 
 ```tsx
 <OrbitBackground count={110} speed={1.1} tail={28} ease={0.04} soft={60} />

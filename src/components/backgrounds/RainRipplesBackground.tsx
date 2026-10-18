@@ -20,13 +20,16 @@ export interface RainRipplesBackgroundProps {
 type Drop = { x: number; y: number; px: number; py: number; vx: number; vy: number; len: number; impact: number };
 type Ripple = { x: number; y: number; age: number; rMax: number };
 
+// Las ondas son elipses aplanadas (mucho más anchas que altas), como reflejo sobre el suelo
+const RIPPLE_FLAT = 0.32;
+
 export default function RainRipplesBackground({
-  rain = 7,
+  rain = 6,
   speed = 1,
-  length = 16,
-  life = 1.6,
+  length = 30,
+  life = 4,
   width = 1,
-  alpha = 0.6,
+  alpha = 0.2,
   color,
   className,
 }: RainRipplesBackgroundProps) {
@@ -149,14 +152,14 @@ export default function RainRipplesBackground({
         ctx!.globalAlpha = a * alpha * mul * 0.75;
         ctx!.lineWidth = width * (1 - 0.5 * t) + 0.3;
         ctx!.beginPath();
-        ctx!.arc(rp.x, rp.y, r, 0, Math.PI * 2);
+        ctx!.ellipse(rp.x, rp.y, r, r * RIPPLE_FLAT, 0, 0, Math.PI * 2);
         ctx!.stroke();
         const t2 = t - 0.18;
         if (t2 > 0) {
           const r2 = (1 - Math.pow(1 - t2, 2)) * rp.rMax;
           ctx!.globalAlpha = Math.pow(1 - t2, 1.7) * alpha * mul * 0.4;
           ctx!.beginPath();
-          ctx!.arc(rp.x, rp.y, r2, 0, Math.PI * 2);
+          ctx!.ellipse(rp.x, rp.y, r2, r2 * RIPPLE_FLAT, 0, 0, Math.PI * 2);
           ctx!.stroke();
         }
       }

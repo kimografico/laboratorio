@@ -17,8 +17,14 @@ export interface GalaxyBackgroundProps {
   size?: number;
   /** Influencia del puntero en las estrellas (0 = ninguna, 1 = máxima) */
   mouse?: number;
+  /** Suavizado del parallax (0.01 = muy rezagado, 1 = instantáneo) */
+  easing?: number;
   /** Brillo del núcleo (0 = apagado, 1 = intenso) */
   core?: number;
+
+  /** Opacidad del resplandor radial de fondo (0 = invisible, 1 = completo) */
+
+  glow?: number;
   color?: string;
   background?: string;
   className?: string;
@@ -52,19 +58,26 @@ function withAlpha(input: string, a: number): string {
 
 export default function GalaxyBackground({
   arms = 6,
-  stars = 5000,
-  radius = 0.8,
-  spin = 0.1,
-  spread = 0.35,
-  twinkle = 1.5,
-  size = 1,
-  mouse = 0.04,
+  stars = 10000,
+  radius = 1.2,
+  spin = 0.03,
+  spread = 0.75,
+  twinkle = 1.05,
+  size = 0.5,
+  mouse = 0.1,
+  easing = 0.03,
   core = 0.34,
+
+  glow = 0.2,
   color = "#f4efe8",
   background = "#1b1917",
   className,
 }: GalaxyBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Valores vivos: se leen en cada fotograma sin recrear el effect (evita rebarajar las estrellas)
+  const live = useRef({ core, mouse, easing, glow });
+  live.current = { core, mouse, easing, glow };
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -83,6 +96,8 @@ export default function GalaxyBackground({
     let hasPointer = false;
     let sx = 0;
     let sy = 0;
+    let ex = 0;
+    let ey = 0;
 
     function resize() {
       w = canvas.clientWidth;
@@ -91,6 +106,8 @@ export default function GalaxyBackground({
       canvas.height = h;
       sx = w / 2;
       sy = h / 2;
+      ex = sx;
+      ey = sy;
       maxR = Math.min(w, h) * radius;
       rn = new Float32Array(stars);
       a0 = new Float32Array(stars);
@@ -131,18 +148,27 @@ export default function GalaxyBackground({
       ctx!.clearRect(0, 0, w, h);
       const cx = w / 2;
       const cy = h / 2;
-      const par = hasPointer ? mouse : 0;
-      const offX = (sx - cx) * par;
-      const offY = (sy - cy) * par;
+      // Easing: la posición efectiva del puntero se acerca al real en cada fotograma
+      const k = live.current.easing;
+      ex += (sx - ex) * k;
+      ey += (sy - ey) * k;
 
-      const coreGrad = ctx!.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.5);
-      coreGrad.addColorStop(0, withAlpha(color, core));
-      coreGrad.addColorStop(0.4, withAlpha(color, core * 0.3));
-      coreGrad.addColorStop(1, withAlpha(color, 0));
-      ctx!.fillStyle = coreGrad;
-      ctx!.beginPath();
-      ctx!.arc(cx, cy, maxR * 0.5, 0, Math.PI * 2);
-      ctx!.fill();
+      const par = hasPointer ? live.current.mouse : 0;
+      const offX = (ex - cx) * par;
+      const offY = (ey - cy) * par;
+
+      // Resplandor radial de fondo: `glow` regula su opacidad (0 lo hace desaparecer)
+      const coreA = live.current.core * live.current.glow;
+      if (coreA > 0.002) {
+        const coreGrad = ctx!.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.5);
+        coreGrad.addColorStop(0, withAlpha(color, coreA));
+        coreGrad.addColorStop(0.4, withAlpha(color, coreA * 0.3));
+        coreGrad.addColorStop(1, withAlpha(color, 0));
+        ctx!.fillStyle = coreGrad;
+        ctx!.beginPath();
+        ctx!.arc(cx, cy, maxR * 0.5, 0, Math.PI * 2);
+        ctx!.fill();
+      }
 
       for (let i = 0; i < stars; i++) {
         const r = rn[i];

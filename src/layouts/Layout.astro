@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import AtomIcon from "../components/ui/icons/AtomIcon.astro";
+import InfoIcon from "../components/ui/icons/InfoIcon.astro";
 import ThemeToggle from "../components/ui/ThemeToggle";
 import { base, withBase } from "../lib/base";
 
@@ -17,6 +18,7 @@ const {
 const path = Astro.url.pathname.slice(base.length) || "/";
 const isExperiments = path === "/" || path.startsWith("/experiment");
 const isUi = path.startsWith("/ui");
+const isInfo = path.startsWith("/info");
 ---
 
 <!doctype html>
@@ -64,6 +66,16 @@ const isUi = path.startsWith("/ui");
               }`}
               >UI</a
             >
+            <a
+              href={withBase("/info")}
+              class={`inline-flex h-8 w-8 items-center justify-center rounded-lg transition ${
+                isInfo ? "text-fg" : "text-muted hover:text-fg"
+              }`}
+              aria-label="Info"
+              title="Info"
+            >
+              <InfoIcon class="h-5 w-5" />
+            </a>
           </nav>
           <ThemeToggle client:load interactive size="sm" />
         </div>

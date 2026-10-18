@@ -38,11 +38,11 @@ const ridged = (x: number) => {
 
 export default function RidgeBackground({
   spacing = 18,
-  lift = 52,
+  lift = 120,
   radius = 180,
-  roughness = 0,
-  variation = 0.35,
-  idle = 4,
+  roughness = 0.75,
+  variation = 0.5,
+  idle = 14,
   ease = 0.06,
   lineWidth = 1,
   color = "rgba(0, 0, 0, 0.3)",

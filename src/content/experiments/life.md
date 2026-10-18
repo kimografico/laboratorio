@@ -1,7 +1,7 @@
 ---
 title: Juego de la Vida
 description: Autómata celular de Conway que evoluciona y crece bajo la estela del puntero.
-category: pendiente
+category: backgrounds
 component: LifeBackground
 props:
   - name: cell

@@ -26,13 +26,13 @@ const TAU = Math.PI * 2;
 const OMEGA = TAU / 2.2;
 
 export default function FirefliesBackground({
-  count = 70,
-  coupling = 0.7,
+  count = 200,
+  coupling = 0.5,
   call = 2.5,
   radius = 180,
-  attract = 0.012,
-  glow = 12,
-  speed = 1,
+  attract = 0.03,
+  glow = 5,
+  speed = 1.3,
   color = "#d4a017",
   background = "#e0dad5",
   className,

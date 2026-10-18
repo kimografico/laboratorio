@@ -87,12 +87,21 @@ function LazyPreview({
 }
 
 export default function Gallery({ experiments, basePath = "/experiment" }: GalleryProps) {
-  const [category, setCategory] = useState<string>("all");
-
   const categories = useMemo(() => {
     const set = new Set(experiments.map((e) => e.category));
-    return ["all", ...Array.from(set)];
+    const rest = Array.from(set).filter((c) => c !== "pendiente");
+    return [...(set.has("pendiente") ? ["pendiente"] : []), "all", ...rest];
   }, [experiments]);
+
+  const defaultCategory = categories.includes("pendiente") ? "pendiente" : "all";
+
+  const [category, setCategory] = useState<string>(defaultCategory);
+
+  useEffect(() => {
+    if (category !== "all" && !categories.includes(category)) {
+      setCategory(defaultCategory);
+    }
+  }, [categories, category, defaultCategory]);
 
   const hasFilter = categories.length > 2;
 
@@ -121,7 +130,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
                 <Button
                   key={c}
                   variant={active ? "solid" : "outline"}
-                  label={c === "all" ? "Todos" : c}
+                  label={c === "all" ? "Todos" : c === "pendiente" ? "Pendientes" : c}
                   badge={count}
                   onClick={() => setCategory(c)}
                   className="capitalize"

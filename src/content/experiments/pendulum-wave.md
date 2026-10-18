@@ -1,55 +1,55 @@
 ---
 title: Onda de péndulos
 description: Filas de puntos que oscilan con frecuencias distintas y forman ondas que viajan hasta realinearse.
-category: pendiente
+category: backgrounds
 component: PendulumWaveBackground
 props:
   - name: count
     label: Péndulos por fila
     type: number
-    default: 44
+    default: 74
     min: 8
     max: 120
     step: 1
   - name: rows
     label: Filas
     type: number
-    default: 6
+    default: 8
     min: 1
     max: 16
     step: 1
   - name: amplitude
     label: Amplitud
     type: number
-    default: 0.42
+    default: 0.5
     min: 0
     max: 1
     step: 0.02
   - name: period
     label: Periodo (s)
     type: number
-    default: 90
+    default: 250
     min: 20
     max: 300
     step: 5
   - name: dot
     label: Radio (px)
     type: number
-    default: 3
+    default: 2
     min: 1
     max: 10
     step: 0.5
   - name: excite
     label: Excitación
     type: number
-    default: 1
+    default: 1.7
     min: 0
     max: 3
     step: 0.1
   - name: alpha
     label: Opacidad
     type: number
-    default: 0.42
+    default: 0.3
     min: 0
     max: 1
     step: 0.02

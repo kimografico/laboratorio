@@ -23,13 +23,13 @@ export interface PendulumWaveBackgroundProps {
 }
 
 export default function PendulumWaveBackground({
-  count = 44,
-  rows = 6,
-  amplitude = 0.42,
-  period = 90,
-  dot = 3,
-  excite = 1,
-  alpha = 0.42,
+  count = 74,
+  rows = 8,
+  amplitude = 0.5,
+  period = 250,
+  dot = 2,
+  excite = 1.7,
+  alpha = 0.3,
   line = 0.14,
   color,
   className,

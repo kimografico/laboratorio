@@ -43,12 +43,12 @@ type Orbit = {
 const TAU = Math.PI * 2;
 
 export default function PlanetsOrbitsBackground({
-  orbits = 7,
-  minRadius = 50,
-  gap = 38,
-  eccentricity = 0.35,
-  lag = 0.6,
-  stiffness = 0.03,
+  orbits = 8,
+  minRadius = 75,
+  gap = 80,
+  eccentricity = 0.6,
+  lag = 2,
+  stiffness = 0.01,
   speed = 1,
   planet = 3.5,
   lineWidth = 1,
