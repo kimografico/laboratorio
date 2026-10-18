@@ -1,13 +1,13 @@
 ---
 title: Azulejos Truchet
-description: Azulejos con arcos que el puntero gira sobre la marcha y forman laberintos serpenteantes.
-category: pendiente
+description: Azulejos con arcos que el puntero gira permanentemente (90°) formando laberintos serpenteantes. El slider controla el radio de acción.
+category: backgrounds
 component: TruchetBackground
 props:
   - name: size
     label: Tamaño (px)
     type: number
-    default: 12
+    default: 36
     min: 12
     max: 160
     step: 2
@@ -21,28 +21,21 @@ props:
   - name: radius
     label: Radio de giro (px)
     type: number
-    default: 130
+    default: 20
     min: 0
     max: 400
     step: 10
-  - name: heal
-    label: Reversión
-    type: number
-    default: 0.8
-    min: 0.8
-    max: 0.999
-    step: 0.01
   - name: idle
-    label: Giro en reposo
+    label: Giro espontáneo/s
     type: number
-    default: 17
+    default: 12
     min: 0
-    max: 20
+    max: 25
     step: 1
   - name: alpha
     label: Opacidad
     type: number
-    default: 0.26
+    default: 0.1
     min: 0
     max: 1
     step: 0.01
@@ -50,8 +43,8 @@ props:
 
 ## Uso
 
-Cada azulejo guarda dos arcos; el puntero invierte la orientación de los que tiene cerca (`radius`) y `heal` los va devolviendo a su estado original. `idle` gira azulejos al azar para que el patrón nunca se repita. Hereda el color de la página o se fija con `--truchet-color` y `--truchet-opacity` en CSS.
+Cada azulejo guarda dos arcos; el puntero invierte permanentemente la orientación de los que tiene cerca (`radius`). `idle` gira azulejos al azar de forma permanente para que el patrón evolucione solo. Hereda el color de la página o se fija con `--truchet-color` y `--truchet-opacity` en CSS.
 
 ```tsx
-<TruchetBackground size={12} band={0.17} radius={130} heal={0.8} idle={17} />
+<TruchetBackground size={12} band={0.17} radius={130} idle={0} />
 ```

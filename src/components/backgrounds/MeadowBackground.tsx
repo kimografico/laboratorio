@@ -138,6 +138,8 @@ export default function MeadowBackground({
     }
 
     function plant(x: number, y: number) {
+      // Si ya hay el máximo de plantas, no se añaden más (no se eliminan las existentes)
+      if (plants.length >= maxPlants) return;
       const seed = Math.random() * 1000;
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 0.5;
       plants.push({
@@ -147,7 +149,6 @@ export default function MeadowBackground({
         doneAt: -1,
         seed,
       });
-      if (plants.length > maxPlants) plants.shift();
     }
 
     function onPointer(clientX: number, clientY: number) {

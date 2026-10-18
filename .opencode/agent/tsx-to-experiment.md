@@ -190,6 +190,20 @@ Referencia orientativa: `src/components/backgrounds/PlanktonBackground.tsx`.
 
 En los elementos de interfaz, evita colores de tema hardcodeados como `text-white` o `bg-[#...]` si el proyecto dispone de tokens semánticos. Usa los tokens realmente definidos en `src/styles/theme.css`.
 
+### Patrón C: fondo del canvas en previews de galería
+
+En la galería, los experimentos de fondo se renderizan dentro de un card con `bg-panel` (token `var(--panel)`). El componente `LazyPreview` en `Gallery.tsx` trata los backgrounds de forma especial: no los envuelve en un contenedor con `bg-surface`, sino que renderiza el `Stage` directamente. Sin embargo, si el `<canvas>` no tiene `backgroundColor` explícito, es transparente y deja ver el fondo del contenedor padre (que puede ser `var(--surface)` en fullscreen o en otros contextos).
+
+**Regla obligatoria:** todo componente de fondo que use `<canvas>` debe establecer el fondo del canvas al token del panel:
+
+```tsx
+<canvas ref={canvasRef} style={{ backgroundColor: "var(--panel)" }} />
+```
+
+Esto garantiza que el experimento se vea igual en la galería, en la página de detalle y en fullscreen, independientemente de la categoría del frontmatter (`pendiente`, `backgrounds`, etc.).
+
+Referencia: `src/components/backgrounds/TruchetBackground.tsx` (línea 165) y otros backgrounds corregidos.
+
 ## Colocar y adaptar el componente
 
 Usa la ubicación adecuada según las convenciones reales del proyecto, normalmente:

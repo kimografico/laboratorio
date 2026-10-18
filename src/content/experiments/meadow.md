@@ -1,13 +1,13 @@
 ---
 title: "Pradera"
 description: "Pradera de hierba al viento con plantas que brotan al pasar el puntero."
-category: pendiente
+category: backgrounds
 component: "MeadowBackground"
 props:
   - name: "spacing"
     label: "Separación (px)"
     type: "number"
-    default: 9
+    default: 8
     min: 4
     max: 30
     step: 1
@@ -42,7 +42,7 @@ props:
   - name: "plantEvery"
     label: "Distancia por planta (px)"
     type: "number"
-    default: 90
+    default: 300
     min: 10
     max: 400
     step: 10
@@ -56,35 +56,35 @@ props:
   - name: "growth"
     label: "Crecimiento (px/s)"
     type: "number"
-    default: 70
+    default: 80
     min: 10
     max: 300
     step: 10
   - name: "life"
     label: "Vida de la planta (s)"
     type: "number"
-    default: 16
+    default: 6
     min: 1
     max: 60
     step: 1
   - name: "wither"
     label: "Marchitado (s)"
     type: "number"
-    default: 6
+    default: 3
     min: 0
     max: 30
     step: 1
   - name: "maxPlants"
     label: "Máx. de plantas"
     type: "number"
-    default: 18
+    default: 10
     min: 0
     max: 50
     step: 1
   - name: "ambient"
     label: "Plantas solas/s"
     type: "number"
-    default: 0.1
+    default: 0.2
     min: 0
     max: 2
     step: 0.05
@@ -124,5 +124,23 @@ props:
 Briznas repartidas por `spacing` en tres capas de profundidad se mecen con `wind` y se apartan del puntero dentro de `radius`. Cada cierto trecho recorrido brota una planta que crece con ramas y hojas (`flowers` añade flores al final), vive `life` segundos y se marchita en `wither`.
 
 ```tsx
-<MeadowBackground spacing={9} blade={14} wind={1} flowers alpha={0.45} />
+<MeadowBackground
+  spacing={8}
+  blade={14}
+  wind={1}
+  radius={110}
+  bend={1}
+  plantEvery={300}
+  plantSize={110}
+  growth={80}
+  life={6}
+  wither={3}
+  maxPlants={10}
+  ambient={0.2}
+  flowers
+  lineWidth={1}
+  color={""}
+  alpha={0.45}
+  plantColor={"rgba(30, 84, 40, 0.9)"}
+  flowerColor={"rgba(196, 70, 90, 0.95)"} />
 ```
