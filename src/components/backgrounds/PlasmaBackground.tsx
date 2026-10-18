@@ -11,18 +11,22 @@ export interface PlasmaBackgroundProps {
   strength?: number;
   /** Fracción de rayos que puede apagarse a la vez: con lines = 20 y dropout = 0.35 hay entre 13 y 20 rayos visibles */
   dropout?: number;
+  /** Velocidad del parpadeo: más alto, los rayos aparecen y desaparecen más veces por segundo (1 = la actual) */
+  flicker?: number;
   /** Longitud de cada paso de integración (px): más corto, trazado más fino */
   step?: number;
   /** Pasos máximos por rayo: limita su longitud */
   length?: number;
   /** Amplitud del zigzag eléctrico (px) */
   jag?: number;
-  /** Proporción de rayos que ramifican (0-1) */
-  branch?: number;
   /** Velocidad del parpadeo y del zigzag */
   speed?: number;
-  /** Velocidad de giro de los rayos alrededor del puntero */
+  /** Tamaño del núcleo luminoso del puntero (1 = actual) */
+  core?: number;
+  /** Velocidad de giro de los rayos alrededor del puntero (rad por segundo) */
   spin?: number;
+  /** Cristal cargado: cerca del borde aparecen hasta `lines` rayos con más grosor y opacidad; en el centro bajan a 2 y se ralentizan */
+  charged?: boolean;
   /** Suavizado con el que el polo del puntero lo sigue (1 = instantáneo) */
   ease?: number;
   lineWidth?: number;
@@ -33,8 +37,7 @@ export interface PlasmaBackgroundProps {
   className?: string;
 }
 
-type Branch = { u: number; side: number; len: number; seed: number };
-type Bolt = { jit: number; seed: number; fs: number; env: number; rolled: boolean; branches: Branch[] };
+type Bolt = { jit: number; seed: number; fs: number; rolled: boolean };
 type Point = {
   fx: number;
   fy: number;
@@ -54,7 +57,6 @@ type Point = {
 };
 
 const TAU = Math.PI * 2;
-const BSEGS = 7;
 const GAIN = 1.6;
 
 function hash(n: number) {
@@ -70,17 +72,19 @@ function vnoise(a: number, t: number) {
 }
 
 export default function PlasmaBackground({
-  lines = 26,
-  poles = 48,
-  points = 8,
-  strength = 1,
-  dropout = 0.35,
+  lines = 22,
+  poles = 90,
+  points = 0,
+  strength = 2.5,
+  dropout = 0.75,
+  flicker = 4,
   step = 8,
   length = 240,
-  jag = 8,
-  branch = 0.5,
-  speed = 1,
-  spin = 0.00006,
+  jag = 12,
+  speed = 1.5,
+  core = 1,
+  spin = 0.4,
+  charged = true,
   ease = 0.25,
   lineWidth = 1,
   alpha = 0.5,
@@ -105,7 +109,6 @@ export default function PlasmaBackground({
     const gr = new Float32Array(points);
     const gv = new Float32Array(points);
     const raw = new Float32Array((length + 2) * 2);
-    const jp = new Float32Array((length + 2) * 2);
 
     let width = 0;
     let height = 0;
@@ -117,6 +120,11 @@ export default function PlasmaBackground({
     let ey = 0;
     let bolts: Bolt[] = [];
     let spots: Point[] = [];
+    let tsAcc = 0;
+    let spinAcc = 0;
+    let lastSx = 0;
+    let lastSy = 0;
+    let vPing = 0;
     let last = -1;
     let raf = 0;
 
@@ -145,14 +153,7 @@ export default function PlasmaBackground({
         jit: (Math.random() - 0.5) * 0.9,
         seed: Math.random() * 1000,
         fs: 5 + Math.random() * 6,
-        env: Math.random() < 1 - dropout * 0.5 ? 1 : 0,
         rolled: false,
-        branches: Array.from({ length: 2 }, () => ({
-          u: 0.2 + Math.random() * 0.55,
-          side: Math.random() < 0.5 ? -1 : 1,
-          len: 0.06 + Math.random() * 0.16,
-          seed: Math.random() * 1000,
-        })).filter(() => Math.random() < branch),
       }));
     }
 
@@ -239,11 +240,21 @@ export default function PlasmaBackground({
         py += (ty - py) * ease;
       }
 
-      const ts = time * 0.001 * speed;
+      const dmPointer = Math.min(sx, width - sx, sy, height - sy);
+      const nde = charged ? Math.min(1, dmPointer / (Math.min(width, height) * 0.5)) : 1;
+      const sLocal = charged ? 0.6 + 0.4 * (1 - nde) : 1;
+      const aLocal = charged ? 0.4 + 0.6 * (1 - nde) : 1;
       const dtMs = last < 0 ? 16.67 : Math.min(time - last, 100);
       last = time;
-      const fadeK = 1 - Math.exp(-dtMs / 90);
-      const reach = Math.min(width, height) * 0.5;
+      const dtS = dtMs / 1000;
+      tsAcc += dtS * speed * sLocal;
+      spinAcc += dtS * spin * sLocal;
+      const ts = tsAcc;
+      const vspd = Math.hypot(sx - lastSx, sy - lastSy) / dtMs;
+      lastSx = sx;
+      lastSy = sy;
+      vPing += (vspd - vPing) * (1 - Math.exp(-dtMs / 90));
+      const pulse = 1 + Math.min(1, vPing * 0.25);
       const sc = Math.min(width, height) / 700;
 
       let sum = 0;
@@ -263,7 +274,8 @@ export default function PlasmaBackground({
       }
 
       const nAct = Math.min(1, Math.max(0, (vnoise(777, ts * 0.4) - 0.3) / 0.4));
-      const activeFrac = 1 - dropout + dropout * nAct;
+      let activeFrac = 1 - dropout + dropout * nAct;
+      if (charged) activeFrac *= (2 + (lines - 2) * (1 - nde)) / lines;
 
       ctx!.clearRect(0, 0, width, height);
       ctx!.lineCap = "round";
@@ -277,10 +289,8 @@ export default function PlasmaBackground({
 
       for (let l = 0; l < bolts.length; l++) {
         const bolt = bolts[l];
-        const on = (l * 0.61803 + ts * 0.05) % 1 < activeFrac;
-        bolt.env += ((on ? 1 : 0) - bolt.env) * fadeK;
-        if (on) bolt.rolled = false;
-        if (!on && bolt.env < 0.02) {
+        const on = (l * 0.61803 + ts * 0.05 * flicker) % 1 < activeFrac;
+        if (!on) {
           if (!bolt.rolled) {
             bolt.jit = (Math.random() - 0.5) * 0.9;
             bolt.seed = Math.random() * 1000;
@@ -288,7 +298,8 @@ export default function PlasmaBackground({
           }
           continue;
         }
-        const th = ((l + 0.5 + bolt.jit) * TAU) / lines + time * spin;
+        bolt.rolled = false;
+        const th = ((l + 0.5 + bolt.jit) * TAU) / lines + spinAcc;
 
         let x = sx + Math.cos(th) * 4;
         let y = sy + Math.sin(th) * 4;
@@ -328,11 +339,9 @@ export default function PlasmaBackground({
           }
         }
 
-        const bright = (0.45 + 0.55 * vnoise(bolt.seed, ts * bolt.fs)) * bolt.env;
+        const bright = 0.45 + 0.55 * vnoise(bolt.seed, ts * bolt.fs);
         ctx!.beginPath();
         ctx!.moveTo(raw[0], raw[1]);
-        jp[0] = raw[0];
-        jp[1] = raw[1];
         for (let k = 1; k < n; k++) {
           const u = k / (n - 1);
           const k0 = Math.max(0, k - 1);
@@ -343,39 +352,21 @@ export default function PlasmaBackground({
           const off = (vnoise(bolt.seed + k * 7.13, ts * 12) - 0.5) * 2 * GAIN * jag * Math.pow(Math.sin(Math.PI * u), 0.5);
           const jx = raw[2 * k] - (ty2 / tl) * off;
           const jy = raw[2 * k + 1] + (tx2 / tl) * off;
-          jp[2 * k] = jx;
-          jp[2 * k + 1] = jy;
           ctx!.lineTo(jx, jy);
         }
 
-        for (const b of bolt.branches) {
-          const j = Math.max(1, Math.min(n - 2, Math.floor(b.u * (n - 1))));
-          const bx0 = jp[2 * j];
-          const by0 = jp[2 * j + 1];
-          const a = Math.atan2(raw[2 * (j + 1) + 1] - raw[2 * (j - 1) + 1], raw[2 * (j + 1)] - raw[2 * (j - 1)]) + b.side * (0.5 + 0.6 * hash(b.seed));
-          const bl = b.len * reach * 2;
-          const cx = Math.cos(a);
-          const cy = Math.sin(a);
-          ctx!.moveTo(bx0, by0);
-          for (let k = 1; k <= BSEGS; k++) {
-            const u = k / BSEGS;
-            const off = (vnoise(b.seed + k * 3.7, ts * 12) - 0.5) * 2 * GAIN * jag * 0.9 * Math.min(1, u * 3);
-            ctx!.lineTo(bx0 + cx * bl * u - cy * off, by0 + cy * bl * u + cx * off);
-          }
-        }
-
-        setAlpha(bright * 0.1 * alpha * mul);
+        setAlpha(bright * 0.1 * alpha * mul * aLocal);
         ctx!.lineWidth = lineWidth * 6;
         ctx!.stroke();
-        setAlpha(bright * 0.28 * alpha * mul);
+        setAlpha(bright * 0.28 * alpha * mul * aLocal);
         ctx!.lineWidth = lineWidth * 2.6;
         ctx!.stroke();
-        setAlpha(bright * alpha * mul);
+        setAlpha(bright * alpha * mul * aLocal);
         ctx!.lineWidth = lineWidth;
         ctx!.stroke();
 
         if (hit) {
-          setAlpha(bright * 0.8 * alpha * mul);
+          setAlpha(bright * 0.8 * alpha * mul * aLocal);
           ctx!.beginPath();
           ctx!.arc(raw[2 * (n - 1)], raw[2 * (n - 1) + 1], 1.5 + lineWidth, 0, TAU);
           ctx!.fill();
@@ -383,15 +374,17 @@ export default function PlasmaBackground({
       }
 
       // Núcleo luminoso en el puntero
+      const nCore =
+        core * (charged ? 0.75 + 0.65 * (1 - nde) : 1) * pulse;
       for (let i = 0; i < 5; i++) {
-        setAlpha(0.07 * alpha * mul);
+        setAlpha(0.07 * alpha * mul * aLocal);
         ctx!.beginPath();
-        ctx!.arc(sx, sy, 4 + i * 5, 0, TAU);
+        ctx!.arc(sx, sy, (4 + i * 5) * nCore, 0, TAU);
         ctx!.fill();
       }
-      setAlpha(1 * alpha * mul);
+      setAlpha(1 * alpha * mul * aLocal);
       ctx!.beginPath();
-      ctx!.arc(sx, sy, 2.5, 0, TAU);
+      ctx!.arc(sx, sy, 2.5 * nCore, 0, TAU);
       ctx!.fill();
 
       ctx!.globalAlpha = 1;
@@ -416,7 +409,7 @@ export default function PlasmaBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [lines, poles, points, strength, dropout, step, length, jag, branch, speed, spin, ease, lineWidth, alpha]);
+  }, [lines, poles, points, strength, dropout, step, length, jag, speed, core, spin, charged, ease, lineWidth, alpha]);
 
   return (
     <div
