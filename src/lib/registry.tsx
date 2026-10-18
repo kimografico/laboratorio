@@ -29,7 +29,6 @@ import KaleidoscopeBackground from "../components/backgrounds/KaleidoscopeBackgr
 import KelpBackground from "../components/backgrounds/KelpBackground";
 import KoiBackground from "../components/backgrounds/KoiBackground";
 import LavaLampBackground from "../components/backgrounds/LavaLampBackground";
-import LeavesBackground from "../components/backgrounds/LeavesBackground";
 import LifeBackground from "../components/backgrounds/LifeBackground";
 import MimosaPudicaBackground from "../components/backgrounds/MimosaPudicaBackground";
 import LilyBackground from "../components/backgrounds/LilyBackground";
@@ -117,7 +116,6 @@ export const registry: Record<string, ComponentType<any>> = {
   KelpBackground,
   KoiBackground,
   LavaLampBackground,
-  LeavesBackground,
   LifeBackground,
   MimosaPudicaBackground,
   LilyBackground,

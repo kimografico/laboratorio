@@ -9,6 +9,8 @@ export interface MimosaPudicaBackgroundProps {
   reopenSpeed?: number;
   reopenDelay?: number;
   leavesPerBranch?: number;
+  sizeTaper?: number;
+  opaqueLeaves?: boolean;
   alpha?: number;
   lineWidth?: number;
   color?: string;
@@ -47,15 +49,42 @@ const R_CLOSE = 50;
 const R_START = 140;
 const MAX_CLOSE_ANGLE = Math.PI * 60 / 180;
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = hex.replace(/^#/, "").match(/.{2}/g);
+  if (!m) return null;
+  return {
+    r: parseInt(m[0], 16) / 255,
+    g: parseInt(m[1], 16) / 255,
+    b: parseInt(m[2], 16) / 255,
+  };
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  const toHex = (v: number) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function lightenColor(hex: string, amount: number = 0.12): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  // Simple sRGB lightening: mix with white
+  const r = rgb.r + (1 - rgb.r) * amount;
+  const g = rgb.g + (1 - rgb.g) * amount;
+  const b = rgb.b + (1 - rgb.b) * amount;
+  return rgbToHex(r, g, b);
+}
+
 export default function MimosaPudicaBackground({
-  near = 8,
-  far = 6,
-  size = 100,
-  wind = 1,
+  near = 10,
+  far = 12,
+  size = 120,
+  wind = 1.2,
   touchSensitivity = 1,
-  reopenSpeed = 5,
+  reopenSpeed = 6,
   reopenDelay = 2000,
   leavesPerBranch = 14,
+  sizeTaper = 65,
+  opaqueLeaves = true,
   alpha = 0.4,
   lineWidth = 1.2,
   color,
@@ -63,13 +92,16 @@ export default function MimosaPudicaBackground({
 }: MimosaPudicaBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerRef = useRef<{ x: number; y: number; active: boolean }>({ x: -9999, y: -9999, active: false });
+  const bgColorRef = useRef<string>("");
+  const loggedRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const style = getComputedStyle(canvas);
+    const canvasStyle = getComputedStyle(canvas);
+    const rootStyle = getComputedStyle(document.documentElement);
     let w = 0;
     let h = 0;
     let branches: Branch[] = [];
@@ -103,14 +135,17 @@ export default function MimosaPudicaBackground({
 
       const count = Math.min(leavesPerBranch, AVAILABLE_NODES);
       const leaves: Leaf[] = [];
+      const taperFactor = sizeTaper / 100;
       for (let pair = 0; pair < count; pair++) {
         const t = (pair + 0.5) / count;
         const node = Math.round(START_NODE + t * (AVAILABLE_NODES - 1));
         const clampedNode = Math.max(START_NODE, Math.min(END_NODE, node));
+        const nodeRatio = (clampedNode - START_NODE) / (END_NODE - START_NODE);
+        const taper = 1 - taperFactor * nodeRatio;
         leaves.push({
           node: clampedNode,
           side: 1,
-          len: size * sc * (0.7 + 0.4 * Math.random()) * (1 - 0.35 * (clampedNode / NODES)),
+          len: size * sc * (0.7 + 0.4 * Math.random()) * taper,
           ph: Math.random() * Math.PI * 2,
           angle: 0,
           reopenAt: 0,
@@ -118,7 +153,7 @@ export default function MimosaPudicaBackground({
         leaves.push({
           node: clampedNode,
           side: -1,
-          len: size * sc * (0.7 + 0.4 * Math.random()) * (1 - 0.35 * (clampedNode / NODES)),
+          len: size * sc * (0.7 + 0.4 * Math.random()) * taper,
           ph: Math.random() * Math.PI * 2,
           angle: 0,
           reopenAt: 0,
@@ -255,8 +290,18 @@ export default function MimosaPudicaBackground({
         ctx!.moveTo(0, 0);
         ctx!.quadraticCurveTo(L * 0.5, -Wd, L, 0);
         ctx!.quadraticCurveTo(L * 0.5, Wd, 0, 0);
-        setAlpha(a * (b.far ? 0.3 : 0.22));
-        ctx!.fill();
+
+        const isNearAndOpaque = opaqueLeaves && !b.far;
+        if (isNearAndOpaque) {
+          ctx!.fillStyle = bgColorRef.current;
+          setAlpha(1);
+          ctx!.fill();
+          ctx!.fillStyle = ctx!.strokeStyle;
+        } else {
+          setAlpha(a * (b.far ? 0.3 : 0.22));
+          ctx!.fill();
+        }
+
         if (!b.far) {
           ctx!.lineWidth = lineWidth;
           setAlpha(a * 0.75);
@@ -281,8 +326,8 @@ export default function MimosaPudicaBackground({
     function animate(time: number) {
       ctx!.setTransform(1, 0, 0, 1, 0, 0);
       ctx!.clearRect(0, 0, w, h);
-      const ink = style.getPropertyValue("--leaves-color").trim() || style.color;
-      const k = style.getPropertyValue("--leaves-opacity").trim();
+      const ink = canvasStyle.getPropertyValue("--leaves-color").trim() || canvasStyle.color;
+      const k = canvasStyle.getPropertyValue("--leaves-opacity").trim();
       const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
       ctx!.strokeStyle = ink;
       ctx!.fillStyle = ink;
@@ -291,6 +336,25 @@ export default function MimosaPudicaBackground({
       for (const b of branches) drawBranch(b, time, alpha * mul * (b.far ? 0.25 : 1));
       ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
+    }
+
+    if (opaqueLeaves && !loggedRef.current) {
+      const surface = rootStyle.getPropertyValue("--surface").trim();
+      const panel = rootStyle.getPropertyValue("--panel").trim();
+      const canvasBg = canvasStyle.backgroundColor;
+      const baseColor = surface || panel || canvasBg;
+      const lightened = baseColor ? lightenColor(baseColor, 0.12) : "";
+      bgColorRef.current = lightened;
+      console.log("[MimosaPudica] opaqueLeaves bgColor:", {
+        "--surface": surface || "(empty)",
+        "--panel": panel || "(empty)",
+        "canvas.backgroundColor": canvasBg || "(empty)",
+        base: baseColor,
+        lightened,
+      });
+      loggedRef.current = true;
+    } else if (!opaqueLeaves) {
+      loggedRef.current = false;
     }
 
     const ro = new ResizeObserver(resize);
@@ -309,14 +373,14 @@ export default function MimosaPudicaBackground({
       canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("pointerout", onPointerLeave);
     };
-  }, [near, far, size, wind, touchSensitivity, reopenSpeed, reopenDelay, leavesPerBranch, alpha, lineWidth]);
+  }, [near, far, size, wind, touchSensitivity, reopenSpeed, reopenDelay, leavesPerBranch, sizeTaper, opaqueLeaves, alpha, lineWidth]);
 
   return (
     <div
       className={`bg-canvas ${className ?? ""}`.trim()}
       style={color ? ({ "--leaves-color": color } as React.CSSProperties) : undefined}
     >
-      <canvas ref={canvasRef} style={{ touchAction: "none" }} />
+      <canvas ref={canvasRef} style={{ touchAction: "none", backgroundColor: "var(--surface, var(--panel))" }} />
     </div>
   );
 }
