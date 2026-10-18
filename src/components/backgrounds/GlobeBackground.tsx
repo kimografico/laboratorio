@@ -16,8 +16,10 @@ export interface GlobeBackgroundProps {
   /** Suavizado con el que la esfera se inclina y el bulto sigue al puntero */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad de las líneas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las líneas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -32,8 +34,8 @@ export default function GlobeBackground({
   spin = 0.00025,
   ease = 0.2,
   lineWidth = 0.5,
-  color = "rgba(0, 0, 0, 0.5)",
-  background = "#e0dad5",
+  alpha = 0.5,
+  color,
   className,
 }: GlobeBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,6 +45,7 @@ export default function GlobeBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const cap = 4 * (lat + 2) * (lon + 2) * 4;
     const bucketAlpha = [0.18, 0.5, 1];
@@ -59,7 +62,6 @@ export default function GlobeBackground({
     let ny = 0.5;
     let raf = 0;
 
-    // Resultado de project(): coordenadas de pantalla y profundidad
     let sx = 0;
     let sy = 0;
     let sz = 0;
@@ -100,7 +102,6 @@ export default function GlobeBackground({
       const cp = Math.cos(pitch);
       const sp = Math.sin(pitch);
 
-      // Dirección del puntero sobre la esfera (espacio de vista) y cuánto influye
       let cdx = 0;
       let cdy = 0;
       let cdz = 1;
@@ -119,12 +120,10 @@ export default function GlobeBackground({
       const sg2 = spread * spread;
       const t = time * 0.001;
 
-      // Punto de la esfera por latitud/longitud: se gira, se levanta bajo el puntero y se proyecta con perspectiva
       function project(phi: number, theta: number) {
         const bx = Math.cos(phi) * Math.cos(theta);
         const by = Math.sin(phi);
         const bz = Math.cos(phi) * Math.sin(theta);
-        // Giro alrededor de Y (yaw) y luego de X (cabeceo)
         const x1 = bx * cyw + bz * syw;
         const z1 = -bx * syw + bz * cyw;
         const y2 = by * cp - z1 * sp;
@@ -148,7 +147,6 @@ export default function GlobeBackground({
         count[b]++;
       }
 
-      // Paralelos
       const pts = lon * 2;
       for (let i = 1; i < lat; i++) {
         const phi = -Math.PI / 2 + (Math.PI * i) / lat;
@@ -164,7 +162,6 @@ export default function GlobeBackground({
           z0 = sz;
         }
       }
-      // Meridianos
       const lp = lat * 2;
       for (let m = 0; m < lon; m++) {
         const theta = (TAU * m) / lon;
@@ -182,7 +179,11 @@ export default function GlobeBackground({
       }
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--globe-color").trim() || style.color;
+      const k = style.getPropertyValue("--globe-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineCap = "round";
       for (let b = 0; b < 3; b++) {
         ctx!.beginPath();
@@ -191,7 +192,7 @@ export default function GlobeBackground({
           ctx!.moveTo(s[n * 4], s[n * 4 + 1]);
           ctx!.lineTo(s[n * 4 + 2], s[n * 4 + 3]);
         }
-        ctx!.globalAlpha = bucketAlpha[b];
+        ctx!.globalAlpha = bucketAlpha[b] * alpha * mul;
         ctx!.lineWidth = lineWidth * (b === 2 ? 1.2 : 1);
         ctx!.stroke();
       }
@@ -217,10 +218,13 @@ export default function GlobeBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [lat, lon, size, bump, spread, spin, ease, lineWidth, color]);
+  }, [lat, lon, size, bump, spread, spin, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--globe-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

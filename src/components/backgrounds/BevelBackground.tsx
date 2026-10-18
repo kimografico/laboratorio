@@ -19,8 +19,8 @@ export interface BevelBackgroundProps {
   bevel?: number;
   /** Suavizado con el que la luz sigue al puntero */
   ease?: number;
+  /** Opcional: fija el color de las aristas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -36,8 +36,7 @@ export default function BevelBackground({
   ambient = 0.07,
   bevel = 2,
   ease = 0.15,
-  color = "rgba(255, 255, 255, 1)",
-  background = "#3a3633",
+  color,
   className,
 }: BevelBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,6 +46,7 @@ export default function BevelBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const K = Math.SQRT1_2;
 
@@ -170,7 +170,11 @@ export default function BevelBackground({
       }
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--bevel-color").trim() || style.color;
+      const k = style.getPropertyValue("--bevel-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineCap = "round";
       for (let b = 0; b < BUCKETS; b++) {
         if (!counts[b]) continue;
@@ -183,11 +187,11 @@ export default function BevelBackground({
         }
         // Las aristas más iluminadas llevan además un halo ancho y tenue
         if (b >= BUCKETS * 0.5) {
-          ctx!.globalAlpha = a * 0.18;
+          setAlpha(a * 0.18 * mul);
           ctx!.lineWidth = bevel * 4;
           ctx!.stroke();
         }
-        ctx!.globalAlpha = Math.min(1, a);
+        setAlpha(Math.min(1, a) * mul);
         ctx!.lineWidth = bevel;
         ctx!.stroke();
       }
@@ -195,6 +199,8 @@ export default function BevelBackground({
 
       raf = requestAnimationFrame(animate);
     }
+
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
@@ -213,10 +219,13 @@ export default function BevelBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, gap, layout, radius, lightHeight, intensity, ambient, bevel, ease, color]);
+  }, [size, gap, layout, radius, lightHeight, intensity, ambient, bevel, ease]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--bevel-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

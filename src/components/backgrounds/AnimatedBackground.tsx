@@ -13,10 +13,8 @@ export interface AnimatedBackgroundProps {
   growth?: number;
   /** Suavizado de la animación (0.02 - 0.15) */
   ease?: number;
-  /** Color de relleno si no hay imagen */
-  fill?: string;
-  /** Color de fondo del contenedor */
-  background?: string;
+  /** Opcional: fija el color de los círculos. Por defecto se hereda del CSS de la página (`color`). */
+  color?: string;
   className?: string;
 }
 
@@ -29,8 +27,7 @@ export default function AnimatedBackground({
   proximity = 125,
   growth = 60,
   ease = 0.075,
-  fill = "#000000",
-  background = "#e0dad5",
+  color,
   className,
 }: AnimatedBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,6 +37,7 @@ export default function AnimatedBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let dots: Dot[] = [];
@@ -91,8 +89,16 @@ export default function AnimatedBackground({
       ctx!.drawImage(img, (width - w) / 2, (height - h) / 2, w, h);
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--animated-color").trim() || style.color;
+      const k = style.getPropertyValue("--animated-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.save();
       ctx!.beginPath();
       for (const d of dots) {
@@ -103,10 +109,11 @@ export default function AnimatedBackground({
       if (imageLoaded) {
         drawImage();
       } else {
-        ctx!.fillStyle = fill;
+        setAlpha(mul);
         ctx!.fill();
       }
       ctx!.restore();
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -118,7 +125,7 @@ export default function AnimatedBackground({
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -127,10 +134,13 @@ export default function AnimatedBackground({
       window.removeEventListener("touchmove", onTouch);
       img.onload = null;
     };
-  }, [image, size, radius, proximity, growth, ease, fill]);
+  }, [image, size, radius, proximity, growth, ease]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--animated-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

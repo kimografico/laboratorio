@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.28)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.28
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 El tramado se dibuja con una matriz de Bayer de 8×8: `cell` y `gap` controlan el tamaño y la separación de los píxeles, `radius` e `intensity` el halo que sigue al puntero, y `ambient`/`speed` las nubes que flotan solas. `ease` regula con qué suavidad el halo alcanza al cursor.
 
 ```tsx
-<DitherBackground cell={6} radius={240} intensity={0.55} ambient={0.18} />
+<DitherBackground cell={6} radius={240} intensity={0.55} ambient={0.18} alpha={0.28} />
 ```

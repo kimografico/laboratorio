@@ -7,16 +7,18 @@ export interface TileBackgroundProps {
   gap?: number;
   /** Distancia de influencia del puntero (px) */
   proximity?: number;
-  /** Opacidad en reposo */
+  /** Opacidad en reposo (0-1) */
   baseAlpha?: number;
-  /** Opacidad máxima al paso del puntero */
+  /** Opacidad máxima al paso del puntero (0-1) */
   maxAlpha?: number;
   /** Persistencia de la estela (0-1): más alto, estela más larga */
   decay?: number;
   /** Irregularidad (0-1): 0 = todas iguales */
   randomness?: number;
+  /** Opacidad base de las baldosas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las baldosas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -30,8 +32,8 @@ export default function TileBackground({
   maxAlpha = 0.22,
   decay = 0.97,
   randomness = 0.6,
-  color = "#000000",
-  background = "#e0dad5",
+  alpha = 0.22,
+  color,
   className,
 }: TileBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,6 +43,7 @@ export default function TileBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let tiles: Tile[] = [];
@@ -84,14 +87,20 @@ export default function TileBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--tile-color").trim() || style.color;
+      const k = style.getPropertyValue("--tile-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
       const side = size - gap;
       for (const t of tiles) {
         t.shown += (t.level - t.shown) * 0.25;
         t.level *= t.fade;
-        ctx!.globalAlpha = baseAlpha + t.shown * (maxAlpha - baseAlpha);
+        setAlpha((baseAlpha + t.shown * (maxAlpha - baseAlpha)) * alpha * mul);
         ctx!.fillRect(t.x + gap / 2, t.y + gap / 2, side, side);
       }
       ctx!.globalAlpha = 1;
@@ -100,13 +109,14 @@ export default function TileBackground({
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -114,10 +124,13 @@ export default function TileBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, gap, proximity, baseAlpha, maxAlpha, decay, randomness, color]);
+  }, [size, gap, proximity, baseAlpha, maxAlpha, decay, randomness, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--tile-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

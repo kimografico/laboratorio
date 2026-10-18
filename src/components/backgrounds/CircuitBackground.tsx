@@ -16,8 +16,10 @@ export interface CircuitBackgroundProps {
   /** Máximo de pistas a la vez */
   maxTraces?: number;
   lineWidth?: number;
+  /** Opacidad de las pistas y los puntos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las pistas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -44,8 +46,8 @@ export default function CircuitBackground({
   fade = 5,
   maxTraces = 200,
   lineWidth = 1.3,
-  color = "rgba(0, 0, 0, 0.4)",
-  background = "#e0dad5",
+  alpha = 0.4,
+  color,
   className,
 }: CircuitBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,6 +57,7 @@ export default function CircuitBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let gx = 0;
@@ -108,7 +111,6 @@ export default function CircuitBackground({
       }
     }
 
-    // Avanza una pista un paso: siempre en una de las 8 direcciones, con giros de 45° al terminar cada tramo recto
     function advance(t: Trace, time: number) {
       if (t.run <= 0) {
         const r = Math.random();
@@ -132,6 +134,8 @@ export default function CircuitBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const dt = last < 0 ? 16.67 : Math.min(time - last, 100);
       last = time;
@@ -149,8 +153,12 @@ export default function CircuitBackground({
       traces = traces.filter((t) => !t.done || time - t.doneAt < fade * 1000);
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--circuit-color").trim() || style.color;
+      const k = style.getPropertyValue("--circuit-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.lineWidth = lineWidth;
       ctx!.lineCap = "round";
       ctx!.lineJoin = "miter";
@@ -158,16 +166,15 @@ export default function CircuitBackground({
 
       for (const t of traces) {
         const a = t.done ? 1 - (time - t.doneAt) / (fade * 1000) : 1;
-        ctx!.globalAlpha = Math.max(0, a);
+        setAlpha(Math.max(0, a) * alpha * mul);
         ctx!.beginPath();
         ctx!.moveTo(gx + t.pts[0] * grid, gy + t.pts[1] * grid);
         for (let k = 2; k < t.pts.length; k += 2) ctx!.lineTo(gx + t.pts[k] * grid, gy + t.pts[k + 1] * grid);
         ctx!.stroke();
 
-        const n = t.pts.length;
-        const hx = gx + t.pts[n - 2] * grid;
-        const hy = gy + t.pts[n - 1] * grid;
-        // Inicio: punto relleno. Final: anillo (pad de soldadura); la cabeza que aún crece, un punto
+        const nn = t.pts.length;
+        const hx = gx + t.pts[nn - 2] * grid;
+        const hy = gy + t.pts[nn - 1] * grid;
         ctx!.beginPath();
         ctx!.arc(gx + t.pts[0] * grid, gy + t.pts[1] * grid, pad * 0.6, 0, TAU);
         ctx!.fill();
@@ -198,10 +205,13 @@ export default function CircuitBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [grid, speed, maxLen, ambient, spawnDist, fade, maxTraces, lineWidth, color]);
+  }, [grid, speed, maxLen, ambient, spawnDist, fade, maxTraces, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--circuit-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

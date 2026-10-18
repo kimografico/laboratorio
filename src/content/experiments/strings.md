@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.3)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.3
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 Cada cuerda es una cadena de segmentos con tensión (`tension`), amortiguación (`decay`) y un lazo de afinación que la devuelve a su línea recta; el puntero la desplaza al pasar (`pluck`) y `ambient` mantiene una vibración mínima para que nunca queden totalmente quietas.
 
 ```tsx
-<StringsBackground strings={40} tension={0.15} decay={0.95} pluck={30} ambient={4} segment={15} />
+<StringsBackground strings={40} tension={0.15} decay={0.95} pluck={30} ambient={4} segment={15} alpha={0.3} />
 ```

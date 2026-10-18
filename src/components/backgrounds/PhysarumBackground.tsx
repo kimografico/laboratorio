@@ -15,8 +15,7 @@ export interface PhysarumBackgroundProps {
   persistence?: number;
   /** Cuánto se esparce el rastro a los píxeles vecinos por fotograma (0 = nada, 0.35 = muy difuso). Menos difusión, venas más finas */
   diffusion?: number;
-  /** Grado de atracción del puntero: fracción de los agentes que acuden a él (0 = ninguno, solo actúa el alimento; 1 = un tercio; 3 = todos).
-   * Los que acuden entran desde el borde de `reach` hacia el puntero, dibujando venas que convergen en él; el resto mantiene la red del fondo */
+  /** Grado de atracción del puntero: fracción de los agentes que acuden a él (0 = ninguno, solo actúa el alimento; 1 = un tercio; 3 = todos). */
   attraction?: number;
   /** Radio de la atracción (px): a partir de esta distancia el puntero no influye */
   reach?: number;
@@ -32,20 +31,9 @@ export interface PhysarumBackgroundProps {
   sharpness?: number;
   /** Opacidad de las venas (0-1) */
   opacity?: number;
+  /** Opcional: fija el color de las venas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
-}
-
-function parseColor(color: string): [number, number, number] {
-  const c = document.createElement("canvas");
-  c.width = 1;
-  c.height = 1;
-  const x = c.getContext("2d", { willReadFrequently: true })!;
-  x.fillStyle = color;
-  x.fillRect(0, 0, 1, 1);
-  const d = x.getImageData(0, 0, 1, 1).data;
-  return [d[0], d[1], d[2]];
 }
 
 const TAU = Math.PI * 2;
@@ -67,8 +55,7 @@ export default function PhysarumBackground({
   threshold = 0.6,
   sharpness = 0.8,
   opacity = 0.85,
-  color = "#7a4a1d",
-  background = "#e0dad5",
+  color,
   className,
 }: PhysarumBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -78,7 +65,7 @@ export default function PhysarumBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const [cr, cg, cb] = parseColor(color);
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
 
     // Una celda por píxel: el mapa se vuelca tal cual sobre el canvas, sin ampliar ni interpolar.
@@ -100,6 +87,9 @@ export default function PhysarumBackground({
     let px = OFF;
     let py = OFF;
     let raf = 0;
+    // Tinta y opacidad vivas (se actualizan en cada fotograma desde el CSS)
+    let ink = "";
+    let mul = 1;
 
     function resize() {
       width = canvas.clientWidth;
@@ -109,12 +99,13 @@ export default function PhysarumBackground({
       t0 = new Float32Array(width * height);
       t1 = new Float32Array(width * height);
       tmp = new Float32Array(width * height);
-      // La imagen se crea una vez con el color fijo; en cada fotograma solo cambia el canal alfa
+      // Máscara de alfa pura: el RGB se tiña con `ink` mediante source-in tras el putImageData
       img = ctx!.createImageData(width, height);
       for (let i = 0; i < width * height; i++) {
-        img.data[4 * i] = cr;
-        img.data[4 * i + 1] = cg;
-        img.data[4 * i + 2] = cb;
+        img.data[4 * i] = 0;
+        img.data[4 * i + 1] = 0;
+        img.data[4 * i + 2] = 0;
+        img.data[4 * i + 3] = 0;
       }
       n = Math.min(MAX_AGENTS, Math.round((density * width * height) / 10000));
       ax = new Float32Array(n);
@@ -135,7 +126,6 @@ export default function PhysarumBackground({
       py = clientY - rect.top;
     }
 
-    // Rastro en el punto (x, y) con los bordes enlazados
     function sample(x: number, y: number) {
       const i = ((Math.floor(x) % width) + width) % width;
       const j = ((Math.floor(y) % height) + height) % height;
@@ -159,10 +149,6 @@ export default function PhysarumBackground({
             aa[k] += turn;
           }
 
-          // Atracción: solo acude una fracción de los agentes (attraction / 3). Los que están fuera de `reach` son
-          // "llamados" al azar y entran por el borde de `reach` mirando al puntero; dentro giran hacia él, y al llegar
-          // se consumen y vuelven a entrar por el borde. Así hay un caudal continuo de agentes que dibuja venas
-          // convergentes, sin amontonarlos en el puntero ni vaciar la red del resto del fondo
           if (px !== OFF && recruit[k] < attraction / 3) {
             const dx = px - ax[k];
             const dy = py - ay[k];
@@ -196,7 +182,6 @@ export default function PhysarumBackground({
         }
       }
 
-      // El alimento del puntero: un montículo de rastro que atrae a los agentes
       if (px !== OFF && lure > 0) {
         const r = Math.ceil(lureRadius);
         for (let dj = -r; dj <= r; dj++) {
@@ -210,7 +195,6 @@ export default function PhysarumBackground({
         }
       }
 
-      // Difusión (desenfoque 3x3 en dos pasadas) + evaporación, y de paso se escribe el alfa de cada píxel
       const keep = 1 - diffusion;
       const d = img!.data;
       for (let j = 0; j < height; j++) {
@@ -228,7 +212,11 @@ export default function PhysarumBackground({
           const v = (t0[k] * keep + ((tmp[jm + i] + tmp[k] + tmp[jp + i]) / 3) * diffusion) * persistence;
           t1[k] = v;
           const t = (v - threshold) / edge;
-          d[4 * k + 3] = t <= 0 ? 0 : t >= 1 ? opacity * 255 : t * t * (3 - 2 * t) * opacity * 255;
+          // Máscara de alfa pura: RGB 0, se tiña con `ink` tras el putImageData
+          d[4 * k] = 0;
+          d[4 * k + 1] = 0;
+          d[4 * k + 2] = 0;
+          d[4 * k + 3] = (t <= 0 ? 0 : t >= 1 ? opacity * mul : t * t * (3 - 2 * t) * opacity * mul) * 255;
         }
       }
       const sw = t0;
@@ -238,13 +226,21 @@ export default function PhysarumBackground({
 
     function animate() {
       step();
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      ink = style.getPropertyValue("--physarum-color").trim() || style.color;
+      const k = style.getPropertyValue("--physarum-opacity").trim();
+      mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
       ctx!.putImageData(img!, 0, 0);
+      // Tiña la máscara de alfa con la tinta viva de la página
+      ctx!.globalCompositeOperation = "source-in";
+      ctx!.fillStyle = ink;
+      ctx!.fillRect(0, 0, width, height);
+      ctx!.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(animate);
     }
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
-
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
@@ -259,10 +255,13 @@ export default function PhysarumBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [density, steps, sensor, sensorAngle, turn, persistence, diffusion, attraction, reach, sink, lure, lureRadius, threshold, sharpness, opacity, color]);
+  }, [density, steps, sensor, sensorAngle, turn, persistence, diffusion, attraction, reach, sink, lure, lureRadius, threshold, sharpness, opacity]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--physarum-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

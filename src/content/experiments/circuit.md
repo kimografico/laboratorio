@@ -63,11 +63,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.4)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.4
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -75,5 +77,5 @@ props:
 Las pistas avanzan por una cuadrícula en 8 direcciones con giros de 45°, nacen solas (`ambient`) o bajo el puntero cada `spawnDist` px, y se desvanecen tras `fade` segundos. Ajusta `grid`, `speed` y `maxTraces` para controlar densidad y ritmo.
 
 ```tsx
-<CircuitBackground grid={10} speed={25} maxLen={60} ambient={1.2} spawnDist={30} fade={5} maxTraces={200} lineWidth={1.3} />
+<CircuitBackground grid={10} speed={25} maxLen={60} ambient={1.2} spawnDist={30} fade={5} maxTraces={200} lineWidth={1.3} alpha={0.4} />
 ```

@@ -13,12 +13,10 @@ export interface PlanktonBackgroundProps {
   radius?: number;
   /** Intensidad del brillo */
   glow?: number;
-  /** Opacidad base */
+  /** Opacidad base (0-1) */
   alpha?: number;
-  /** Color de las partículas */
+  /** Opcional: fija el color de las partículas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color de fondo */
-  background?: string;
   className?: string;
 }
 
@@ -41,8 +39,7 @@ export default function PlanktonBackground({
   radius = 150,
   glow = 0.7,
   alpha = 0.35,
-  color = "#000000",
-  background = "#e0dad5",
+  color,
   className,
 }: PlanktonBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -52,6 +49,7 @@ export default function PlanktonBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let pointerX = -9999;
@@ -127,16 +125,21 @@ export default function PlanktonBackground({
       else if (p.x < -8) p.x = width + 8;
     }
 
-    function draw(p: Plankton, t: number) {
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
+    function draw(p: Plankton, t: number, mul: number) {
       const flicker = 0.85 + 0.15 * Math.sin(t * 0.002 + p.phase);
       const a = alpha * (0.25 + 0.75 * p.depth) * flicker;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--plankton-color").trim() || style.color;
+      ctx!.fillStyle = ink;
       if (p.glow > 0.03) {
-        ctx!.globalAlpha = clamp(p.glow * glow * 0.22);
+        setAlpha(clamp(p.glow * glow * 0.22) * mul);
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.r * (2 + 3 * p.glow), 0, Math.PI * 2);
         ctx!.fill();
       }
-      ctx!.globalAlpha = clamp(a + p.glow * glow);
+      setAlpha(clamp(a + p.glow * glow) * mul);
       ctx!.beginPath();
       ctx!.arc(p.x, p.y, p.r * (1 + 0.8 * p.glow), 0, Math.PI * 2);
       ctx!.fill();
@@ -144,11 +147,15 @@ export default function PlanktonBackground({
 
     function animate(t: number) {
       ctx!.clearRect(0, 0, width, height);
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--plankton-color").trim() || style.color;
+      const k = style.getPropertyValue("--plankton-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
       wakeX *= 0.9;
       wakeY *= 0.9;
       for (const p of plankton) update(p, t);
-      for (const p of plankton) draw(p, t);
+      for (const p of plankton) draw(p, t, mul);
       ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
@@ -169,10 +176,13 @@ export default function PlanktonBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [density, size, drift, wake, radius, glow, alpha, color]);
+  }, [density, size, drift, wake, radius, glow, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--plankton-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

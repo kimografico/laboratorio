@@ -13,6 +13,7 @@ export interface RainRipplesBackgroundProps {
   width?: number;
   /** Opacidad de gotas y ondas (0-1) */
   alpha?: number;
+  /** Opcional: fija el color de gotas y ondas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
   className?: string;
 }
@@ -20,7 +21,6 @@ export interface RainRipplesBackgroundProps {
 type Drop = { x: number; y: number; px: number; py: number; vx: number; vy: number; len: number; impact: number };
 type Ripple = { x: number; y: number; age: number; rMax: number };
 
-// Las ondas son elipses aplanadas (mucho más anchas que altas), como reflejo sobre el suelo
 const RIPPLE_FLAT = 0.32;
 
 export default function RainRipplesBackground({
@@ -100,6 +100,8 @@ export default function RainRipplesBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const dt = last < 0 ? 0.0167 : Math.min((time - last) / 1000, 0.05);
       last = time;
@@ -128,6 +130,7 @@ export default function RainRipplesBackground({
       }
 
       ctx!.clearRect(0, 0, w, h);
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
       const ink = style.getPropertyValue("--rain-color").trim() || style.color;
       const k = style.getPropertyValue("--rain-opacity").trim();
       const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
@@ -136,7 +139,7 @@ export default function RainRipplesBackground({
 
       for (const d of drops) {
         const vlen = Math.hypot(d.vx, d.vy) || 1;
-        ctx!.globalAlpha = alpha * mul * (0.35 + (d.impact / h) * 0.55);
+        setAlpha(alpha * mul * (0.35 + (d.impact / h) * 0.55));
         ctx!.lineWidth = width;
         ctx!.beginPath();
         ctx!.moveTo(d.x - (d.vx / vlen) * d.len, d.y - (d.vy / vlen) * d.len);
@@ -149,7 +152,7 @@ export default function RainRipplesBackground({
         const a = Math.pow(1 - t, 1.7);
         if (a < 0.02) continue;
         const r = (1 - Math.pow(1 - t, 2)) * rp.rMax;
-        ctx!.globalAlpha = a * alpha * mul * 0.75;
+        setAlpha(a * alpha * mul * 0.75);
         ctx!.lineWidth = width * (1 - 0.5 * t) + 0.3;
         ctx!.beginPath();
         ctx!.ellipse(rp.x, rp.y, r, r * RIPPLE_FLAT, 0, 0, Math.PI * 2);
@@ -157,7 +160,7 @@ export default function RainRipplesBackground({
         const t2 = t - 0.18;
         if (t2 > 0) {
           const r2 = (1 - Math.pow(1 - t2, 2)) * rp.rMax;
-          ctx!.globalAlpha = Math.pow(1 - t2, 1.7) * alpha * mul * 0.4;
+          setAlpha(Math.pow(1 - t2, 1.7) * alpha * mul * 0.4);
           ctx!.beginPath();
           ctx!.ellipse(rp.x, rp.y, r2, r2 * RIPPLE_FLAT, 0, 0, Math.PI * 2);
           ctx!.stroke();
@@ -170,6 +173,7 @@ export default function RainRipplesBackground({
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);

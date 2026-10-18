@@ -13,9 +13,8 @@ export interface MatrixBackgroundProps {
   spread?: number;
   /** Opacidad de la cabeza de cada gota (0-1); la estela se desvanece */
   alpha?: number;
-  /** Color de los caracteres (blanco sobre fondo oscuro) */
+  /** Opcional: fija el color de los caracteres. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -28,8 +27,7 @@ export default function MatrixBackground({
   length = 12,
   spread = 1,
   alpha = 0.3,
-  color = "#ffffff",
-  background = "#1b1917",
+  color,
   className,
 }: MatrixBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,6 +37,7 @@ export default function MatrixBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const glyphs = Array.from(chars);
     let width = 0;
     let height = 0;
@@ -80,12 +79,18 @@ export default function MatrixBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
       ctx!.font = `${size * 0.9}px ui-monospace, Menlo, Consolas, monospace`;
       ctx!.textAlign = "center";
       ctx!.textBaseline = "middle";
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--matrix-color").trim() || style.color;
+      const k = style.getPropertyValue("--matrix-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
 
       for (let c = 0; c < cols; c++) if (cooldown[c] > 0) cooldown[c]--;
 
@@ -102,7 +107,7 @@ export default function MatrixBackground({
         for (let i = 0; i < d.chars.length; i++) {
           const row = head - i;
           if (row < 0 || row >= rows) continue;
-          ctx!.globalAlpha = alpha * Math.pow(1 - i / d.len, 1.6);
+          setAlpha(alpha * Math.pow(1 - i / d.len, 1.6) * mul);
           ctx!.fillText(d.chars[i], d.col * size + size / 2, row * size + size / 2);
         }
       }
@@ -119,7 +124,7 @@ export default function MatrixBackground({
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -127,10 +132,13 @@ export default function MatrixBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, chars, speed, length, spread, alpha, color]);
+  }, [size, chars, speed, length, spread, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--matrix-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

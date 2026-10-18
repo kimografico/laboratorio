@@ -63,7 +63,13 @@ props:
   - name: "color"
     label: "Muros"
     type: "color"
-    default: "rgba(0, 0, 0, 0.45)"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.45
+    min: 0
+    max: 1
+    step: 0.02
   - name: "glow"
     label: "Color de la luz"
     type: "color"
@@ -75,10 +81,6 @@ props:
     min: 0
     max: 1
     step: 0.05
-  - name: "background"
-    label: "Fondo"
-    type: "color"
-    default: "#e0dad5"
 ---
 
 ## Uso
@@ -86,5 +88,5 @@ props:
 Laberinto perfecto generado con excavación por retroceso (DFS); se excava a `genSpeed` celdas por fotograma, se mantiene `hold` segundos y se disuelve para generar otro. La luz del puntero (y las ondas ambientales) viaja por los pasillos según BFS a `waveSpeed`, con frente de `waveWidth` celdas.
 
 ```tsx
-<MazeBackground cell={30} hold={14} waveSpeed={14} glow="#d9822b" />
+<MazeBackground cell={30} hold={14} waveSpeed={14} glow="#d9822b" alpha={0.45} />
 ```

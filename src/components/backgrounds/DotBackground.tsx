@@ -13,8 +13,10 @@ export interface DotBackgroundProps {
   stiffness?: number;
   /** Amortiguación (0-1): más alto, más rebote */
   damping?: number;
+  /** Opacidad de los puntos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de los puntos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -38,8 +40,8 @@ export default function DotBackground({
   push = 30,
   stiffness = 0.05,
   damping = 0.85,
-  color = "rgba(0, 0, 0, 0.2)",
-  background = "#e0dad5",
+  alpha = 0.2,
+  color,
   className,
 }: DotBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -49,6 +51,7 @@ export default function DotBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let dots: Dot[] = [];
@@ -90,8 +93,16 @@ export default function DotBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--dot-color").trim() || style.color;
+      const k = style.getPropertyValue("--dot-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.beginPath();
       for (const d of dots) {
         d.vx = (d.vx + (d.tx - d.x) * stiffness) * damping;
@@ -102,8 +113,9 @@ export default function DotBackground({
         ctx!.moveTo(d.x + d.r, d.y);
         ctx!.arc(d.x, d.y, d.r, 0, Math.PI * 2);
       }
-      ctx!.fillStyle = color;
+      setAlpha(alpha * mul);
       ctx!.fill();
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -115,7 +127,7 @@ export default function DotBackground({
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -123,10 +135,13 @@ export default function DotBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, radius, proximity, push, stiffness, damping, color]);
+  }, [size, radius, proximity, push, stiffness, damping, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--dot-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

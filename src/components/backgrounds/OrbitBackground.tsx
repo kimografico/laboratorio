@@ -14,8 +14,10 @@ export interface OrbitBackgroundProps {
   /** Fuerza de atracción del centro de gravedad */
   attract?: number;
   lineWidth?: number;
+  /** Opacidad de las estelas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las partículas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -30,8 +32,8 @@ export default function OrbitBackground({
   soft = 60,
   attract = 1.25,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.5)",
-  background = "#e0dad5",
+  alpha = 0.5,
+  color,
   className,
 }: OrbitBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,6 +43,7 @@ export default function OrbitBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const g = speed * speed * attract;
     const soft2 = soft * soft;
     const xs = new Float32Array(count);
@@ -92,6 +95,8 @@ export default function OrbitBackground({
       pointer = true;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       if (!pointer) {
         tx = width / 2 + Math.cos(time * 0.0003) * width * 0.12;
@@ -121,7 +126,11 @@ export default function OrbitBackground({
       }
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--orbit-color").trim() || style.color;
+      const k = style.getPropertyValue("--orbit-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineWidth = lineWidth;
       ctx!.lineCap = "round";
 
@@ -137,7 +146,7 @@ export default function OrbitBackground({
             ctx!.lineTo(hist[ib], hist[ib + 1]);
           }
         }
-        ctx!.globalAlpha = Math.pow(1 - b / BUCKETS, 1.6);
+        setAlpha(Math.pow(1 - b / BUCKETS, 1.6) * alpha * mul);
         ctx!.stroke();
       }
       ctx!.globalAlpha = 1;
@@ -162,10 +171,13 @@ export default function OrbitBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, speed, tail, ease, soft, attract, lineWidth, color]);
+  }, [count, speed, tail, ease, soft, attract, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--orbit-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

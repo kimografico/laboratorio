@@ -17,26 +17,12 @@ export interface LavaLampBackgroundProps {
   pool?: boolean;
   /** Opacidad de la cera (0-1) */
   opacity?: number;
-  /** Color de la cera */
+  /** Opcional: fija el color de la cera. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color del centro caliente de cada burbuja */
-  core?: string;
-  background?: string;
   className?: string;
 }
 
 type Blob = { x: number; y: number; vx: number; vy: number; r: number; temp: number; phase: number };
-
-function parseColor(color: string): [number, number, number] {
-  const c = document.createElement("canvas");
-  c.width = 1;
-  c.height = 1;
-  const x = c.getContext("2d", { willReadFrequently: true })!;
-  x.fillStyle = color;
-  x.fillRect(0, 0, 1, 1);
-  const d = x.getImageData(0, 0, 1, 1).data;
-  return [d[0], d[1], d[2]];
-}
 
 export default function LavaLampBackground({
   count = 12,
@@ -47,9 +33,7 @@ export default function LavaLampBackground({
   glow = 0.18,
   pool = true,
   opacity = 0.15,
-  color = "#ffffff",
-  core = "#ffffff",
-  background = "#e0dad5",
+  color,
   className,
 }: LavaLampBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,13 +43,11 @@ export default function LavaLampBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     // Campo de las metabolas a baja resolución; luego se amplía con suavizado
     const off = document.createElement("canvas");
     const octx = off.getContext("2d", { willReadFrequently: true });
     if (!octx) return;
-
-    const [cr, cg, cb] = parseColor(color);
-    const [kr, kg, kb] = parseColor(core);
     const OFF = -9999;
     const THR = 0.5;
 
@@ -79,6 +61,9 @@ export default function LavaLampBackground({
     let pressed = false;
     let blobs: Blob[] = [];
     let raf = 0;
+    // Tinta y opacidad vivas (se actualizan en cada fotograma desde el CSS)
+    let ink = "";
+    let mul = 1;
 
     function build() {
       const m = Math.min(width, height);
@@ -135,12 +120,11 @@ export default function LavaLampBackground({
       }
 
       const m = Math.min(width, height);
-      const k = m / 700;
+      const kScale = m / 700;
       const reach = m * 0.3;
 
       for (const b of blobs) {
         // Termodinámica: se calientan abajo, se enfrían arriba; lo caliente sube y lo frío baja
-        // En la zona media la cera conserva su temperatura, así que sigue subiendo o bajando hasta llegar al otro extremo
         if (b.y > height * 0.75) b.temp += 0.008 * dt;
         else if (b.y < height * 0.25) b.temp -= 0.008 * dt;
         else b.temp += Math.sin(time * 0.0002 + b.phase) * 0.002 * dt;
@@ -152,17 +136,17 @@ export default function LavaLampBackground({
         }
         b.temp = Math.max(-1, Math.min(1, b.temp));
 
-        b.vy -= b.temp * 0.018 * k * dt;
-        b.vx += Math.sin(time * 0.0004 + b.phase) * 0.004 * k * dt;
+        b.vy -= b.temp * 0.018 * kScale * dt;
+        b.vx += Math.sin(time * 0.0004 + b.phase) * 0.004 * kScale * dt;
 
-        if (b.x < b.r * 0.3) b.vx += 0.03 * k * dt;
-        if (b.x > width - b.r * 0.3) b.vx -= 0.03 * k * dt;
+        if (b.x < b.r * 0.3) b.vx += 0.03 * kScale * dt;
+        if (b.x > width - b.r * 0.3) b.vx -= 0.03 * kScale * dt;
         if (b.y < b.r * 0.2) {
-          b.vy += 0.05 * k * dt;
+          b.vy += 0.05 * kScale * dt;
           b.temp = Math.min(b.temp, -0.3);
         }
         if (b.y > height - b.r * 0.2) {
-          b.vy -= 0.05 * k * dt;
+          b.vy -= 0.05 * kScale * dt;
           b.temp = Math.max(b.temp, 0.3);
         }
 
@@ -179,7 +163,6 @@ export default function LavaLampBackground({
       for (const b of blobs) splat(b.x, b.y, b.r);
 
       if (pool) {
-        // Ola ancha y poco profunda ocupando toda la parte inferior
         const depth = m * 0.12;
         const amp = depth * 0.45;
         const top = height - depth;
@@ -210,7 +193,13 @@ export default function LavaLampBackground({
         }
       }
 
-      // Umbral: convierte el campo en cera con borde suave, centro más claro y un halo tenue
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      ink = style.getPropertyValue("--lava-lamp-color").trim() || style.color;
+      const kOp = style.getPropertyValue("--lava-lamp-opacity").trim();
+      mul = kOp !== "" && Number.isFinite(Number(kOp)) ? Number(kOp) : 1;
+
+      // Umbral: convierte el campo en cera con borde suave, centro más claro y un halo tenue.
+      // Máscara de alfa pura; el RGB se tiña con `ink` mediante source-in tras el drawImage
       const img = octx!.getImageData(0, 0, off.width, off.height);
       const d = img.data;
       const t0 = THR - softness;
@@ -228,11 +217,10 @@ export default function LavaLampBackground({
           a = x * x * (3 - 2 * x);
         }
         const halo = v >= t0 ? glow : glow * (v / t0) * (v / t0);
-        const mix = v > t1 ? Math.min(1, (v - t1) / (1 - t1)) * 0.9 : 0;
-        d[i] = cr + (kr - cr) * mix;
-        d[i + 1] = cg + (kg - cg) * mix;
-        d[i + 2] = cb + (kb - cb) * mix;
-        d[i + 3] = Math.max(a, halo) * opacity * 255;
+        d[i] = 0;
+        d[i + 1] = 0;
+        d[i + 2] = 0;
+        d[i + 3] = Math.max(a, halo) * opacity * mul * 255;
       }
       octx!.putImageData(img, 0, 0);
 
@@ -240,6 +228,11 @@ export default function LavaLampBackground({
       ctx!.imageSmoothingEnabled = true;
       ctx!.imageSmoothingQuality = "high";
       ctx!.drawImage(off, 0, 0, off.width, off.height, 0, 0, width, height);
+      // Tiña la máscara de alfa con la tinta viva de la página
+      ctx!.globalCompositeOperation = "source-in";
+      ctx!.fillStyle = ink;
+      ctx!.fillRect(0, 0, width, height);
+      ctx!.globalCompositeOperation = "source-over";
 
       raf = requestAnimationFrame(animate);
     }
@@ -277,10 +270,13 @@ export default function LavaLampBackground({
       window.removeEventListener("touchend", onUp);
       window.removeEventListener("blur", onUp);
     };
-  }, [count, size, speed, heat, softness, glow, pool, opacity, color, core]);
+  }, [count, size, speed, heat, softness, glow, pool, opacity]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--lava-lamp-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

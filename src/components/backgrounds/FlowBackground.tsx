@@ -14,9 +14,10 @@ export interface FlowBackgroundProps {
   /** Rapidez con la que se borra la estela (0.02 = larga, 0.15 = corta) */
   fade?: number;
   lineWidth?: number;
-  /** Color de las partículas (con transparencia) */
+  /** Opacidad de las partículas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las partículas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -30,8 +31,8 @@ export default function FlowBackground({
   push = 3,
   fade = 0.07,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.45)",
-  background = "#e0dad5",
+  alpha = 0.45,
+  color,
   className,
 }: FlowBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,6 +42,7 @@ export default function FlowBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let time = 0;
@@ -60,8 +62,6 @@ export default function FlowBackground({
       height = canvas.clientHeight;
       canvas.width = width;
       canvas.height = height;
-      ctx!.fillStyle = background;
-      ctx!.fillRect(0, 0, width, height);
       particles = Array.from({ length: count }, () => {
         const p = { x: 0, y: 0, life: 0 };
         spawn(p);
@@ -79,14 +79,23 @@ export default function FlowBackground({
       (Math.sin(x * scale + time * 2) + Math.cos(y * scale * 1.3 - time) + Math.sin((x + y) * scale * 0.5)) *
       Math.PI;
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       time += 0.003;
-      ctx!.globalAlpha = fade;
-      ctx!.fillStyle = background;
+      // destination-out borra la estela sin depender del color de fondo (desaparece la dependencia del fondo)
+      ctx!.save();
+      ctx!.globalCompositeOperation = "destination-out";
+      setAlpha(fade);
       ctx!.fillRect(0, 0, width, height);
-      ctx!.globalAlpha = 1;
+      ctx!.restore();
 
       ctx!.beginPath();
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--flow-color").trim() || style.color;
+      const k = style.getPropertyValue("--flow-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       for (const p of particles) {
         const a = angle(p.x, p.y);
         let vx = Math.cos(a) * speed;
@@ -108,9 +117,10 @@ export default function FlowBackground({
 
         if (--p.life <= 0 || p.x < 0 || p.x > width || p.y < 0 || p.y > height) spawn(p);
       }
-      ctx!.strokeStyle = color;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.stroke();
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -122,7 +132,7 @@ export default function FlowBackground({
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -130,10 +140,13 @@ export default function FlowBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, speed, scale, radius, push, fade, lineWidth, color, background]);
+  }, [count, speed, scale, radius, push, fade, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--flow-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

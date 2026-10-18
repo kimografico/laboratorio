@@ -10,8 +10,10 @@ export interface ThreadBackgroundProps {
   /** Ondulación lateral del hilo (px) */
   wobble?: number;
   lineWidth?: number;
+  /** Opacidad de los hilos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de los hilos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -24,8 +26,8 @@ export default function ThreadBackground({
   follow = 0.3,
   wobble = 7,
   lineWidth = 1.4,
-  color = "rgba(0, 0, 0, 0.45)",
-  background = "#e0dad5",
+  alpha = 0.45,
+  color,
   className,
 }: ThreadBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -35,6 +37,7 @@ export default function ThreadBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let px = 0;
@@ -61,11 +64,17 @@ export default function ThreadBackground({
       lastMove = performance.now();
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const active = performance.now() - lastMove < 2500;
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--thread-color").trim() || style.color;
+      const k = style.getPropertyValue("--thread-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineCap = "round";
 
       strands.forEach((st, s) => {
@@ -91,7 +100,7 @@ export default function ThreadBackground({
           const x = p.x - (dy / d) * wob;
           const y = p.y + (dx / d) * wob;
           const t = i / pts.length;
-          ctx!.globalAlpha = Math.pow(1 - t, 1.5);
+          setAlpha(Math.pow(1 - t, 1.5) * alpha * mul);
           ctx!.lineWidth = lineWidth * (1 - t * 0.7);
           ctx!.beginPath();
           ctx!.moveTo(lx, ly);
@@ -123,10 +132,13 @@ export default function ThreadBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [threads, length, follow, wobble, lineWidth, color]);
+  }, [threads, length, follow, wobble, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--thread-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

@@ -42,11 +42,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.2)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.2
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -54,5 +56,5 @@ props:
 `lens` controla cuánto se abre la rejilla bajo el puntero; `ease` la rapidez con la que la lente lo sigue.
 
 ```tsx
-<WarpGridBackground size={36} radius={180} lens={0.6} ease={0.1} />
+<WarpGridBackground size={36} radius={180} lens={0.6} ease={0.1} alpha={0.2} />
 ```

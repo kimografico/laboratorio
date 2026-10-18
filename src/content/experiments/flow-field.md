@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.45)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.45
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 `fade` define la longitud de la estela (0.02 larga, 0.15 corta). `scale` más bajo = corrientes más amplias.
 
 ```tsx
-<FlowBackground count={800} fade={0.07} scale={0.0035} push={3} />
+<FlowBackground count={800} fade={0.07} scale={0.0035} push={3} alpha={0.45} />
 ```

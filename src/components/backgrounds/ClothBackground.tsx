@@ -20,8 +20,10 @@ export interface ClothBackgroundProps {
   /** Radio de los puntos de cada nodo (px); 0 para no dibujarlos */
   dot?: number;
   lineWidth?: number;
+  /** Opacidad de la red y los nodos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de la red. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -38,8 +40,8 @@ export default function ClothBackground({
   pin = "top",
   dot = 3,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.3)",
-  background = "#e0dad5",
+  alpha = 0.3,
+  color,
   className,
 }: ClothBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -49,6 +51,7 @@ export default function ClothBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
 
     let width = 0;
@@ -88,8 +91,6 @@ export default function ClothBackground({
       }
     }
 
-    // El puntero empuja los nodos cercanos en la dirección en que se mueve: se desplaza x e y pero no ox/oy,
-    // así que el empuje se convierte en velocidad en el siguiente fotograma
     function onPointer(clientX: number, clientY: number) {
       const rect = canvas.getBoundingClientRect();
       const cx = clientX - rect.left;
@@ -132,6 +133,8 @@ export default function ClothBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const lim = spacing;
       for (let j = 0; j < rows; j++) {
@@ -170,7 +173,12 @@ export default function ClothBackground({
         ctx!.moveTo(x[i], y[i]);
         for (let j = 1; j < rows; j++) ctx!.lineTo(x[j * cols + i], y[j * cols + i]);
       }
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--cloth-color").trim() || style.color;
+      const k = style.getPropertyValue("--cloth-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.lineJoin = "round";
       ctx!.stroke();
@@ -181,7 +189,8 @@ export default function ClothBackground({
           ctx!.moveTo(x[k] + dot, y[k]);
           ctx!.arc(x[k], y[k], dot, 0, TAU);
         }
-        ctx!.fillStyle = color;
+        ctx!.fillStyle = ink;
+        setAlpha(alpha * mul);
         ctx!.fill();
       }
 
@@ -205,10 +214,13 @@ export default function ClothBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [spacing, gravity, iterations, wind, radius, push, damping, pin, dot, lineWidth, color]);
+  }, [spacing, gravity, iterations, wind, radius, push, damping, pin, dot, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--cloth-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

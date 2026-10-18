@@ -14,8 +14,10 @@ export interface VoronoiBackgroundProps {
   /** Opacidad con la que se rellena la celda del puntero (0-1) */
   highlight?: number;
   lineWidth?: number;
+  /** Opacidad de las aristas y los puntos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las aristas y puntos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -24,7 +26,6 @@ type Site = { x: number; y: number; vx: number; vy: number };
 const MAX_SITES = 140;
 const MARGIN = 60;
 
-// Recorta el polígono src (n vértices) con el semiplano nx·x + ny·y <= c y devuelve el nuevo nº de vértices
 function clip(src: Float64Array, n: number, dst: Float64Array, nx: number, ny: number, c: number) {
   let m = 0;
   for (let k = 0; k < n; k++) {
@@ -63,8 +64,8 @@ export default function VoronoiBackground({
   dot = 1.6,
   highlight = 0.07,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.2)",
-  background = "#e0dad5",
+  alpha = 0.2,
+  color,
   className,
 }: VoronoiBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -74,6 +75,7 @@ export default function VoronoiBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const cap = 2 * (MAX_SITES + 24);
     const bufA = new Float64Array(cap);
@@ -132,6 +134,8 @@ export default function VoronoiBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       all.length = 0;
       for (const s of sites) {
@@ -147,6 +151,15 @@ export default function VoronoiBackground({
       ctx!.clearRect(0, 0, width, height);
       ctx!.beginPath();
       let hlN = 0;
+
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--voronoi-color").trim() || style.color;
+      const k = style.getPropertyValue("--voronoi-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
+      ctx!.lineWidth = lineWidth;
+      ctx!.lineJoin = "round";
 
       for (let i = 0; i < all.length; i++) {
         const s = all[i];
@@ -177,9 +190,7 @@ export default function VoronoiBackground({
         }
       }
 
-      ctx!.strokeStyle = color;
-      ctx!.lineWidth = lineWidth;
-      ctx!.lineJoin = "round";
+      setAlpha(alpha * mul);
       ctx!.stroke();
 
       if (hlN >= 3 && highlight > 0) {
@@ -187,26 +198,24 @@ export default function VoronoiBackground({
         ctx!.moveTo(hl[0], hl[1]);
         for (let k = 1; k < hlN; k++) ctx!.lineTo(hl[2 * k], hl[2 * k + 1]);
         ctx!.closePath();
-        ctx!.fillStyle = color;
-        ctx!.globalAlpha = highlight / 0.2;
+        setAlpha(highlight * mul);
         ctx!.fill();
-        ctx!.globalAlpha = 1;
       }
 
-      ctx!.fillStyle = color;
       ctx!.beginPath();
       for (const s of sites) {
         ctx!.moveTo(s.x + dot, s.y);
         ctx!.arc(s.x, s.y, dot, 0, Math.PI * 2);
       }
+      setAlpha(alpha * mul);
       ctx!.fill();
+      ctx!.globalAlpha = 1;
 
       raf = requestAnimationFrame(animate);
     }
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
-
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
@@ -221,10 +230,13 @@ export default function VoronoiBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [density, speed, radius, push, dot, highlight, lineWidth, color]);
+  }, [density, speed, radius, push, dot, highlight, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--voronoi-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

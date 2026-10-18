@@ -15,8 +15,10 @@ export interface NetworkBackground2Props {
   attract?: number;
   /** Radio de cada punto conectado (px); los sueltos son más pequeños y variables */
   dot?: number;
+  /** Opacidad de líneas y puntos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de los puntos y las líneas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -30,8 +32,8 @@ export default function NetworkBackground2({
   radius = 200,
   attract = 0.04,
   dot = 1.6,
-  color = "#000000",
-  background = "#e0dad5",
+  alpha = 1,
+  color,
   className,
 }: NetworkBackground2Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,6 +43,7 @@ export default function NetworkBackground2({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let px = -9999;
@@ -79,8 +82,8 @@ export default function NetworkBackground2({
       py = clientY - rect.top;
     }
 
-    function line(x1: number, y1: number, x2: number, y2: number, a: number) {
-      ctx!.globalAlpha = a;
+    function line(x1: number, y1: number, x2: number, y2: number, a: number, mul: number) {
+      ctx!.globalAlpha = Math.min(1, Math.max(0, a * alpha * mul));
       ctx!.beginPath();
       ctx!.moveTo(x1, y1);
       ctx!.lineTo(x2, y2);
@@ -106,13 +109,19 @@ export default function NetworkBackground2({
       else if (n.y > height) n.y -= height;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
       for (const n of nodes) drift(n, 1);
       for (const f of floaters) drift(f, 0.6);
 
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--network-2-color").trim() || style.color;
+      const k = style.getPropertyValue("--network-2-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.lineWidth = 1;
       const link2 = link * link;
       for (const cell of grid) cell.length = 0;
@@ -127,22 +136,22 @@ export default function NetworkBackground2({
               if (j <= i) continue;
               const b = nodes[j];
               const d2 = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
-              if (d2 < link2) line(a.x, a.y, b.x, b.y, 0.25 * (1 - Math.sqrt(d2) / link));
+              if (d2 < link2) line(a.x, a.y, b.x, b.y, 0.25 * (1 - Math.sqrt(d2) / link), mul);
             }
           }
         }
         const d = Math.hypot(a.x - px, a.y - py);
-        if (d < radius) line(a.x, a.y, px, py, 0.5 * (1 - d / radius));
+        if (d < radius) line(a.x, a.y, px, py, 0.5 * (1 - d / radius), mul);
       }
 
-      ctx!.globalAlpha = 0.35;
+      setAlpha(0.35 * alpha * mul);
       ctx!.beginPath();
       for (const n of nodes) {
         ctx!.moveTo(n.x + n.r, n.y);
         ctx!.arc(n.x, n.y, n.r, 0, Math.PI * 2);
       }
       ctx!.fill();
-      ctx!.globalAlpha = 0.22;
+      setAlpha(0.22 * alpha * mul);
       ctx!.beginPath();
       for (const f of floaters) {
         ctx!.moveTo(f.x + f.r, f.y);
@@ -155,13 +164,14 @@ export default function NetworkBackground2({
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -169,10 +179,13 @@ export default function NetworkBackground2({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [density, scatter, link, speed, radius, attract, dot, color]);
+  }, [density, scatter, link, speed, radius, attract, dot, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--network-2-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

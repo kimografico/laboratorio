@@ -46,11 +46,6 @@ props:
   - name: color
     label: Color texto
     type: color
-    default: "#ffffff"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#1b1917"
 ---
 
 ## Uso
@@ -58,5 +53,5 @@ props:
 `chars` puede ser cualquier cadena; los caracteres se eligen al azar de ella. `spread` añade columnas al pasar el puntero.
 
 ```tsx
-<MatrixBackground chars="01アイウ" speed={0.22} length={12} color="#ffffff" background="#1b1917" />
+<MatrixBackground chars="01アイウ" speed={0.22} length={12} color="#ffffff" />
 ```

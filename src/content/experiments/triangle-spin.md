@@ -49,11 +49,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.15)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.15
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -61,5 +63,5 @@ props:
 El giro va a la mitad de velocidad que el crecimiento. `rotation` fija el ángulo máximo (aleatorio en signo).
 
 ```tsx
-<TriangleBackground2 size={30} growth={12} rotation={30} ease={0.05} />
+<TriangleBackground2 size={30} growth={12} rotation={30} ease={0.05} alpha={0.15} />
 ```

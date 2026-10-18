@@ -42,11 +42,6 @@ props:
   - name: color
     label: "Color del vaho"
     type: color
-    default: "#282828"
-  - name: background
-    label: "Fondo"
-    type: color
-    default: "#e0dad5"
 ---
 ## Uso
 
@@ -60,6 +55,6 @@ El vaho se disipa alrededor del puntero y vuelve a crecer con el tiempo. `cell` 
   drips={2}
   opacity={0.85}
   color="#282828"
-  background="#e0dad5"
+ 
 />
 ```

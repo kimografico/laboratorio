@@ -43,14 +43,9 @@ props:
     min: 0.02
     max: 0.2
     step: 0.005
-  - name: fill
-    label: Color de relleno
+  - name: color
+    label: Color
     type: color
-    default: "#000000"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
 ---
 
 ## Uso
@@ -60,5 +55,5 @@ Pasa una `image` para revelarla a través de los círculos, o deja `fill` para q
 ```tsx
 import AnimatedBackground from "@/components/backgrounds/AnimatedBackground";
 
-<AnimatedBackground image="/hero.jpg" size={30} growth={60} fill="#000" background="#e0dad5" />
+<AnimatedBackground image="/hero.jpg" size={30} growth={60} />
 ```

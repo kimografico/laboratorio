@@ -17,20 +17,9 @@ export interface JuliaBackgroundProps {
   ease?: number;
   /** Opacidad general (0-1) */
   opacity?: number;
+  /** Opcional: fija el color del conjunto. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
-}
-
-function parseColor(color: string): [number, number, number] {
-  const c = document.createElement("canvas");
-  c.width = 1;
-  c.height = 1;
-  const x = c.getContext("2d", { willReadFrequently: true })!;
-  x.fillStyle = color;
-  x.fillRect(0, 0, 1, 1);
-  const d = x.getImageData(0, 0, 1, 1).data;
-  return [d[0], d[1], d[2]];
 }
 
 const LN2 = Math.LN2;
@@ -44,8 +33,7 @@ export default function JuliaBackground({
   fill = 0.1,
   ease = 0.06,
   opacity = 0.7,
-  color = "#2f3e5c",
-  background = "#e0dad5",
+  color,
   className,
 }: JuliaBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,10 +43,10 @@ export default function JuliaBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const off = document.createElement("canvas");
     const octx = off.getContext("2d", { willReadFrequently: true });
     if (!octx) return;
-    const [cr0, cg0, cb0] = parseColor(color);
 
     let width = 0;
     let height = 0;
@@ -75,6 +63,9 @@ export default function JuliaBackground({
     let lastR = 0;
     let lastI = 0;
     let raf = 0;
+    // Tinta y opacidad vivas (se actualizan en cada fotograma desde el CSS)
+    let ink = "";
+    let mul = 1;
 
     function resize() {
       width = canvas.clientWidth;
@@ -87,10 +78,12 @@ export default function JuliaBackground({
       off.height = rows;
       rendered = false;
       img = octx!.createImageData(cols, rows);
+      // Máscara de alfa pura: el RGB se tiña con `ink` mediante source-in tras el drawImage
       for (let i = 0; i < cols * rows; i++) {
-        img.data[4 * i] = cr0;
-        img.data[4 * i + 1] = cg0;
-        img.data[4 * i + 2] = cb0;
+        img.data[4 * i] = 0;
+        img.data[4 * i + 1] = 0;
+        img.data[4 * i + 2] = 0;
+        img.data[4 * i + 3] = 0;
       }
     }
 
@@ -104,7 +97,7 @@ export default function JuliaBackground({
       pointer = true;
     }
 
-    function render() {
+    function render(mul: number) {
       const d = img!.data;
       const wc = 3.2 / zoom;
       const hc = (wc * rows) / cols;
@@ -132,18 +125,16 @@ export default function JuliaBackground({
           if (n >= iterations) {
             a = fill;
           } else {
-            // Iteración continua: líneas de nivel suaves, más tenues cuanto más tardan en escapar
             const nu = n + 1 - Math.log(Math.log(x2 + y2) / 2 / LN2) / LN2;
             a = Math.pow(0.5 + 0.5 * Math.cos(nu * freq), sharpness) * Math.exp(-nu * 0.05);
           }
-          d[4 * (j * cols + i) + 3] = a * opacity * 255;
+          d[4 * (j * cols + i) + 3] = a * opacity * mul * 255;
         }
       }
     }
 
     function animate(time: number) {
       if (!pointer) {
-        // En reposo el parámetro recorre una circunferencia de radio 0.7885, donde el conjunto cambia de forma sin romperse
         const a = time * 0.00015;
         tr = 0.7885 * Math.cos(a);
         ti = 0.7885 * Math.sin(a);
@@ -151,14 +142,24 @@ export default function JuliaBackground({
       cr += (tr - cr) * ease;
       ci += (ti - ci) * ease;
 
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      ink = style.getPropertyValue("--julia-color").trim() || style.color;
+      const k = style.getPropertyValue("--julia-opacity").trim();
+      mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+
       // Si el parámetro apenas ha cambiado (puntero quieto) la imagen sería la misma: no se recalcula
       if (!rendered || Math.abs(cr - lastR) + Math.abs(ci - lastI) > 2e-5) {
-        render();
+        render(mul);
         octx!.putImageData(img!, 0, 0);
         ctx!.clearRect(0, 0, width, height);
         ctx!.imageSmoothingEnabled = true;
         ctx!.imageSmoothingQuality = "high";
         ctx!.drawImage(off, 0, 0, cols, rows, 0, 0, width, height);
+        // Tiña la máscara de alfa con la tinta viva de la página
+        ctx!.globalCompositeOperation = "source-in";
+        ctx!.fillStyle = ink;
+        ctx!.fillRect(0, 0, width, height);
+        ctx!.globalCompositeOperation = "source-over";
         lastR = cr;
         lastI = ci;
         rendered = true;
@@ -169,7 +170,6 @@ export default function JuliaBackground({
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
-
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
@@ -184,10 +184,13 @@ export default function JuliaBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [iterations, scale, zoom, lines, sharpness, fill, ease, opacity, color]);
+  }, [iterations, scale, zoom, lines, sharpness, fill, ease, opacity]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--julia-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

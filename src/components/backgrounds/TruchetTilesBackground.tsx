@@ -14,8 +14,10 @@ export interface TruchetTilesBackgroundProps {
   /** Baldosas que giran solas por segundo */
   idle?: number;
   lineWidth?: number;
+  /** Opacidad de las bandas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las bandas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -31,8 +33,8 @@ export default function TruchetTilesBackground({
   cooldown = 600,
   idle = 2,
   lineWidth = 1.5,
-  color = "rgba(0, 0, 0, 0.22)",
-  background = "#e0dad5",
+  alpha = 0.22,
+  color,
   className,
 }: TruchetTilesBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -42,6 +44,7 @@ export default function TruchetTilesBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const h = size / 2;
 
     let width = 0;
@@ -85,6 +88,8 @@ export default function TruchetTilesBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const dt = last < 0 ? 0 : Math.min(time - last, 100);
       last = time;
@@ -101,6 +106,12 @@ export default function TruchetTilesBackground({
       const dtSec = dt / 1000;
       const smooth = 1 - Math.pow(1 - ease, dt / (1000 / 60));
       const spinRad = (spin * Math.PI) / 180;
+
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--truchet-tiles-color").trim() || style.color;
+      const k = style.getPropertyValue("--truchet-tiles-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
 
       for (const t of tiles) {
         const diff = t.k * HALF - t.a;
@@ -120,10 +131,11 @@ export default function TruchetTilesBackground({
       }
 
       ctx!.setTransform(1, 0, 0, 1, 0, 0);
-      ctx!.strokeStyle = color;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.lineCap = "round";
       ctx!.stroke();
+      ctx!.globalAlpha = 1;
 
       raf = requestAnimationFrame(animate);
     }
@@ -145,10 +157,13 @@ export default function TruchetTilesBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, proximity, ease, spin, cooldown, idle, lineWidth, color]);
+  }, [size, proximity, ease, spin, cooldown, idle, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--truchet-tiles-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

@@ -14,8 +14,10 @@ export interface StringsBackgroundProps {
   /** Separación entre los nodos de cada cuerda (px) */
   segment?: number;
   lineWidth?: number;
+  /** Opacidad de las cuerdas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las cuerdas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -27,8 +29,8 @@ export default function StringsBackground({
   ambient = 4,
   segment = 15,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.3)",
-  background = "#e0dad5",
+  alpha = 0.3,
+  color,
   className,
 }: StringsBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,6 +40,7 @@ export default function StringsBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const c2 = Math.min(0.25, tension);
 
     let width = 0;
@@ -61,14 +64,12 @@ export default function StringsBackground({
       v = new Float32Array(strings * cols);
     }
 
-    // Tira de la cuerda s por el punto x y la suelta: el desplazamiento inicial es un triángulo
     function pluckAt(s: number, x: number, amp: number) {
       const i0 = x / segment;
       const w = 6;
       const lim = pluck * 2.5;
       for (let i = Math.max(1, Math.floor(i0 - w)); i <= Math.min(cols - 2, Math.ceil(i0 + w)); i++) {
         const k = s * cols + i;
-        // Pulsaciones seguidas se suman, pero la amplitud queda acotada
         u[k] = Math.max(-lim, Math.min(lim, u[k] + amp * Math.max(0, 1 - Math.abs(i - i0) / w)));
       }
     }
@@ -102,6 +103,8 @@ export default function StringsBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const dt = last < 0 ? 16.67 : Math.min(time - last, 50);
       last = time;
@@ -123,7 +126,12 @@ export default function StringsBackground({
         ctx!.moveTo(0, y0);
         for (let i = 1; i < cols; i++) ctx!.lineTo(i * segment, y0 + u[o + i]);
       }
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--strings-color").trim() || style.color;
+      const k = style.getPropertyValue("--strings-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.lineJoin = "round";
       ctx!.stroke();
@@ -148,10 +156,13 @@ export default function StringsBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [strings, tension, decay, pluck, ambient, segment, lineWidth, color]);
+  }, [strings, tension, decay, pluck, ambient, segment, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--strings-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

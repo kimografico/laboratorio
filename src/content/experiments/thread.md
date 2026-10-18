@@ -42,11 +42,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.45)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.45
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -54,5 +56,5 @@ props:
 `threads` y `length` fijan cuántos hilos hay y cuánto de largo; `follow` decide si se mueven rígidos o serpenteando y `wobble` añade la ondulación lateral. En reposo cada hilo recorre su propia órbita; al mover el puntero todos lo persiguen con distinto retardo.
 
 ```tsx
-<ThreadBackground threads={3} length={34} follow={0.3} wobble={7} />
+<ThreadBackground threads={3} length={34} follow={0.3} wobble={7} alpha={0.45} />
 ```

@@ -11,11 +11,12 @@ export interface SandpileBackgroundProps {
   ambient?: number;
   /** Granos que se pierden por segundo en celdas al azar (erosión): mantiene el montón en movimiento */
   erode?: number;
-  /** Color de las avalanchas recientes */
-  flash?: string;
-  /** Color de la arena en reposo */
+  /** Opacidad de la arena en reposo (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de la arena en reposo. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
+  /** Color de las avalanchas recientes (tono de la paleta) */
+  flash?: string;
   className?: string;
 }
 
@@ -25,9 +26,9 @@ export default function SandpileBackground({
   sweeps = 1,
   ambient = 15,
   erode = 90,
+  alpha = 0.5,
+  color,
   flash = "#96701d",
-  color = "rgba(0, 0, 0, 0.5)",
-  background = "#e0dad5",
   className,
 }: SandpileBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,11 +38,11 @@ export default function SandpileBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let cols = 0;
     let rows = 0;
-    // Altura de cada celda: estable con 0-3 granos; con 4 o más se derrumba y reparte uno a cada vecino
     let h = new Uint8Array(0);
     let hot = new Float32Array(0);
     let pcell = -1;
@@ -69,8 +70,6 @@ export default function SandpileBackground({
       pcell = i >= 0 && i < cols && j >= 0 && j < rows ? j * cols + i : -1;
     }
 
-    // Una pasada: toda celda con 4 o más granos reparte uno a cada vecino. Los granos que cruzan el borde se pierden.
-    // El resultado final (estable) no depende del orden de los derrumbes
     function topple() {
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
@@ -87,6 +86,8 @@ export default function SandpileBackground({
         }
       }
     }
+
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
 
     function animate(time: number) {
       const dt = last < 0 ? 16.67 : Math.min(time - last, 100);
@@ -110,8 +111,11 @@ export default function SandpileBackground({
 
       ctx!.clearRect(0, 0, width, height);
       const size = cell - 1;
-      // Arena en reposo: tres niveles de opacidad según la altura; las celdas que acaban de derrumbarse, en otro color
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--sandpile-color").trim() || style.color;
+      const k = style.getPropertyValue("--sandpile-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
       for (let level = 1; level <= 3; level++) {
         ctx!.beginPath();
         for (let c = 0; c < h.length; c++) {
@@ -120,14 +124,14 @@ export default function SandpileBackground({
             ctx!.rect(i * cell, ((c - i) / cols) * cell, size, size);
           }
         }
-        ctx!.globalAlpha = level / 3 * 0.9;
+        setAlpha(level / 3 * 0.9 * alpha * mul);
         ctx!.fill();
       }
       ctx!.fillStyle = flash;
       for (let c = 0; c < h.length; c++) {
         if (hot[c] > 0.05) {
+          setAlpha(hot[c] * 0.9 * mul);
           const i = c % cols;
-          ctx!.globalAlpha = hot[c] * 0.9;
           ctx!.fillRect(i * cell, ((c - i) / cols) * cell, size, size);
           hot[c] *= 0.9;
         }
@@ -154,10 +158,13 @@ export default function SandpileBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, rate, sweeps, ambient, erode, flash, color]);
+  }, [cell, rate, sweeps, ambient, erode, alpha, flash]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--sandpile-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

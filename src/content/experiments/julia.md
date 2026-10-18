@@ -63,11 +63,6 @@ props:
   - name: "color"
     label: "Color"
     type: "color"
-    default: "#2f3e5c"
-  - name: "background"
-    label: "Fondo"
-    type: "color"
-    default: "#e0dad5"
 ---
 
 ## Uso

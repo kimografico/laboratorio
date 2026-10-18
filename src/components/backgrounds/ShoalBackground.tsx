@@ -11,14 +11,12 @@ export interface ShoalBackgroundProps {
   avoid?: number;
   /** Cohesión del cardumen */
   cohesion?: number;
-  /** Opacidad general */
+  /** Opacidad general (0-1) */
   alpha?: number;
   /** Grosor del trazo */
   lineWidth?: number;
-  /** Color de los peces */
+  /** Opcional: fija el color de los peces. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color de fondo */
-  background?: string;
   className?: string;
 }
 
@@ -40,8 +38,7 @@ export default function ShoalBackground({
   cohesion = 1.2,
   alpha = 0.32,
   lineWidth = 1,
-  color = "#000000",
-  background = "#e0dad5",
+  color,
   className,
 }: ShoalBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -51,6 +48,7 @@ export default function ShoalBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let pointerX = -9999;
@@ -165,7 +163,9 @@ export default function ShoalBackground({
       f.phase += 0.15 + current * 0.12;
     }
 
-    function draw(f: Fish) {
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
+    function draw(f: Fish, mul: number) {
       const a = alpha * (0.15 + 0.85 * Math.pow(f.depth, 1.6));
       const angle = Math.atan2(f.vy, f.vx);
       const cos = Math.cos(angle);
@@ -184,23 +184,31 @@ export default function ShoalBackground({
       ctx!.lineTo(-0.3 * L, 0.07 * L);
       ctx!.quadraticCurveTo(0.2 * L, 0.24 * L, 0.5 * L, 0);
       ctx!.closePath();
-      ctx!.globalAlpha = clamp(a * 0.3);
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--shoal-color").trim() || style.color;
+      ctx!.fillStyle = ink;
+      ctx!.strokeStyle = ink;
+      setAlpha(clamp(a * 0.3) * mul);
       ctx!.fill();
-      ctx!.globalAlpha = clamp(a);
+      setAlpha(clamp(a) * mul);
       ctx!.stroke();
     }
 
     function animate(ts: number) {
       ctx!.setTransform(1, 0, 0, 1, 0, 0);
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--shoal-color").trim() || style.color;
+      const k = style.getPropertyValue("--shoal-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.lineJoin = "round";
 
       const targetX = width * (0.5 + 0.35 * Math.sin(ts * 0.00007));
       const targetY = height * (0.5 + 0.3 * Math.sin(ts * 0.00011 + 1));
       for (const f of fish) steer(f, targetX, targetY);
-      for (const f of fish) draw(f);
+      for (const f of fish) draw(f, mul);
 
       ctx!.setTransform(1, 0, 0, 1, 0, 0);
       ctx!.globalAlpha = 1;
@@ -223,10 +231,13 @@ export default function ShoalBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, size, speed, avoid, cohesion, alpha, lineWidth, color]);
+  }, [count, size, speed, avoid, cohesion, alpha, lineWidth]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--shoal-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

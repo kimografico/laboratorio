@@ -46,11 +46,13 @@ props:
   - name: "color"
     label: "Arena"
     type: "color"
-    default: "rgba(0, 0, 0, 0.5)"
-  - name: "background"
-    label: "Fondo"
-    type: "color"
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.5
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso

@@ -63,15 +63,17 @@ props:
   - name: color
     label: Órbitas
     type: color
-    default: "rgba(0, 0, 0, 0.18)"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.18
+    min: 0
+    max: 1
+    step: 0.02
   - name: planetColor
     label: Planetas
     type: color
     default: "rgba(0, 0, 0, 0.7)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
 ---
 
 ## Uso
@@ -79,5 +81,5 @@ props:
 Las órbitas son elipses rigidas que persiguen al Sol (el puntero) con muelle y amortiguación: `stiffness` fija la fuerza base y `lag` hace que las lejanas reaccionen tarde, así se estiran y ondulan al moverse. La posición del planeta en su elipse resuelve la ecuación de Kepler.
 
 ```tsx
-<PlanetsOrbitsBackground orbits={7} lag={0.6} stiffness={0.03} speed={1} planet={3.5} />
+<PlanetsOrbitsBackground orbits={7} lag={0.6} stiffness={0.03} speed={1} planet={3.5} alpha={0.18} />
 ```

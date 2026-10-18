@@ -70,11 +70,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.5)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.5
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -82,5 +84,5 @@ props:
 Cada rayo se integra sobre el campo de una carga +1 en el puntero y `poles` cargas negativas repartidas por el perímetro; después se le añade zigzag con ruido, ramificaciones y tres pasadas de trazo (halo y núcleo). `dropout` apaga y enciende rayos, y `points` introduce puntos invisibles que desvían el campo.
 
 ```tsx
-<PlasmaBackground lines={26} jag={8} branch={0.5} dropout={0.35} speed={1} />
+<PlasmaBackground lines={26} jag={8} branch={0.5} dropout={0.35} speed={1} alpha={0.5} />
 ```

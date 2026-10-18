@@ -77,11 +77,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.3)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.3
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -96,5 +98,7 @@ La malla se simula con restricciones: `spacing` controla el tamaño de los nudos
   wind={0.05}
   pin="top"
   damping={0.99}
-/>
+  alpha={0.3}
+ />
 ```
+

@@ -11,24 +11,12 @@ export interface FogBackgroundProps {
   drips?: number;
   /** Opacidad del vaho (0-1) */
   opacity?: number;
-  /** Color del vaho */
+  /** Opcional: fija el color del vaho. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
 type Drip = { x: number; y: number; vy: number; phase: number; left: number };
-
-function parseColor(color: string): [number, number, number] {
-  const c = document.createElement("canvas");
-  c.width = 1;
-  c.height = 1;
-  const x = c.getContext("2d", { willReadFrequently: true })!;
-  x.fillStyle = color;
-  x.fillRect(0, 0, 1, 1);
-  const d = x.getImageData(0, 0, 1, 1).data;
-  return [d[0], d[1], d[2]];
-}
 
 export default function FogBackground({
   cell = 1,
@@ -36,8 +24,7 @@ export default function FogBackground({
   regrow = 0.003,
   drips = 3,
   opacity = 0.25,
-  color = "#282828",
-  background = "#e0dad5",
+  color,
   className,
 }: FogBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,10 +34,10 @@ export default function FogBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const off = document.createElement("canvas");
     const octx = off.getContext("2d", { willReadFrequently: true });
     if (!octx) return;
-    const [cr, cg, cb] = parseColor(color);
     const OFF = -9999;
 
     let width = 0;
@@ -96,7 +83,6 @@ export default function FogBackground({
       }
     }
 
-    // Limpia el vaho alrededor de (x, y): más en el centro, nada en el borde del radio
     function wipe(x: number, y: number, r: number, strength: number) {
       const i0 = Math.max(0, Math.floor((x - r) / cell));
       const i1 = Math.min(cols - 1, Math.ceil((x + r) / cell));
@@ -129,7 +115,6 @@ export default function FogBackground({
         }
       }
 
-      // Gotas: nacen donde el vaho es denso y resbalan dejando un rastro estrecho
       acc += (dt * 16.67 * drips) / 1000;
       while (acc >= 1) {
         const x = Math.random() * width;
@@ -151,15 +136,21 @@ export default function FogBackground({
 
       for (let i = 0; i < fog.length; i++) fog[i] = Math.min(1, fog[i] + regrow * dt);
 
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--fog-color").trim() || style.color;
+      const k = style.getPropertyValue("--fog-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+
       const img = octx!.createImageData(cols, rows);
       const data = img.data;
       for (let i = 0; i < fog.length; i++) {
         const f = fog[i];
         const t = Math.min(1, Math.max(0, (f - 0.1) / 0.8));
-        const a = t * t * (3 - 2 * t) * opacity * (0.92 + 0.16 * grain[i]);
-        data[4 * i] = cr;
-        data[4 * i + 1] = cg;
-        data[4 * i + 2] = cb;
+        const a = t * t * (3 - 2 * t) * opacity * mul * (0.92 + 0.16 * grain[i]);
+        // Máscara de alfa pura: el RGB se tiña con `ink` mediante source-in tras el drawImage
+        data[4 * i] = 0;
+        data[4 * i + 1] = 0;
+        data[4 * i + 2] = 0;
         data[4 * i + 3] = Math.min(1, a) * 255;
       }
       octx!.putImageData(img, 0, 0);
@@ -168,6 +159,11 @@ export default function FogBackground({
       ctx!.imageSmoothingEnabled = true;
       ctx!.imageSmoothingQuality = "high";
       ctx!.drawImage(off, 0, 0, cols, rows, 0, 0, width, height);
+      // Tiña la máscara de alfa con la tinta viva de la página
+      ctx!.globalCompositeOperation = "source-in";
+      ctx!.fillStyle = ink;
+      ctx!.fillRect(0, 0, width, height);
+      ctx!.globalCompositeOperation = "source-over";
 
       raf = requestAnimationFrame(animate);
     }
@@ -189,10 +185,13 @@ export default function FogBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, radius, regrow, drips, opacity, color]);
+  }, [cell, radius, regrow, drips, opacity]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--fog-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

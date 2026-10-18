@@ -14,8 +14,8 @@ export interface MantaBackgroundProps {
   /** Opacidad del contorno de las mantas cercanas (0-1); las lejanas son más tenues */
   alpha?: number;
   lineWidth?: number;
+  /** Opcional: fija el color de las mantas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -41,8 +41,7 @@ export default function MantaBackground({
   turn = 0.015,
   alpha = 0.28,
   lineWidth = 1.2,
-  color = "#000000",
-  background = "#e0dad5",
+  color,
   className,
 }: MantaBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -52,6 +51,7 @@ export default function MantaBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let px = -9999;
@@ -117,7 +117,9 @@ export default function MantaBackground({
       }
     }
 
-    function draw(m: Manta) {
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
+    function draw(m: Manta, mul: number) {
       const L = m.L;
       const flap = Math.sin(m.phase);
       const tipX = -0.05 * L + 0.08 * L * flap;
@@ -134,9 +136,9 @@ export default function MantaBackground({
       ctx!.quadraticCurveTo(-0.15 * L, 0.25 * L, tipX, tipY);
       ctx!.quadraticCurveTo(0.3 * L, 0.45 * L, 0.45 * L, 0);
       ctx!.closePath();
-      ctx!.globalAlpha = a * 0.25;
+      setAlpha(a * 0.25 * mul);
       ctx!.fill();
-      ctx!.globalAlpha = a;
+      setAlpha(a * mul);
       ctx!.stroke();
       ctx!.beginPath();
       ctx!.moveTo(-0.4 * L, 0);
@@ -146,19 +148,24 @@ export default function MantaBackground({
         -1.1 * L,
         Math.sin(m.phase * 0.7 + 1) * 0.18 * L
       );
+      setAlpha(a * mul);
       ctx!.stroke();
       ctx!.restore();
     }
 
     function animate(time: number) {
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--manta-color").trim() || style.color;
+      const k = style.getPropertyValue("--manta-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.lineWidth = lineWidth;
       ctx!.lineCap = "round";
       for (const m of mantas) {
         update(m, time);
-        draw(m);
+        draw(m, mul);
       }
       if (needsSort) {
         mantas.sort((a, b) => a.depth - b.depth);
@@ -184,10 +191,13 @@ export default function MantaBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, size, speed, avoid, turn, alpha, lineWidth, color]);
+  }, [count, size, speed, avoid, turn, alpha, lineWidth]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--manta-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

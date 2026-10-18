@@ -11,8 +11,10 @@ export interface LifeBackgroundProps {
   seed?: number;
   /** Probabilidad por generación de que aparezca un grupo nuevo de celdas (0-1) */
   spark?: number;
+  /** Opacidad de las celdas vivas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las celdas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -22,8 +24,8 @@ export default function LifeBackground({
   brush = 2,
   seed = 0.05,
   spark = 0.01,
-  color = "rgba(0, 0, 0, 0.3)",
-  background = "#e0dad5",
+  alpha = 0.3,
+  color,
   className,
 }: LifeBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -33,6 +35,7 @@ export default function LifeBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let cols = 0;
@@ -106,7 +109,6 @@ export default function LifeBackground({
       next = tmp;
 
       if (Math.random() < spark) {
-        // Pentaminó R: crece de forma caótica durante muchas generaciones
         const i0 = Math.floor(Math.random() * cols);
         const j0 = Math.floor(Math.random() * rows);
         for (const [dx, dy] of [[1, 0], [2, 0], [0, 1], [1, 1], [1, 2]]) {
@@ -114,6 +116,8 @@ export default function LifeBackground({
         }
       }
     }
+
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
 
     function animate(time: number) {
       const dt = last < 0 ? 0 : Math.min(time - last, 100);
@@ -125,7 +129,11 @@ export default function LifeBackground({
       }
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--life-color").trim() || style.color;
+      const k = style.getPropertyValue("--life-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
           const idx = j * cols + i;
@@ -134,7 +142,7 @@ export default function LifeBackground({
           const a = shown[idx];
           if (a < 0.03) continue;
           const s = (cell - 2) * (0.5 + 0.5 * a);
-          ctx!.globalAlpha = a;
+          setAlpha(a * alpha * mul);
           ctx!.fillRect(i * cell + (cell - s) / 2, j * cell + (cell - s) / 2, s, s);
         }
       }
@@ -160,10 +168,13 @@ export default function LifeBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, tick, brush, seed, spark, color]);
+  }, [cell, tick, brush, seed, spark, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--life-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

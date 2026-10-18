@@ -15,8 +15,10 @@ export interface FirefliesBackgroundProps {
   glow?: number;
   /** Velocidad del tiempo */
   speed?: number;
+  /** Opacidad de los destellos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las luciérnagas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -33,8 +35,8 @@ export default function FirefliesBackground({
   attract = 0.03,
   glow = 5,
   speed = 1.3,
-  color = "#d4a017",
-  background = "#e0dad5",
+  alpha = 1,
+  color,
   className,
 }: FirefliesBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -44,6 +46,7 @@ export default function FirefliesBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
 
     let width = 0;
@@ -80,6 +83,8 @@ export default function FirefliesBackground({
       py = clientY - rect.top;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const dtMs = last < 0 ? 16.67 : Math.min(time - last, 50);
       last = time;
@@ -96,6 +101,13 @@ export default function FirefliesBackground({
       }
       const r = Math.hypot(sc, ss) / flies.length;
       const psi = Math.atan2(ss, sc);
+
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--fireflies-color").trim() || style.color;
+      const k = style.getPropertyValue("--fireflies-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
+      ctx!.strokeStyle = ink;
 
       for (const f of flies) {
         let dth = f.omega + coupling * r * Math.sin(psi - f.theta);
@@ -114,7 +126,6 @@ export default function FirefliesBackground({
         }
         f.theta = (f.theta + dth * dt) % TAU;
 
-        // Vuelo errático; el puntero atrae a las cercanas pero sin amontonarlas encima
         f.vx += (Math.random() - 0.5) * 0.06 * fr;
         f.vy += (Math.random() - 0.5) * 0.06 * fr;
         if (prox > 0 && d > 24) {
@@ -137,27 +148,24 @@ export default function FirefliesBackground({
       }
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.fillStyle = color;
       for (const f of flies) {
-        // Destello breve y brusco: (0.5 + 0.5·cos θ)^6
         const p = Math.pow(0.5 + 0.5 * Math.cos(f.theta), 6);
         for (let k = 0; k < 3; k++) {
-          ctx!.globalAlpha = (0.05 + 0.3 * p) * (1 - k * 0.3);
+          setAlpha((0.05 + 0.3 * p) * (1 - k * 0.3) * alpha * mul);
           ctx!.beginPath();
           ctx!.arc(f.x, f.y, glow * (0.3 + 0.7 * p) * (1 - k * 0.3), 0, TAU);
           ctx!.fill();
         }
-        ctx!.globalAlpha = 0.35 + 0.65 * p;
+        setAlpha((0.35 + 0.65 * p) * alpha * mul);
         ctx!.beginPath();
         ctx!.arc(f.x, f.y, 1.6, 0, TAU);
         ctx!.fill();
       }
 
-      // El puntero también destella: un anillo tenue marca su ritmo
       if (px !== OFF && call > 0) {
         const pc = Math.pow(0.5 + 0.5 * Math.cos(thetaC), 6);
-        ctx!.strokeStyle = color;
-        ctx!.globalAlpha = 0.1 + 0.3 * pc;
+        ctx!.strokeStyle = ink;
+        setAlpha((0.1 + 0.3 * pc) * alpha * mul);
         ctx!.lineWidth = 1;
         ctx!.beginPath();
         ctx!.arc(px, py, 5 + 5 * pc, 0, TAU);
@@ -185,10 +193,13 @@ export default function FirefliesBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, coupling, call, radius, attract, glow, speed, color]);
+  }, [count, coupling, call, radius, attract, glow, speed, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--fireflies-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

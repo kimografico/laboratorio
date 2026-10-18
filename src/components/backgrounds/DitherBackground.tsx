@@ -15,8 +15,10 @@ export interface DitherBackgroundProps {
   speed?: number;
   /** Suavizado con el que el halo sigue al puntero */
   ease?: number;
+  /** Opacidad del tramado (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color del tramado. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -47,8 +49,8 @@ export default function DitherBackground({
   ambient = 0.18,
   speed = 0.0003,
   ease = 0.1,
-  color = "rgba(0, 0, 0, 0.28)",
-  background = "#e0dad5",
+  alpha = 0.28,
+  color,
   className,
 }: DitherBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -58,6 +60,7 @@ export default function DitherBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
 
     let width = 0;
@@ -89,6 +92,8 @@ export default function DitherBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       if (px !== OFF) {
         px += (tx - px) * ease;
@@ -102,6 +107,12 @@ export default function DitherBackground({
 
       ctx!.clearRect(0, 0, width, height);
       ctx!.beginPath();
+
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--dither-color").trim() || style.color;
+      const k = style.getPropertyValue("--dither-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
 
       for (let j = 0; j < rows; j++) {
         const y = (j + 0.5) * cell;
@@ -119,8 +130,9 @@ export default function DitherBackground({
         }
       }
 
-      ctx!.fillStyle = color;
+      setAlpha(alpha * mul);
       ctx!.fill();
+      ctx!.globalAlpha = 1;
 
       raf = requestAnimationFrame(animate);
     }
@@ -142,10 +154,13 @@ export default function DitherBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, gap, radius, intensity, ambient, speed, ease, color]);
+  }, [cell, gap, radius, intensity, ambient, speed, ease, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--dither-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

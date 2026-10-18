@@ -60,15 +60,10 @@ props:
   - name: color
     label: "Color de cera"
     type: color
-    default: "#ffffff"
   - name: core
     label: "Color del núcleo"
     type: color
     default: "#ffffff"
-  - name: background
-    label: "Fondo"
-    type: color
-    default: "#e0dad5"
 ---
 ## Uso
 
@@ -80,7 +75,7 @@ import LavaLampBackground from "@kimografico/laboratorio/backgrounds/LavaLampBac
 export default function Example() {
   return (
     <div style={{ height: "100vh" }}>
-      <LavaLampBackground count={10} heat={1.2} color="#ff6b35" core="#ffd23f" background="#1a1a1a" />
+      <LavaLampBackground count={10} heat={1.2} color="#ff6b35" core="#ffd23f" />
     </div>
   );
 }

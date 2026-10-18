@@ -28,13 +28,14 @@ export interface MeadowBackgroundProps {
   /** Si las ramas terminan en flor */
   flowers?: boolean;
   lineWidth?: number;
-  /** Color de la hierba */
+  /** Opacidad de las briznas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de la hierba. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color de los tallos y las hojas */
+  /** Color de los tallos y las hojas (tono de la paleta) */
   plantColor?: string;
-  /** Color de las flores */
+  /** Color de las flores (tono de la paleta) */
   flowerColor?: string;
-  background?: string;
   className?: string;
 }
 
@@ -63,10 +64,10 @@ export default function MeadowBackground({
   ambient = 0.1,
   flowers = true,
   lineWidth = 1,
-  color = "rgba(46, 94, 54, 0.45)",
+  alpha = 0.45,
+  color,
   plantColor = "rgba(30, 84, 40, 0.9)",
   flowerColor = "rgba(196, 70, 90, 0.95)",
-  background = "#e0dad5",
   className,
 }: MeadowBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -76,6 +77,7 @@ export default function MeadowBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const LAYERS = 3;
 
@@ -87,7 +89,6 @@ export default function MeadowBackground({
     let bl = new Float32Array(0);
     let bp = new Float32Array(0);
     let layer = new Uint8Array(0);
-    // Índices de las briznas ordenados por capa, para dibujar cada capa sin recorrerlas todas
     let order = new Uint32Array(0);
     let starts: number[] = [];
     let plants: Plant[] = [];
@@ -121,14 +122,12 @@ export default function MeadowBackground({
           bx[k] = (i + Math.random()) * spacing;
           by[k] = (j + Math.random()) * spacing;
           ba[k] = -Math.PI / 2 + (Math.random() - 0.5) * 0.7;
-          // Las briznas más altas en la pantalla (más lejanas) son más cortas y pálidas
           const depth = Math.min(1, by[k] / height);
           bl[k] = blade * (0.55 + 0.45 * depth) * (0.7 + Math.random() * 0.6);
           bp[k] = Math.random() * TAU;
           layer[k] = Math.min(LAYERS - 1, Math.floor(depth * LAYERS));
         }
       }
-      // Ordenación por capas (cuenta + reparto)
       starts = new Array(LAYERS + 1).fill(0);
       for (let k = 0; k < n; k++) starts[layer[k] + 1]++;
       for (let l = 0; l < LAYERS; l++) starts[l + 1] += starts[l];
@@ -164,8 +163,6 @@ export default function MeadowBackground({
       }
     }
 
-    // Crece una planta: el tallo avanza con una curvatura suave; cada cierto trecho brota una rama lateral
-    // (alternando lados) y un par de hojas; las ramas terminan, si se quiere, en una flor
     function grow(p: Plant, px_: number) {
       let remaining = px_;
       while (remaining > 0) {
@@ -195,6 +192,8 @@ export default function MeadowBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       now = time / 1000;
       const dt = last < 0 ? 16.67 : Math.min(time - last, 100);
@@ -216,34 +215,38 @@ export default function MeadowBackground({
 
       // Hierba: cada brizna se mece con el viento y se inclina alejándose del puntero. Tres capas con distinto alfa dan profundidad
       const t = time * 0.002;
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--meadow-color").trim() || style.color;
+      const k = style.getPropertyValue("--meadow-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineWidth = lineWidth;
       const r2 = radius * radius;
       for (let l = 0; l < LAYERS; l++) {
         ctx!.beginPath();
         for (let q = starts[l]; q < starts[l + 1]; q++) {
-          const k = order[q];
-          let a = ba[k] + Math.sin(t + bp[k] + bx[k] * 0.01) * 0.25 * wind;
+          const kk = order[q];
+          let a = ba[kk] + Math.sin(t + bp[kk] + bx[kk] * 0.01) * 0.25 * wind;
           if (px !== OFF) {
-            const dx = bx[k] - px;
-            const dy = by[k] - py;
+            const dx = bx[kk] - px;
+            const dy = by[kk] - py;
             const d2 = dx * dx + dy * dy;
             if (d2 < r2) {
               const w = 1 - Math.sqrt(d2) / radius;
               a += (dx >= 0 ? 1 : -1) * w * w * 1.3 * bend;
             }
           }
-          ctx!.moveTo(bx[k], by[k]);
-          ctx!.lineTo(bx[k] + Math.cos(a) * bl[k], by[k] + Math.sin(a) * bl[k]);
+          ctx!.moveTo(bx[kk], by[kk]);
+          ctx!.lineTo(bx[kk] + Math.cos(a) * bl[kk], by[kk] + Math.sin(a) * bl[kk]);
         }
-        ctx!.globalAlpha = 0.45 + 0.55 * (l / (LAYERS - 1));
+        setAlpha((0.45 + 0.55 * (l / (LAYERS - 1))) * alpha * mul);
         ctx!.stroke();
       }
 
-      // Plantas
+      // Plantas (tonos de paleta: tallos y flores mantienen su propio color)
       for (const p of plants) {
-        const alpha = p.doneAt < 0 ? 1 : Math.max(0, 1 - Math.max(0, now - p.doneAt - life) / wither);
-        ctx!.globalAlpha = alpha;
+        const a = p.doneAt < 0 ? 1 : Math.max(0, 1 - Math.max(0, now - p.doneAt - life) / wither);
+        setAlpha(a * mul);
         ctx!.strokeStyle = plantColor;
         ctx!.lineWidth = lineWidth * 1.4;
         ctx!.beginPath();
@@ -256,9 +259,9 @@ export default function MeadowBackground({
         ctx!.fillStyle = plantColor;
         ctx!.beginPath();
         for (let i = 0; i < p.leaves.length; i += 3) {
-          const a = p.leaves[i + 2];
-          ctx!.moveTo(p.leaves[i] + Math.cos(a) * 9, p.leaves[i + 1] + Math.sin(a) * 9);
-          ctx!.ellipse(p.leaves[i] + Math.cos(a) * 5, p.leaves[i + 1] + Math.sin(a) * 5, 5, 2.2, a, 0, TAU);
+          const ang = p.leaves[i + 2];
+          ctx!.moveTo(p.leaves[i] + Math.cos(ang) * 9, p.leaves[i + 1] + Math.sin(ang) * 9);
+          ctx!.ellipse(p.leaves[i] + Math.cos(ang) * 5, p.leaves[i + 1] + Math.sin(ang) * 5, 5, 2.2, ang, 0, TAU);
         }
         ctx!.fill();
 
@@ -292,10 +295,13 @@ export default function MeadowBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [spacing, blade, wind, radius, bend, plantEvery, plantSize, growth, life, wither, maxPlants, ambient, flowers, lineWidth, color, plantColor, flowerColor]);
+  }, [spacing, blade, wind, radius, bend, plantEvery, plantSize, growth, life, wither, maxPlants, ambient, flowers, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--meadow-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

@@ -36,10 +36,6 @@ props:
     min: 0
     max: 2
     step: 0.1
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
 ---
 
 ## Uso

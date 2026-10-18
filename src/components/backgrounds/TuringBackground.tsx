@@ -15,20 +15,9 @@ export interface TuringBackgroundProps {
   spark?: number;
   /** Opacidad del patrón (0-1) */
   opacity?: number;
+  /** Opcional: fija el color del patrón. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
-}
-
-function parseColor(color: string): [number, number, number] {
-  const c = document.createElement("canvas");
-  c.width = 1;
-  c.height = 1;
-  const x = c.getContext("2d", { willReadFrequently: true })!;
-  x.fillStyle = color;
-  x.fillRect(0, 0, 1, 1);
-  const d = x.getImageData(0, 0, 1, 1).data;
-  return [d[0], d[1], d[2]];
 }
 
 const DU = 1;
@@ -42,8 +31,7 @@ export default function TuringBackground({
   brush = 5,
   spark = 0.15,
   opacity = 0.8,
-  color = "#3b2f2a",
-  background = "#e0dad5",
+  color,
   className,
 }: TuringBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,10 +41,10 @@ export default function TuringBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const off = document.createElement("canvas");
     const octx = off.getContext("2d", { willReadFrequently: true });
     if (!octx) return;
-    const [cr, cg, cb] = parseColor(color);
 
     let width = 0;
     let height = 0;
@@ -72,8 +60,10 @@ export default function TuringBackground({
     let acc = 0;
     let last = -1;
     let raf = 0;
+    // Tinta y opacidad vivas (se actualizan en cada fotograma desde el CSS)
+    let ink = "";
+    let mul = 1;
 
-    // Mancha de producto químico B (y menos A) de radio r celdas centrada en (ci, cj)
     function seed(ci: number, cj: number, r: number) {
       for (let dj = -r; dj <= r; dj++) {
         for (let di = -r; di <= r; di++) {
@@ -89,7 +79,6 @@ export default function TuringBackground({
       }
     }
 
-    // Borra el patrón en un círculo de r celdas: vuelve a crecer desde el patrón que queda alrededor
     function clearAt(ci: number, cj: number, r: number) {
       for (let dj = -r; dj <= r; dj++) {
         for (let di = -r; di <= r; di++) {
@@ -132,7 +121,6 @@ export default function TuringBackground({
       lastY = y;
     }
 
-    // Un paso de Gray-Scott con laplaciano de 9 puntos y bordes que se enlazan
     function step() {
       for (let j = 0; j < rows; j++) {
         const jm = ((j - 1 + rows) % rows) * cols;
@@ -166,7 +154,6 @@ export default function TuringBackground({
       const dt = last < 0 ? 16.67 : Math.min(time - last, 50);
       last = time;
 
-      // La tasa de alimentación oscila despacio en el espacio y el tiempo: el patrón se transforma, no se congela
       for (let i = 0; i < cols; i++) fm[i] = feed + 0.004 * Math.sin((i / cols) * 8.2 + time * 0.0002);
 
       acc += (dt * spark) / 1000;
@@ -177,14 +164,20 @@ export default function TuringBackground({
 
       for (let s = 0; s < steps; s++) step();
 
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      ink = style.getPropertyValue("--turing-color").trim() || style.color;
+      const k = style.getPropertyValue("--turing-opacity").trim();
+      mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+
       const img = octx!.createImageData(cols, rows);
       const data = img.data;
       for (let i = 0; i < b0.length; i++) {
         const t = Math.min(1, Math.max(0, (b0[i] - 0.1) / 0.22));
-        data[4 * i] = cr;
-        data[4 * i + 1] = cg;
-        data[4 * i + 2] = cb;
-        data[4 * i + 3] = t * t * (3 - 2 * t) * opacity * 255;
+        // Máscara de alfa pura: el RGB se tiña con `ink` mediante source-in tras el drawImage
+        data[4 * i] = 0;
+        data[4 * i + 1] = 0;
+        data[4 * i + 2] = 0;
+        data[4 * i + 3] = t * t * (3 - 2 * t) * opacity * mul * 255;
       }
       octx!.putImageData(img, 0, 0);
 
@@ -192,13 +185,17 @@ export default function TuringBackground({
       ctx!.imageSmoothingEnabled = true;
       ctx!.imageSmoothingQuality = "high";
       ctx!.drawImage(off, 0, 0, cols, rows, 0, 0, width, height);
+      // Tiña la máscara de alfa con la tinta viva de la página
+      ctx!.globalCompositeOperation = "source-in";
+      ctx!.fillStyle = ink;
+      ctx!.fillRect(0, 0, width, height);
+      ctx!.globalCompositeOperation = "source-over";
 
       raf = requestAnimationFrame(animate);
     }
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
-
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
@@ -213,10 +210,13 @@ export default function TuringBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, steps, feed, kill, brush, spark, opacity, color]);
+  }, [cell, steps, feed, kill, brush, spark, opacity]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--turing-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.2)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.2
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 `density` y `speed` gobiernan cuántas semillas hay y qué rápido derivan; `radius` y `push` definen la zona y la fuerza con la que el puntero las aparta. `dot` dibuja el punto de cada semilla y `highlight` realza la celda bajo el cursor.
 
 ```tsx
-<VoronoiBackground density={3} speed={0.25} radius={150} push={1.2} highlight={0.07} />
+<VoronoiBackground density={3} speed={0.25} radius={150} push={1.2} highlight={0.07} alpha={0.2} />
 ```

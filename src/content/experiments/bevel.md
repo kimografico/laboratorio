@@ -68,11 +68,6 @@ props:
   - name: "color"
     label: "Color"
     type: "color"
-    default: "rgba(255, 255, 255, 1)"
-  - name: "background"
-    label: "Fondo"
-    type: "color"
-    default: "#3a3633"
 ---
 
 ## Uso

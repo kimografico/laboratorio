@@ -19,8 +19,8 @@ export interface TileSpinBackgroundProps {
   alpha?: number;
   /** Variación aleatoria fija de la opacidad de cada baldosa */
   alphaJitter?: number;
+  /** Opcional: fija el color de las baldosas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -46,8 +46,7 @@ export default function TileSpinBackground({
   randomness = 0.85,
   alpha = 0.08,
   alphaJitter = 0.04,
-  color = "#000000",
-  background = "#e0dad5",
+  color,
   className,
 }: TileSpinBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,6 +56,7 @@ export default function TileSpinBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const maxAngle = (rotation * Math.PI) / 180;
     let width = 0;
     let height = 0;
@@ -103,10 +103,16 @@ export default function TileSpinBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.setTransform(1, 0, 0, 1, 0, 0);
       ctx!.clearRect(0, 0, width, height);
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--tile-spin-color").trim() || style.color;
+      const k = style.getPropertyValue("--tile-spin-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
       const side = size - gap;
       for (const t of tiles) {
         t.shown += (t.level - t.shown) * 0.2;
@@ -115,7 +121,7 @@ export default function TileSpinBackground({
         const a = t.dir * maxAngle * t.shown;
         const cos = Math.cos(a);
         const sin = Math.sin(a);
-        ctx!.globalAlpha = t.alpha;
+        setAlpha(t.alpha * mul);
         ctx!.setTransform(cos, sin, -sin, cos, t.x, t.y);
         ctx!.fillRect(-s / 2, -s / 2, s, s);
       }
@@ -126,13 +132,14 @@ export default function TileSpinBackground({
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -140,10 +147,13 @@ export default function TileSpinBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, gap, proximity, shrink, rotation, decay, randomness, alpha, alphaJitter, color]);
+  }, [size, gap, proximity, shrink, rotation, decay, randomness, alpha, alphaJitter]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--tile-spin-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

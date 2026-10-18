@@ -15,8 +15,8 @@ export interface FireworksBackgroundProps {
   size?: number;
   /** Explosiones de colores en lugar de un solo color */
   rainbow?: boolean;
+  /** Opcional: fija el color de los cohetes y chispas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -51,8 +51,7 @@ export default function FireworksBackground({
   life = 1.7,
   size = 1.6,
   rainbow = true,
-  color = "#fff1dc",
-  background = "#1b1917",
+  color,
   className,
 }: FireworksBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -62,6 +61,7 @@ export default function FireworksBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let w = 0;
     let h = 0;
     let raf = 0;
@@ -80,7 +80,10 @@ export default function FireworksBackground({
     }
 
     function paintFor() {
-      if (!rainbow) return color;
+      if (!rainbow) {
+        const ink = style.getPropertyValue("--fireworks-color").trim() || style.color;
+        return ink;
+      }
       const muted = ["#d89f3f", "#b44f4f", "#4f8bb8", "#5a9f5a", "#a0895f", "#d89f5f", "#8f7bb8", "#b88f5f"];
       return muted[Math.floor(Math.random() * muted.length)];
     }
@@ -168,10 +171,14 @@ export default function FireworksBackground({
 
       ctx!.clearRect(0, 0, w, h);
       ctx!.lineCap = "round";
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma (solo cuando no hay arcoíris)
+      const ink = style.getPropertyValue("--fireworks-color").trim() || style.color;
+      const k = style.getPropertyValue("--fireworks-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
 
       for (const r of rockets) {
         ctx!.globalAlpha = 0.85;
-        ctx!.strokeStyle = color;
+        ctx!.strokeStyle = rainbow ? paintFor() : ink;
         ctx!.lineWidth = size * 1.4;
         ctx!.beginPath();
         ctx!.moveTo(r.px, r.py);
@@ -185,13 +192,13 @@ export default function FireworksBackground({
         if (a < 0.02) continue;
         ctx!.strokeStyle = s.paint;
         ctx!.lineWidth = s.w * 3.4;
-        ctx!.globalAlpha = a * 0.2;
+        ctx!.globalAlpha = a * 0.2 * mul;
         ctx!.beginPath();
         ctx!.moveTo(s.px, s.py);
         ctx!.lineTo(s.x, s.y);
         ctx!.stroke();
         ctx!.lineWidth = s.w;
-        ctx!.globalAlpha = a;
+        ctx!.globalAlpha = a * mul;
         ctx!.beginPath();
         ctx!.moveTo(s.px, s.py);
         ctx!.lineTo(s.x, s.y);
@@ -225,10 +232,13 @@ export default function FireworksBackground({
       window.removeEventListener("mousedown", onMouse);
       window.removeEventListener("touchstart", onTouch);
     };
-  }, [rate, burst, gravity, drag, life, size, rainbow, color]);
+  }, [rate, burst, gravity, drag, life, size, rainbow]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--fireworks-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

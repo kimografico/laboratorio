@@ -15,10 +15,10 @@ export interface NeedleBackgroundProps {
   restAngle?: number;
   /** Grosor de la línea (px) */
   lineWidth?: number;
-  /** Color de las líneas (negro con mucha transparencia) */
+  /** Opacidad de las líneas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las líneas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color de fondo */
-  background?: string;
   className?: string;
 }
 
@@ -35,8 +35,8 @@ export default function NeedleBackground({
   ease = 0.06,
   restAngle = 45,
   lineWidth = 1.5,
-  color = "rgba(0, 0, 0, 0.18)",
-  background = "#e0dad5",
+  alpha = 0.18,
+  color,
   className,
 }: NeedleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,6 +46,7 @@ export default function NeedleBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const rest = (restAngle * Math.PI) / 180;
     let width = 0;
     let height = 0;
@@ -92,9 +93,16 @@ export default function NeedleBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
       ctx!.beginPath();
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--needle-color").trim() || style.color;
+      const k = style.getPropertyValue("--needle-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       for (const n of needles) {
         n.angle += delta(n.angle, n.targetAngle) * ease;
         n.len += (n.targetLen - n.len) * ease;
@@ -103,10 +111,11 @@ export default function NeedleBackground({
         ctx!.moveTo(n.x - hx, n.y - hy);
         ctx!.lineTo(n.x + hx, n.y + hy);
       }
-      ctx!.strokeStyle = color;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.lineCap = "round";
       ctx!.stroke();
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -118,7 +127,7 @@ export default function NeedleBackground({
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -126,10 +135,13 @@ export default function NeedleBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, length, growth, proximity, ease, restAngle, lineWidth, color]);
+  }, [size, length, growth, proximity, ease, restAngle, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--needle-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

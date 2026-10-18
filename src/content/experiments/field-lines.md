@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.22)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.22
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 Cada línea se integra numéricamente siguiendo el campo de una carga +1 en el puntero y `sinks` cargas negativas que orbitan. `length` limita cuántos pasos da cada línea, `spin` hace girar su origen y `ease` suaviza el seguimiento del puntero.
 
 ```tsx
-<FieldLinesBackground lines={28} sinks={3} length={300} spin={0.00005} ease={0.1} />
+<FieldLinesBackground lines={28} sinks={3} length={300} spin={0.00005} ease={0.1} alpha={0.22} />
 ```

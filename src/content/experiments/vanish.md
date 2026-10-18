@@ -49,11 +49,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.55)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.55
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -61,5 +63,5 @@ props:
 Cada estrella se mueve radialmente desde el punto focal con velocidad proporcional a su distancia; `streak` estira el trazo en dirección al movimiento y `ease` suaviza el retargeting cuando sigue al puntero. Al salir del lienzo reaparecen en el centro con `speed`.
 
 ```tsx
-<VanishBackground count={600} speed={0.0006} focal={0.25} streak={2} ease={0.05} />
+<VanishBackground count={600} speed={0.0006} focal={0.25} streak={2} ease={0.05} alpha={0.55} />
 ```

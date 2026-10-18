@@ -63,11 +63,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.5)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.5
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -75,5 +77,5 @@ props:
 La esfera se inclina siguiendo al puntero y, bajo el cursor, los segmentos se abomban hacia fuera (`bump`, con la anchura `spread`). Ajusta `lat`/`lon` para la densidad de la malla, `spin` para el giro continuo y `ease` para el suavizado del seguimiento.
 
 ```tsx
-<GlobeBackground lat={14} lon={24} size={0.84} bump={0.35} spin={0.00008} />
+<GlobeBackground lat={14} lon={24} size={0.84} bump={0.35} spin={0.00008} alpha={0.5} />
 ```

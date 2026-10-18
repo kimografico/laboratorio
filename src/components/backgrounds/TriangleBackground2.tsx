@@ -13,8 +13,10 @@ export interface TriangleBackground2Props {
   ease?: number;
   /** Giro máximo aleatorio (grados, +/-) al acercarse el puntero */
   rotation?: number;
+  /** Opacidad de los triángulos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de los triángulos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -27,8 +29,8 @@ export default function TriangleBackground2({
   growth = 12,
   ease = 0.05,
   rotation = 30,
-  color = "rgba(0, 0, 0, 0.15)",
-  background = "#e0dad5",
+  alpha = 0.15,
+  color,
   className,
 }: TriangleBackground2Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,6 +40,7 @@ export default function TriangleBackground2({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const maxAngle = (rotation * Math.PI) / 180;
     let width = 0;
     let height = 0;
@@ -87,16 +90,24 @@ export default function TriangleBackground2({
       ctx!.closePath();
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       ctx!.clearRect(0, 0, width, height);
       ctx!.beginPath();
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--triangle-2-color").trim() || style.color;
+      const k = style.getPropertyValue("--triangle-2-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.fillStyle = ink;
       for (const d of dots) {
         d.r += (radius + d.grow - d.r) * ease;
         d.angle += (d.target - d.angle) * ease * 0.5;
         triangle(d.x, d.y, Math.max(d.r, 0), d.angle);
       }
-      ctx!.fillStyle = color;
+      setAlpha(alpha * mul);
       ctx!.fill();
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -108,7 +119,7 @@ export default function TriangleBackground2({
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -116,10 +127,13 @@ export default function TriangleBackground2({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, radius, proximity, growth, ease, rotation, color]);
+  }, [size, radius, proximity, growth, ease, rotation, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--triangle-2-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

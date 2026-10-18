@@ -16,8 +16,10 @@ export interface Contour2BackgroundProps {
   /** Suavizado con el que la colina sigue al puntero */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad base de las curvas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las curvas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -41,8 +43,8 @@ export default function Contour2Background({
   radius = 170,
   ease = 0.12,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.22)",
-  background = "#e0dad5",
+  alpha = 0.22,
+  color,
   className,
 }: Contour2BackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -52,6 +54,7 @@ export default function Contour2Background({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const lo = -0.8;
     const step = 0.3;
@@ -110,6 +113,8 @@ export default function Contour2Background({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       if (px !== OFF) {
         px += (tx - px) * ease;
@@ -118,7 +123,11 @@ export default function Contour2Background({
       sample(time);
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--contour-2-color").trim() || style.color;
+      const k = style.getPropertyValue("--contour-2-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineCap = "round";
       const stride = cols + 1;
 
@@ -151,8 +160,10 @@ export default function Contour2Background({
             }
           }
         }
-        ctx!.globalAlpha = k % 3 === 0 ? 1 : 0.55;
-        ctx!.lineWidth = k % 3 === 0 ? lineWidth * 1.2 : lineWidth;
+        const lvlAlpha = k % 3 === 0 ? 1 : 0.55;
+        const lvlWidth = k % 3 === 0 ? lineWidth * 1.2 : lineWidth;
+        setAlpha(lvlAlpha * alpha * mul);
+        ctx!.lineWidth = lvlWidth;
         ctx!.stroke();
       }
 
@@ -177,10 +188,13 @@ export default function Contour2Background({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, levels, scale, speed, bump, radius, ease, lineWidth, color]);
+  }, [cell, levels, scale, speed, bump, radius, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--contour-2-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

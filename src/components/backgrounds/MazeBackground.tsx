@@ -16,13 +16,14 @@ export interface MazeBackgroundProps {
   /** Ondas que nacen solas por segundo en celdas al azar (además de las del puntero) */
   ambient?: number;
   lineWidth?: number;
-  /** Color de los muros */
+  /** Opacidad de los muros (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de los muros. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color de la luz que recorre los pasillos */
+  /** Color de la luz que recorre los pasillos (tonalidad de la paleta) */
   glow?: string;
   /** Opacidad máxima de la luz (0-1) */
   glowOpacity?: number;
-  background?: string;
   className?: string;
 }
 
@@ -37,10 +38,10 @@ export default function MazeBackground({
   waveLife = 4,
   ambient = 0.4,
   lineWidth = 1.2,
-  color = "rgba(0, 0, 0, 0.45)",
+  alpha = 0.45,
+  color,
   glow = "#d9822b",
   glowOpacity = 0.55,
-  background = "#e0dad5",
   className,
 }: MazeBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -50,13 +51,13 @@ export default function MazeBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let cols = 0;
     let rows = 0;
     let ox = 0;
     let oy = 0;
-    // Muros al este y al sur de cada celda (1 = muro). Los de los bordes exteriores nunca se abren
     let wallR = new Uint8Array(0);
     let wallB = new Uint8Array(0);
     let visited = new Uint8Array(0);
@@ -105,7 +106,6 @@ export default function MazeBackground({
       pcell = i >= 0 && i < cols && j >= 0 && j < rows ? j * cols + i : -1;
     }
 
-    // Excavación con retroceso (DFS): produce un laberinto perfecto, es decir, sin ciclos y con un único camino entre dos celdas
     function carve(steps: number) {
       for (let s = 0; s < steps && stack.length; s++) {
         const c = stack[stack.length - 1];
@@ -140,7 +140,6 @@ export default function MazeBackground({
       }
     }
 
-    // Distancia por los pasillos desde una celda (búsqueda en anchura): la luz recorre el laberinto, no el plano
     function bfs(from: number) {
       const dist = new Int16Array(cols * rows).fill(-1);
       const q = [from];
@@ -168,6 +167,8 @@ export default function MazeBackground({
       if (waves.length > 4) waves.shift();
       lastWave = time;
     }
+
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
 
     function animate(time: number) {
       const dt = last < 0 ? 16.67 : Math.min(time - last, 100);
@@ -198,7 +199,6 @@ export default function MazeBackground({
         if (fade <= 0) generate(pcell >= 0 ? pcell : Math.floor(Math.random() * cols * rows));
       }
 
-      // La luz de cada onda es un frente que avanza por los pasillos y se apaga con el tiempo
       glowMap.fill(0);
       waves = waves.filter((w) => (time - w.start) / 1000 < waveLife);
       for (const w of waves) {
@@ -214,20 +214,24 @@ export default function MazeBackground({
       }
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.globalAlpha = fade;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--maze-color").trim() || style.color;
+      const kOp = style.getPropertyValue("--maze-opacity").trim();
+      const mul = kOp !== "" && Number.isFinite(Number(kOp)) ? Number(kOp) : 1;
 
+      setAlpha(fade * mul);
       ctx!.fillStyle = glow;
       for (let c = 0; c < glowMap.length; c++) {
         const g = glowMap[c];
         if (g < 0.03) continue;
         const i = c % cols;
         const j = (c - i) / cols;
-        ctx!.globalAlpha = fade * Math.min(1, g) * glowOpacity;
+        setAlpha(fade * Math.min(1, g) * glowOpacity * mul);
         ctx!.fillRect(ox + i * cell + 1, oy + j * cell + 1, cell - 1, cell - 1);
       }
 
-      ctx!.globalAlpha = fade;
-      ctx!.strokeStyle = color;
+      setAlpha(fade * alpha * mul);
+      ctx!.strokeStyle = ink;
       ctx!.lineWidth = lineWidth;
       ctx!.lineCap = "round";
       ctx!.beginPath();
@@ -279,10 +283,13 @@ export default function MazeBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [cell, genSpeed, hold, waveSpeed, waveWidth, waveLife, ambient, lineWidth, color, glow, glowOpacity]);
+  }, [cell, genSpeed, hold, waveSpeed, waveWidth, waveLife, ambient, lineWidth, alpha, glow, glowOpacity]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--maze-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

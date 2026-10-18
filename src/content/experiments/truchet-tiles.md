@@ -56,11 +56,13 @@ props:
   - name: "color"
     label: "Color"
     type: "color"
-    default: "rgba(0, 0, 0, 0.22)"
-  - name: "background"
-    label: "Fondo"
-    type: "color"
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.22
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 Cada baldosa dibuja dos arcos de esquinas opuestas y gira 90° con easing (`ease`) cuando el puntero pasa a menos de `proximity`; tras girar espera `cooldown` ms antes de poder girar otra vez. `idle` mantiene el patrón vivo sin ratón.
 
 ```tsx
-<TruchetTilesBackground size={40} proximity={130} ease={0.12} idle={2} />
+<TruchetTilesBackground size={40} proximity={130} ease={0.12} idle={2} alpha={0.22} />
 ```

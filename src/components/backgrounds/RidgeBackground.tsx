@@ -16,8 +16,10 @@ export interface RidgeBackgroundProps {
   /** Suavizado con el que la elevación sigue al puntero */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad de las elevaciones (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las elevaciones. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -45,8 +47,8 @@ export default function RidgeBackground({
   idle = 14,
   ease = 0.06,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.3)",
-  background = "#e0dad5",
+  alpha = 0.3,
+  color,
   className,
 }: RidgeBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -56,6 +58,7 @@ export default function RidgeBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const varF = variation * roughness;
     const step = roughness > 0 ? 5 : 8;
 
@@ -85,14 +88,20 @@ export default function RidgeBackground({
       }
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       if (px !== OFF) {
         px += (tx - px) * ease;
         py += (ty - py) * ease;
       }
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = background;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--ridge-color").trim() || style.color;
+      const k = style.getPropertyValue("--ridge-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.lineWidth = lineWidth;
       ctx!.lineJoin = "round";
 
@@ -100,6 +109,7 @@ export default function RidgeBackground({
         const shift = (hash(row * 3.7 + 1.3) - 0.5) * 3 * varF;
         const height2 = 1 + (hash(row * 5.3 + 2.1) - 0.5) * 0.8 * varF;
         const freq = 0.03 * (1 + (hash(row * 7.1 + 3.9) - 0.5) * 0.2 * varF);
+        // Trazamos el perfil de la elevación y el área que queda debajo
         ctx!.beginPath();
         for (let x = -step; x <= width + step; x += step) {
           const dx = x - px;
@@ -111,12 +121,21 @@ export default function RidgeBackground({
           if (x === -step) ctx!.moveTo(x, y);
           else ctx!.lineTo(x, y);
         }
-        ctx!.stroke();
         ctx!.lineTo(width + step, y0 + spacing * 0.5);
         ctx!.lineTo(-step, y0 + spacing * 0.5);
         ctx!.closePath();
+        // destination-out borra la silueta de lo que hay detrás (sin depender del color de fondo),
+        // luego se pinta el área y el contorno con la tinta viva
+        ctx!.globalCompositeOperation = "destination-out";
+        setAlpha(1);
         ctx!.fill();
+        ctx!.globalCompositeOperation = "source-over";
+        setAlpha(alpha * mul);
+        ctx!.fill();
+        ctx!.stroke();
       }
+      ctx!.globalAlpha = 1;
+      ctx!.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(animate);
     }
 
@@ -136,10 +155,13 @@ export default function RidgeBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [spacing, lift, radius, roughness, variation, idle, ease, lineWidth, color, background]);
+  }, [spacing, lift, radius, roughness, variation, idle, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--ridge-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

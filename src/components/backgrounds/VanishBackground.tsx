@@ -12,8 +12,10 @@ export interface VanishBackgroundProps {
   /** Suavizado con el que el punto de fuga sigue al puntero */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad de las estelas (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las estelas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -24,8 +26,8 @@ export default function VanishBackground({
   streak = 2,
   ease = 0.05,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.55)",
-  background = "#e0dad5",
+  alpha = 0.55,
+  color,
   className,
 }: VanishBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -35,6 +37,7 @@ export default function VanishBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const xs = new Float32Array(count);
     const ys = new Float32Array(count);
     const zs = new Float32Array(count);
@@ -74,6 +77,8 @@ export default function VanishBackground({
       pointer = true;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const dt = last < 0 ? 16 : Math.min(time - last, 50);
       last = time;
@@ -89,7 +94,11 @@ export default function VanishBackground({
       const tail = speed * 16.7 * streak;
 
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--vanish-color").trim() || style.color;
+      const k = style.getPropertyValue("--vanish-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
       ctx!.lineCap = "round";
 
       for (let i = 0; i < count; i++) {
@@ -107,7 +116,7 @@ export default function VanishBackground({
           continue;
         }
         const depth = 1 - z;
-        ctx!.globalAlpha = Math.min(1, Math.pow(depth, 1.2));
+        setAlpha(Math.pow(depth, 1.2) * alpha * mul);
         ctx!.lineWidth = lineWidth * (0.6 + depth * 1.2);
         ctx!.beginPath();
         ctx!.moveTo(vx + (xs[i] * f) / z0, vy + (ys[i] * f) / z0);
@@ -136,10 +145,13 @@ export default function VanishBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, speed, focal, streak, ease, lineWidth, color]);
+  }, [count, speed, focal, streak, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--vanish-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.5)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.5
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 Cada partícula es atraída por un centro de gravedad que sigue al puntero (o que orbita solo si no hay puntero). `ease` marca qué tan pegado va ese centro: con valores bajos el centro va rezagado, arrastra con retardo y las partículas describen amplias órbitas en espiral; con valores altos casi no se separa del puntero y las órbitas se ciñen a su paso. `soft` evita que las partículas salgan disparadas al pasar muy cerca y `attract` regula la fuerza de atracción del centro.
 
 ```tsx
-<OrbitBackground count={110} speed={1.1} tail={28} ease={0.04} soft={60} />
+<OrbitBackground count={110} speed={1.1} tail={28} ease={0.04} soft={60} alpha={0.5} />
 ```

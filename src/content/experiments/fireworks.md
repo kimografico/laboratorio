@@ -53,11 +53,6 @@ props:
   - name: color
     label: Color
     type: color
-    default: "#fff1dc"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#1b1917"
 ---
 
 ## Uso
@@ -65,5 +60,5 @@ props:
 Cohetes que suben con estela y estallan en `burst` chispas; `gravity` y `drag` definen su caída y `life` su desvanecido. Con `rainbow` cada explosión usa un tonos suaves (rojo, naranja, amarillo, verde, azul, violeta).
 
 ```tsx
-<FireworksBackground rate={1.5} burst={150} gravity={90} drag={0.999} size={1.5} color="#fff1dc" background="#1b1917" />
+<FireworksBackground rate={1.5} burst={150} gravity={90} drag={0.999} size={1.5} color="#fff1dc" />
 ```

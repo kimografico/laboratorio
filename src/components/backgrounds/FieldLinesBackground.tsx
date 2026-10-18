@@ -14,8 +14,10 @@ export interface FieldLinesBackgroundProps {
   /** Suavizado con el que el polo del puntero lo sigue */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad de las líneas y los puntos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las líneas. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -29,8 +31,8 @@ export default function FieldLinesBackground({
   spin = 0.00005,
   ease = 0.1,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.22)",
-  background = "#e0dad5",
+  alpha = 0.22,
+  color,
   className,
 }: FieldLinesBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,6 +42,7 @@ export default function FieldLinesBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const kx = new Float32Array(sinks);
     const ky = new Float32Array(sinks);
@@ -72,7 +75,6 @@ export default function FieldLinesBackground({
       }
     }
 
-    // Campo de una carga +1 en (cx, cy) y `sinks` cargas -1/sinks; deja el resultado en (ex, ey)
     function field(x: number, y: number, cx: number, cy: number) {
       let dx = x - cx;
       let dy = y - cy;
@@ -91,6 +93,8 @@ export default function FieldLinesBackground({
       ex = fx;
       ey = fy;
     }
+
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
 
     function animate(time: number) {
       if (px === OFF) {
@@ -112,6 +116,15 @@ export default function FieldLinesBackground({
 
       ctx!.clearRect(0, 0, width, height);
       ctx!.beginPath();
+
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--field-lines-color").trim() || style.color;
+      const kOp = style.getPropertyValue("--field-lines-opacity").trim();
+      const mul = kOp !== "" && Number.isFinite(Number(kOp)) ? Number(kOp) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
+      ctx!.lineCap = "round";
+      ctx!.lineJoin = "round";
 
       for (let l = 0; l < lines; l++) {
         const th = (l * TAU) / lines + time * spin;
@@ -143,9 +156,8 @@ export default function FieldLinesBackground({
         }
       }
 
-      ctx!.strokeStyle = color;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
-      ctx!.lineJoin = "round";
       ctx!.stroke();
 
       ctx!.beginPath();
@@ -155,8 +167,7 @@ export default function FieldLinesBackground({
         ctx!.moveTo(kx[k] + 2, ky[k]);
         ctx!.arc(kx[k], ky[k], 2, 0, TAU);
       }
-      ctx!.fillStyle = color;
-      ctx!.globalAlpha = 2.2;
+      setAlpha(mul);
       ctx!.fill();
       ctx!.globalAlpha = 1;
 
@@ -180,10 +191,13 @@ export default function FieldLinesBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [lines, sinks, step, length, spin, ease, lineWidth, color]);
+  }, [lines, sinks, step, length, spin, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--field-lines-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

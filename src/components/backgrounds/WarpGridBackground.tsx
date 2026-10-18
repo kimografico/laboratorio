@@ -10,8 +10,10 @@ export interface WarpGridBackgroundProps {
   /** Suavizado con el que la lente sigue al puntero (0.02 - 0.2) */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad de la rejilla (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de la rejilla. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -21,8 +23,8 @@ export default function WarpGridBackground({
   lens = 0.6,
   ease = 0.1,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.2)",
-  background = "#e0dad5",
+  alpha = 0.2,
+  color,
   className,
 }: WarpGridBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,6 +34,7 @@ export default function WarpGridBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const step = 10;
     const OFF = -9999;
     let width = 0;
@@ -67,6 +70,8 @@ export default function WarpGridBackground({
       else ctx!.lineTo(px + dx * k, py + dy * k);
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate() {
       if (px !== OFF) {
         px += (tx - px) * ease;
@@ -80,21 +85,28 @@ export default function WarpGridBackground({
       for (let x = 0; x <= width + size; x += size) {
         for (let y = 0; y <= height + step; y += step) point(x, y, y === 0);
       }
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--warp-grid-color").trim() || style.color;
+      const k = style.getPropertyValue("--warp-grid-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.stroke();
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
     window.addEventListener("touchmove", onTouch, { passive: true });
 
     resize();
-    animate();
+    raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -102,10 +114,13 @@ export default function WarpGridBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [size, radius, lens, ease, lineWidth, color]);
+  }, [size, radius, lens, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--warp-grid-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

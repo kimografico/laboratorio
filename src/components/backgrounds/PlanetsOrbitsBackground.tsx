@@ -18,11 +18,12 @@ export interface PlanetsOrbitsBackgroundProps {
   /** Radio del planeta más grande (px) */
   planet?: number;
   lineWidth?: number;
-  /** Color de las elipses */
+  /** Opacidad de las elipses (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de las elipses. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  /** Color de los planetas y del Sol */
+  /** Color de los planetas y del Sol (tono de la paleta; la página puede sobrescribirlo) */
   planetColor?: string;
-  background?: string;
   className?: string;
 }
 
@@ -52,9 +53,9 @@ export default function PlanetsOrbitsBackground({
   speed = 1,
   planet = 3.5,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.18)",
+  alpha = 0.18,
+  color,
   planetColor = "rgba(0, 0, 0, 0.7)",
-  background = "#e0dad5",
   className,
 }: PlanetsOrbitsBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -64,6 +65,7 @@ export default function PlanetsOrbitsBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let sx = 0;
@@ -112,7 +114,8 @@ export default function PlanetsOrbitsBackground({
       pointer = true;
     }
 
-    // Resuelve la ecuación de Kepler M = E - e·sin(E) por Newton
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function kepler(M: number, e: number) {
       let E = M;
       for (let i = 0; i < 5; i++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
@@ -145,7 +148,12 @@ export default function PlanetsOrbitsBackground({
         ctx!.ellipse(cx, cy, o.a, b, o.w, 0, TAU);
       }
 
-      ctx!.strokeStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--planets-orbits-color").trim() || style.color;
+      const k = style.getPropertyValue("--planets-orbits-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      setAlpha(alpha * mul);
       ctx!.lineWidth = lineWidth;
       ctx!.stroke();
 
@@ -165,6 +173,7 @@ export default function PlanetsOrbitsBackground({
       ctx!.moveTo(sx + planet * 0.8, sy);
       ctx!.arc(sx, sy, planet * 0.8, 0, TAU);
       ctx!.fillStyle = planetColor;
+      setAlpha(mul);
       ctx!.fill();
 
       raf = requestAnimationFrame(animate);
@@ -187,10 +196,13 @@ export default function PlanetsOrbitsBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [orbits, minRadius, gap, eccentricity, lag, stiffness, speed, planet, lineWidth, color, planetColor]);
+  }, [orbits, minRadius, gap, eccentricity, lag, stiffness, speed, planet, lineWidth, alpha, planetColor]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--planets-orbits-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

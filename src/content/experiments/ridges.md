@@ -63,11 +63,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.3)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.3
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -75,5 +77,5 @@ props:
 `roughness={0}` da una colina suave y redonda; súbela hacia 1 para montañas aserradas. Deja `background` igual al color de fondo real para tapar las líneas de detrás.
 
 ```tsx
-<RidgeBackground spacing={18} lift={52} roughness={0.6} variation={0.35} />
+<RidgeBackground spacing={18} lift={52} roughness={0.6} variation={0.35} alpha={0.3} />
 ```

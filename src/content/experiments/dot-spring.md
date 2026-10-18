@@ -49,11 +49,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.2)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.2
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -61,5 +63,5 @@ props:
 `stiffness` controla la velocidad de retorno y `damping` el rebote: cerca de 0.99 rebota mucho.
 
 ```tsx
-<DotBackground size={18} radius={1} proximity={160} push={30} stiffness={0.05} damping={0.85} />
+<DotBackground size={18} radius={1} proximity={160} push={30} stiffness={0.05} damping={0.85} alpha={0.2} />
 ```

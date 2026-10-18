@@ -42,11 +42,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.3)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.3
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -54,5 +56,5 @@ props:
 El universo se siembra al azar (`seed`) y evoluciona cada `tick` milisegundos; `cell` controla el tamaño de la cuadrícula y `brush` el radio con el que el puntero pinta celdas vivas. De vez en cuando aparece un pentaminó R según la probabilidad `spark`, y `color`/`background` fijan la tinta y el lienzo.
 
 ```tsx
-<LifeBackground cell={10} tick={140} brush={2} seed={0.05} spark={0.01} />
+<LifeBackground cell={10} tick={140} brush={2} seed={0.05} spark={0.01} alpha={0.3} />
 ```

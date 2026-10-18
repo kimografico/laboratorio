@@ -26,8 +26,10 @@ export interface PlasmaBackgroundProps {
   /** Suavizado con el que el polo del puntero lo sigue (1 = instantáneo) */
   ease?: number;
   lineWidth?: number;
+  /** Opacidad de los rayos (0-1) */
+  alpha?: number;
+  /** Opcional: fija el color de los rayos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -53,7 +55,6 @@ type Point = {
 
 const TAU = Math.PI * 2;
 const BSEGS = 7;
-// vnoise interpola entre muestras y por eso varía menos que un ruido uniforme: se compensa para que `jag` sea la amplitud real
 const GAIN = 1.6;
 
 function hash(n: number) {
@@ -61,7 +62,6 @@ function hash(n: number) {
   return s - Math.floor(s);
 }
 
-// Ruido de valor suave en el tiempo: varía de forma continua entre muestras aleatorias
 function vnoise(a: number, t: number) {
   const i = Math.floor(t);
   const f = t - i;
@@ -83,8 +83,8 @@ export default function PlasmaBackground({
   spin = 0.00006,
   ease = 0.25,
   lineWidth = 1,
-  color = "rgba(0, 0, 0, 0.5)",
-  background = "#e0dad5",
+  alpha = 0.5,
+  color,
   className,
 }: PlasmaBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -94,6 +94,7 @@ export default function PlasmaBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const OFF = -9999;
     const kx = new Float32Array(poles);
     const ky = new Float32Array(poles);
@@ -155,7 +156,6 @@ export default function PlasmaBackground({
       }));
     }
 
-    // Reparte los polos a intervalos iguales a lo largo del perímetro
     function layoutPoles() {
       const P = 2 * (width + height);
       for (let i = 0; i < poles; i++) {
@@ -198,10 +198,6 @@ export default function PlasmaBackground({
       }
     }
 
-    // Campo de una carga +1 en (cx, cy), `poles` cargas negativas en el borde (con pesos que suman -1) y los
-    // puntos invisibles: cada uno repele (gr > 0) y hace girar el campo a su alrededor (gv, con signo variable).
-    // Ni repeler ni girar crean sumideros, así que ningún rayo queda atrapado en un punto invisible.
-    // Deja el resultado en (ex, ey)
     function field(x: number, y: number, cx: number, cy: number) {
       let dx = x - cx;
       let dy = y - cy;
@@ -229,6 +225,8 @@ export default function PlasmaBackground({
       ey = fy;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       if (px === OFF) {
         tx = width / 2 + Math.cos(time * 0.0003) * width * 0.12;
@@ -248,7 +246,6 @@ export default function PlasmaBackground({
       const reach = Math.min(width, height) * 0.5;
       const sc = Math.min(width, height) / 700;
 
-      // Cada polo del borde tiene una carga distinta que varía despacio: los rayos no reparten el borde por igual
       let sum = 0;
       for (let i = 0; i < poles; i++) {
         kq[i] = 0.35 + 1.3 * vnoise(i * 13.7 + 5, ts * 0.15);
@@ -256,7 +253,6 @@ export default function PlasmaBackground({
       }
       for (let i = 0; i < poles; i++) kq[i] /= sum;
 
-      // Puntos invisibles: derivan, cambian de intensidad y el sentido del giro se invierte con el tiempo
       for (let i = 0; i < points; i++) {
         const sp = spots[i];
         gx[i] = width * (sp.fx + sp.ax * Math.sin(ts * sp.w1 + sp.p1));
@@ -266,16 +262,18 @@ export default function PlasmaBackground({
         gv[i] = strength * sp.c * 0.9 * sp.vs * Math.sin(ts * sp.vw + sp.vp);
       }
 
-      // Rayos activos: entre lines·(1 - dropout) y lines. Cada rayo tiene un umbral que gira despacio, así que
-      // cada uno se apaga y se enciende a ratos, y el número total cambia con un ruido lento
       const nAct = Math.min(1, Math.max(0, (vnoise(777, ts * 0.4) - 0.3) / 0.4));
       const activeFrac = 1 - dropout + dropout * nAct;
 
       ctx!.clearRect(0, 0, width, height);
       ctx!.lineCap = "round";
       ctx!.lineJoin = "round";
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--plasma-color").trim() || style.color;
+      const k = style.getPropertyValue("--plasma-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
 
       for (let l = 0; l < bolts.length; l++) {
         const bolt = bolts[l];
@@ -283,7 +281,6 @@ export default function PlasmaBackground({
         bolt.env += ((on ? 1 : 0) - bolt.env) * fadeK;
         if (on) bolt.rolled = false;
         if (!on && bolt.env < 0.02) {
-          // Apagado del todo: al volver a encenderse saldrá en otra dirección y con otra forma
           if (!bolt.rolled) {
             bolt.jit = (Math.random() - 0.5) * 0.9;
             bolt.seed = Math.random() * 1000;
@@ -293,7 +290,6 @@ export default function PlasmaBackground({
         }
         const th = ((l + 0.5 + bolt.jit) * TAU) / lines + time * spin;
 
-        // 1) Línea de campo suave: se integra desde el puntero hasta que toca el borde
         let x = sx + Math.cos(th) * 4;
         let y = sy + Math.sin(th) * 4;
         raw[0] = sx;
@@ -309,8 +305,6 @@ export default function PlasmaBackground({
           m = Math.hypot(ex, ey) || 1;
           x += (ex / m) * step;
           y += (ey / m) * step;
-          // Al llegar a menos de un paso del borde el rayo termina y se proyecta sobre él
-          // (cerca de un polo el integrador oscilaría: el paso es mayor que la distancia al polo)
           const dl = x;
           const dr = width - x;
           const dt = y;
@@ -334,7 +328,6 @@ export default function PlasmaBackground({
           }
         }
 
-        // 2) Zigzag: cada vértice se desplaza de lado con ruido que cambia ~12 veces por segundo
         const bright = (0.45 + 0.55 * vnoise(bolt.seed, ts * bolt.fs)) * bolt.env;
         ctx!.beginPath();
         ctx!.moveTo(raw[0], raw[1]);
@@ -355,7 +348,6 @@ export default function PlasmaBackground({
           ctx!.lineTo(jx, jy);
         }
 
-        // 3) Ramificaciones: pequeños rayos que salen de vértices del principal
         for (const b of bolt.branches) {
           const j = Math.max(1, Math.min(n - 2, Math.floor(b.u * (n - 1))));
           const bx0 = jp[2 * j];
@@ -372,20 +364,18 @@ export default function PlasmaBackground({
           }
         }
 
-        // Tres pasadas: halo ancho, halo medio y núcleo
-        ctx!.globalAlpha = bright * 0.1;
+        setAlpha(bright * 0.1 * alpha * mul);
         ctx!.lineWidth = lineWidth * 6;
         ctx!.stroke();
-        ctx!.globalAlpha = bright * 0.28;
+        setAlpha(bright * 0.28 * alpha * mul);
         ctx!.lineWidth = lineWidth * 2.6;
         ctx!.stroke();
-        ctx!.globalAlpha = bright;
+        setAlpha(bright * alpha * mul);
         ctx!.lineWidth = lineWidth;
         ctx!.stroke();
 
-        // Punto de contacto en el borde
         if (hit) {
-          ctx!.globalAlpha = bright * 0.8;
+          setAlpha(bright * 0.8 * alpha * mul);
           ctx!.beginPath();
           ctx!.arc(raw[2 * (n - 1)], raw[2 * (n - 1) + 1], 1.5 + lineWidth, 0, TAU);
           ctx!.fill();
@@ -394,16 +384,17 @@ export default function PlasmaBackground({
 
       // Núcleo luminoso en el puntero
       for (let i = 0; i < 5; i++) {
-        ctx!.globalAlpha = 0.07;
+        setAlpha(0.07 * alpha * mul);
         ctx!.beginPath();
         ctx!.arc(sx, sy, 4 + i * 5, 0, TAU);
         ctx!.fill();
       }
-      ctx!.globalAlpha = 1;
+      setAlpha(1 * alpha * mul);
       ctx!.beginPath();
       ctx!.arc(sx, sy, 2.5, 0, TAU);
       ctx!.fill();
 
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -425,10 +416,13 @@ export default function PlasmaBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [lines, poles, points, strength, dropout, step, length, jag, branch, speed, spin, ease, lineWidth, color]);
+  }, [lines, poles, points, strength, dropout, step, length, jag, branch, speed, spin, ease, lineWidth, alpha]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--plasma-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

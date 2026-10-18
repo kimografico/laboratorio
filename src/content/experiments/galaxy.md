@@ -77,11 +77,6 @@ props:
   - name: color
     label: Color
     type: color
-    default: "#f4efe8"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#1b1917"
 ---
 
 ## Uso

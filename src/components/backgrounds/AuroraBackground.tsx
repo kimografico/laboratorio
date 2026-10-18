@@ -11,7 +11,8 @@ export interface AuroraBackgroundProps {
   ease?: number;
   /** Fuerza con la que las manchas huyen del puntero (0 = lo ignoran, 1 = huyen mucho) */
   avoid?: number;
-  background?: string;
+  /** Opcional: fija el color de las manchas. Por defecto se hereda del CSS de la página (`color`). */
+  color?: string;
   className?: string;
 }
 
@@ -28,7 +29,7 @@ export default function AuroraBackground({
   opacity = 0.5,
   ease = 0.05,
   avoid = 1,
-  background = "#e0dad5",
+  color,
   className,
 }: AuroraBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,6 +40,7 @@ export default function AuroraBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     const palette = colorsKey ? colorsKey.split(",") : [];
 
     let width = 0;
@@ -74,9 +76,17 @@ export default function AuroraBackground({
       hasPointer = true;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       const radius = Math.min(width, height) * size;
       ctx!.clearRect(0, 0, width, height);
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--aurora-color").trim() || style.color;
+      const k = style.getPropertyValue("--aurora-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       for (const b of blobs) {
         let targetX = width / 2 + Math.cos(time * 0.0004 + b.phase) * width * 0.22;
         let targetY = height / 2 + Math.sin(time * 0.0005 + b.phase) * height * 0.18;
@@ -92,11 +102,13 @@ export default function AuroraBackground({
         b.y += (targetY - b.y) * b.ease;
 
         const g = ctx!.createRadialGradient(b.x, b.y, 0, b.x, b.y, radius);
-        g.addColorStop(0, `rgba(${b.rgb}, ${opacity})`);
+        g.addColorStop(0, `rgba(${b.rgb}, ${opacity * mul})`);
         g.addColorStop(1, `rgba(${b.rgb}, 0)`);
         ctx!.fillStyle = g;
+        setAlpha(mul);
         ctx!.fillRect(0, 0, width, height);
       }
+      ctx!.globalAlpha = 1;
       raf = requestAnimationFrame(animate);
     }
 
@@ -119,7 +131,10 @@ export default function AuroraBackground({
   }, [colorsKey, size, opacity, ease, avoid]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--aurora-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

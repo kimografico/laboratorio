@@ -63,11 +63,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.22)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.22
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -75,5 +77,5 @@ props:
 El relieve se genera como suma de senos sobre una malla y se dibujan curvas de nivel con *marching squares*. El puntero eleva el campo con un bulto gaussiano (`bump`, `radius`, `ease`), que le sigue con suavizado. Ajusta `cell` para la resolución de la malla y `levels` para el número de isolíneas.
 
 ```tsx
-<Contour2Background cell={12} levels={9} scale={0.005} />
+<Contour2Background cell={12} levels={9} scale={0.005} alpha={0.22} />
 ```

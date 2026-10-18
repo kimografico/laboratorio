@@ -102,7 +102,13 @@ props:
   - name: "color"
     label: "Hierba"
     type: "color"
-    default: "rgba(46, 94, 54, 0.45)"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.45
+    min: 0
+    max: 1
+    step: 0.02
   - name: "plantColor"
     label: "Plantas"
     type: "color"
@@ -111,10 +117,6 @@ props:
     label: "Flores"
     type: "color"
     default: "rgba(196, 70, 90, 0.95)"
-  - name: "background"
-    label: "Fondo"
-    type: "color"
-    default: "#e0dad5"
 ---
 
 ## Uso
@@ -122,5 +124,5 @@ props:
 Briznas repartidas por `spacing` en tres capas de profundidad se mecen con `wind` y se apartan del puntero dentro de `radius`. Cada cierto trecho recorrido brota una planta que crece con ramas y hojas (`flowers` añade flores al final), vive `life` segundos y se marchita en `wither`.
 
 ```tsx
-<MeadowBackground spacing={9} blade={14} wind={1} flowers />
+<MeadowBackground spacing={9} blade={14} wind={1} flowers alpha={0.45} />
 ```

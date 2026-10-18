@@ -10,8 +10,8 @@ export interface RingsBackgroundProps {
   /** Opacidad máxima de los anillos (0-1) */
   alpha?: number;
   lineWidth?: number;
+  /** Opcional: fija el color de los anillos. Por defecto se hereda del CSS de la página (`color`). */
   color?: string;
-  background?: string;
   className?: string;
 }
 
@@ -23,8 +23,7 @@ export default function RingsBackground({
   ease = 0.03,
   alpha = 0.2,
   lineWidth = 1,
-  color = "#000000",
-  background = "#e0dad5",
+  color,
   className,
 }: RingsBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -34,6 +33,7 @@ export default function RingsBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvas);
     let width = 0;
     let height = 0;
     let rings: Ring[] = [];
@@ -68,12 +68,18 @@ export default function RingsBackground({
       ty = (clientY - rect.top) / height - 0.5;
     }
 
+    const setAlpha = (v: number) => (ctx!.globalAlpha = Math.min(1, Math.max(0, v)));
+
     function animate(time: number) {
       sx += (tx - sx) * ease;
       sy += (ty - sy) * ease;
       ctx!.clearRect(0, 0, width, height);
-      ctx!.strokeStyle = color;
-      ctx!.fillStyle = color;
+      // Tinta y opacidad leídas del CSS de la página en cada fotograma
+      const ink = style.getPropertyValue("--rings-color").trim() || style.color;
+      const k = style.getPropertyValue("--rings-opacity").trim();
+      const mul = k !== "" && Number.isFinite(Number(k)) ? Number(k) : 1;
+      ctx!.strokeStyle = ink;
+      ctx!.fillStyle = ink;
       ctx!.lineWidth = lineWidth;
       for (const r of rings) {
         const x = r.fx * width - sx * strength * 2 * r.z + Math.cos(time * 0.00015 + r.phase) * 14;
@@ -81,10 +87,10 @@ export default function RingsBackground({
         ctx!.beginPath();
         ctx!.arc(x, y, r.r, 0, Math.PI * 2);
         if (r.filled) {
-          ctx!.globalAlpha = alpha * 0.25 * r.z;
+          setAlpha(alpha * 0.25 * r.z * mul);
           ctx!.fill();
         }
-        ctx!.globalAlpha = alpha * (0.4 + 0.6 * r.z);
+        setAlpha(alpha * (0.4 + 0.6 * r.z) * mul);
         ctx!.stroke();
       }
       ctx!.globalAlpha = 1;
@@ -93,6 +99,7 @@ export default function RingsBackground({
 
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
     const onMouse = (e: MouseEvent) => onPointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => onPointer(e.touches[0].clientX, e.touches[0].clientY);
     window.addEventListener("mousemove", onMouse);
@@ -107,10 +114,13 @@ export default function RingsBackground({
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("touchmove", onTouch);
     };
-  }, [count, strength, ease, alpha, lineWidth, color]);
+  }, [count, strength, ease, alpha, lineWidth]);
 
   return (
-    <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ backgroundColor: background }}>
+    <div
+      className={`bg-canvas ${className ?? ""}`.trim()}
+      style={color ? ({ "--rings-color": color } as React.CSSProperties) : undefined}
+    >
       <canvas ref={canvasRef} />
     </div>
   );

@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.18)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.18
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 `restAngle` es la orientación en reposo; cerca del puntero cada aguja rota hacia él mezclando el ángulo.
 
 ```tsx
-<NeedleBackground size={32} length={10} restAngle={45} proximity={220} />
+<NeedleBackground size={32} length={10} restAngle={45} proximity={220} alpha={0.18} />
 ```

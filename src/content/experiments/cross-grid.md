@@ -56,11 +56,13 @@ props:
   - name: color
     label: Color
     type: color
-    default: "rgba(0, 0, 0, 0.2)"
-  - name: background
-    label: Fondo
-    type: color
-    default: "#e0dad5"
+  - name: alpha
+    label: Opacidad
+    type: number
+    default: 0.2
+    min: 0
+    max: 1
+    step: 0.02
 ---
 
 ## Uso
@@ -68,5 +70,5 @@ props:
 `rotation={45}` convierte las cruces en aspas; `rotation={90}` da un cuarto de vuelta completo.
 
 ```tsx
-<CrossBackground size={39} arm={6} growth={8} proximity={180} rotation={120} ease={0.05} lineWidth={1.5} />
+<CrossBackground size={39} arm={6} growth={8} proximity={180} rotation={120} ease={0.05} lineWidth={1.5} alpha={0.2} />
 ```
