@@ -25,7 +25,6 @@ import GlobeBackground from "../components/backgrounds/GlobeBackground";
 import HexPulseBackground from "../components/backgrounds/HexPulseBackground";
 import IsoBackground from "../components/backgrounds/IsoBackground";
 import JellyBackground from "../components/backgrounds/JellyBackground";
-import JuliaBackground from "../components/backgrounds/JuliaBackground";
 import KaleidoscopeBackground from "../components/backgrounds/KaleidoscopeBackground";
 import KelpBackground from "../components/backgrounds/KelpBackground";
 import KoiBackground from "../components/backgrounds/KoiBackground";
@@ -63,11 +62,8 @@ import ThreadBackground from "../components/backgrounds/ThreadBackground";
 import TileBackground from "../components/backgrounds/TileBackground";
 import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
 import TriangleBackground2 from "../components/backgrounds/TriangleBackground2";
-import TruchetArcsBackground from "../components/backgrounds/TruchetArcsBackground";
 import TruchetBackground from "../components/backgrounds/TruchetBackground";
-import TruchetTilesBackground from "../components/backgrounds/TruchetTilesBackground";
 import TuringBackground from "../components/backgrounds/TuringBackground";
-import TurtleBackground from "../components/backgrounds/TurtleBackground";
 import VanishBackground from "../components/backgrounds/VanishBackground";
 import VoronoiBackground from "../components/backgrounds/VoronoiBackground";
 import WarpGridBackground from "../components/backgrounds/WarpGridBackground";
@@ -116,7 +112,6 @@ export const registry: Record<string, ComponentType<any>> = {
   HexPulseBackground,
   IsoBackground,
   JellyBackground,
-  JuliaBackground,
   KaleidoscopeBackground,
   KelpBackground,
   KoiBackground,
@@ -154,11 +149,8 @@ export const registry: Record<string, ComponentType<any>> = {
   TileBackground,
   TileSpinBackground,
   TriangleBackground2,
-  TruchetArcsBackground,
   TruchetBackground,
-  TruchetTilesBackground,
   TuringBackground,
-  TurtleBackground,
   VanishBackground,
   VoronoiBackground,
   WarpGridBackground,
