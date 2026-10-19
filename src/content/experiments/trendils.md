@@ -146,6 +146,10 @@ props:
     label: "Filtro goo"
     type: "boolean"
     default: true
+  - name: "frame"
+    label: "Marco de cueva"
+    type: "boolean"
+    default: true
   - name: "blur"
     label: "Desenfoque (px)"
     type: "number"

@@ -41,6 +41,8 @@ export interface TrendilBackgroundProps {
   eyeSphere?: number;
   /** Suavizado de uniones con feGaussianBlur + feColorMatrix */
   goo?: boolean;
+  /** Marco irregular en el borde, del color de los zarcillos y más grueso en las esquinas */
+  frame?: boolean;
   /** Desenfoque del filtro (px) */
   blur?: number;
   /** Contraste del alfa tras el desenfoque */
@@ -92,7 +94,7 @@ const EYE_PUPIL = "#141416";
 export default function TrendilBackground({
   anchors = 60, inner = 6, sparsity = 0.8, span = 0.3, far = 0.3, thick = 25, thin = 1.5, wave = 0,
   speed = 1, sag = 0.05, drift = 30, radius = 200, pull = 0.8, stiffness = 0.06, damping = 0.9, kick = 0.05,
-  eyes = 3, eyeSphere = 3, eyeColor = EYE_GLOBE, alpha = 1, goo = true, blur = 3, contrast = 60, cut = 3, color, className,
+  eyes = 3, eyeSphere = 3, eyeColor = EYE_GLOBE, alpha = 1, goo = true, frame = true, blur = 3, contrast = 60, cut = 3, color, className,
 }: TrendilBackgroundProps) {
   const strands = 0; // esta versión no tiene hilos largos extra
   const fid = "goo" + useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -104,6 +106,8 @@ export default function TrendilBackground({
   alphaRef.current = alpha; // la opacidad cambia sin regenerar la red
   const eyeColorRef = useRef(eyeColor);
   eyeColorRef.current = eyeColor; // el color del globo cambia sin regenerar la red
+  const frameRef = useRef(frame);
+  frameRef.current = frame; // el marco se activa o desactiva sin regenerar la red
 
   useEffect(() => {
     const front = frontRef.current!;
@@ -339,6 +343,75 @@ export default function TrendilBackground({
       c.fill();
     }
 
+    // Marco irregular en el borde: cubre los nudos de las paredes y engrosa las esquinas para dar aspecto
+    // de cueva. El contorno interior es un rectángulo redondeado con una ondulación periódica desplazada
+    // por la normal, así no se autointersecta y el relleno no deja huecos en las esquinas. Va en la capa
+    // delantera, así que el filtro goo lo funde con los zarcillos.
+    function drawFrame(c: CanvasRenderingContext2D, ink: string) {
+      if (w < 8 || h < 8) return;
+      const b = Math.min(Math.max(7, thick * 0.9), Math.max(2, Math.min(w, h) * 0.3));
+      const rh = Math.max(0, Math.min(Math.max(10, thick * 0.7), Math.min(w, h) / 2 - b - 1));
+      const lx = Math.max(0, w - 2 * b - 2 * rh);
+      const ly = Math.max(0, h - 2 * b - 2 * rh);
+      const per = 2 * lx + 2 * ly + 2 * Math.PI * rh;
+      if (per <= 0.01) return;
+      // Amplitud máxima del desplazamiento: nunca mayor que el radio interior de las esquinas (el
+      // arco se invertiría) ni que el grosor base (el contorno saldría del lienzo)
+      const amp = Math.max(0, Math.min(b, rh > 0 ? rh * 0.95 : b, b - 2));
+      const TAU = Math.PI * 2;
+      // Armónicos de la ondulación (periódica con el perímetro): baja frecuencia para las formas
+      // grandes y alta para el grano fino
+      const wave = (u: number) =>
+        0.34 * Math.sin(u * TAU + 0.9) +
+        0.24 * Math.sin(u * TAU * 3 + 1.7) +
+        0.19 * Math.sin(u * TAU * 8 + 4.1) +
+        0.13 * Math.sin(u * TAU * 15 + 2.3) +
+        0.10 * Math.sin(u * TAU * 27 + 5.9);
+      const pts: number[][] = [];
+      let s = 0;
+      const emit = (x: number, y: number, nx: number, ny: number) => {
+        const t = amp * wave((s / per) % 1);
+        pts.push([x + nx * t, y + ny * t]);
+      };
+      const line = (x0: number, y0: number, x1: number, y1: number, nx: number, ny: number, len: number) => {
+        if (len <= 0.01) return;
+        const steps = Math.max(2, Math.ceil(len / 14));
+        for (let i = 0; i <= steps; i++) {
+          emit(x0 + (x1 - x0) * i / steps, y0 + (y1 - y0) * i / steps, nx, ny);
+          s += len / steps;
+        }
+      };
+      const arc = (cx: number, cy: number, a0: number, a1: number, r: number) => {
+        if (r <= 0.01) return;
+        const len = Math.abs(a1 - a0) * r;
+        const steps = Math.max(4, Math.ceil(len / 14));
+        for (let i = 0; i <= steps; i++) {
+          const a = a0 + (a1 - a0) * i / steps;
+          emit(cx + Math.cos(a) * r, cy + Math.sin(a) * r, -Math.cos(a), -Math.sin(a));
+          s += len / steps;
+        }
+      };
+      const x0 = b, y0 = b, x1 = w - b, y1 = h - b;
+      line(x0 + rh, y0, x1 - rh, y0, 0, 1, lx);
+      arc(x1 - rh, y0 + rh, -Math.PI / 2, 0, rh);
+      line(x1, y0 + rh, x1, y1 - rh, -1, 0, ly);
+      arc(x1 - rh, y1 - rh, 0, Math.PI / 2, rh);
+      line(x1 - rh, y1, x0 + rh, y1, 0, -1, lx);
+      arc(x0 + rh, y1 - rh, Math.PI / 2, Math.PI, rh);
+      line(x0, y1 - rh, x0, y0 + rh, 1, 0, ly);
+      arc(x0 + rh, y0 + rh, Math.PI, (Math.PI * 3) / 2, rh);
+      const o = m + 1;
+      c.beginPath();
+      c.rect(-o, -o, w + 2 * o, h + 2 * o);
+      if (pts.length) {
+        c.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+        c.closePath();
+      }
+      c.fillStyle = ink;
+      c.fill("evenodd");
+    }
+
     // Pupila rasgada sobre una esfera: gira hacia el puntero (hasta ~54° en horizontal) y se inclina hasta 35° en
     // vertical. La rendija es un meridiano de la esfera proyectado, así que se curva hacia donde mira y se estrecha
     // al girar (efecto 3D)
@@ -391,6 +464,7 @@ export default function TrendilBackground({
       const F0 = layers[0];
       const spheres = eyeNode.map((i, k) => blobRing(F0.nodeX[i], F0.nodeY[i], eyeR[k], eyeShape[k], time));
       drawEdges(cF!, F0, false, ink, spheres);
+      if (frameRef.current) drawFrame(cF!, ink);
       if (cB) drawEdges(cB, layers[0], true, ink);
       const fo = Math.min(1, alphaRef.current * mul);
       front.style.opacity = String(fo);
