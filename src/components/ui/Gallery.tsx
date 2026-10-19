@@ -223,20 +223,20 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
   const categories = useMemo(() => {
     const set = new Set(experiments.map((e) => e.category));
     const rest = Array.from(set).filter((c) => c !== "pendiente");
-    return [...(set.has("pendiente") ? ["pendiente"] : []), "all", ...rest];
+    return [...(set.has("pendiente") ? ["pendiente"] : []), ...rest];
   }, [experiments]);
 
-  const defaultCategory = categories.includes("pendiente") ? "pendiente" : "all";
+  const defaultCategory = categories.includes("pendiente") ? "pendiente" : null;
 
-  const [category, setCategory] = useState<string>(defaultCategory);
+  const [category, setCategory] = useState<string | null>(defaultCategory);
 
   useEffect(() => {
-    if (category !== "all" && !categories.includes(category)) {
+    if (category !== null && !categories.includes(category)) {
       setCategory(defaultCategory);
     }
   }, [categories, category, defaultCategory]);
 
-  const hasFilter = categories.length > 2;
+  const hasFilter = categories.length > 1;
 
   const counts = useMemo(() => {
     return experiments.reduce<Record<string, number>>((acc, e) => {
@@ -246,7 +246,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
   }, [experiments]);
 
   const filtered = useMemo(
-    () => experiments.filter((e) => category === "all" || e.category === category),
+    () => experiments.filter((e) => category === null || e.category === category),
     [experiments, category]
   );
 
@@ -257,15 +257,14 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
           <div className="flex flex-wrap items-center gap-3">
             <SlidersHorizontal className="h-4 w-4 text-faint" />
             {categories.map((c) => {
-              const count = c === "all" ? experiments.length : counts[c] ?? 0;
               const active = category === c;
               return (
                 <Button
                   key={c}
                   variant={active ? "solid" : "outline"}
-                  label={c === "all" ? "Todos" : c === "pendiente" ? "Pendientes" : c}
-                  badge={count}
-                  onClick={() => setCategory(c)}
+                  label={c === "pendiente" ? "Pendientes" : c}
+                  badge={counts[c] ?? 0}
+                  onClick={() => setCategory(active ? null : c)}
                   className="capitalize"
                 />
               );
