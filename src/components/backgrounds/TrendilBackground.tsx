@@ -83,6 +83,9 @@ const ccw = (ax: number, ay: number, bx: number, by: number, cx: number, cy: num
 const crossSeg = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number) =>
   ccw(ax, ay, cx, cy, dx, dy) !== ccw(bx, by, cx, cy, dx, dy) && ccw(ax, ay, bx, by, cx, cy) !== ccw(ax, ay, bx, by, dx, dy);
 const MAXSEG = 64;
+// Los ojos no siguen el tema: globo claro y pupila oscura en ambos.
+const EYE_GLOBE = "#f7f7f6";
+const EYE_PUPIL = "#141416";
 
 export default function TrendilBackground({
   anchors = 60, inner = 6, sparsity = 0.8, span = 0.3, far = 0.3, thick = 25, thin = 1.5, wave = 0.05,
@@ -388,7 +391,6 @@ export default function TrendilBackground({
       // Ojos: se recorta un hueco en la capa delantera y se dibujan en su propio canvas, fuera del filtro.
       // La pupila se desplaza hacia el puntero en horizontal y vertical
       cE!.clearRect(0, 0, w, h);
-      cE!.fillStyle = ink; cE!.strokeStyle = ink;
       const F = layers[0];
       cF!.globalCompositeOperation = "destination-out";
       const holes: string[] = [];
@@ -400,8 +402,13 @@ export default function TrendilBackground({
         look[2 * k + 1] += (ty - look[2 * k + 1]) * 0.12;
         cF!.beginPath(); cF!.arc(x, y, R, 0, Math.PI * 2); cF!.fill(); // respaldo si el navegador no soporta máscaras
         holes.push(`radial-gradient(circle ${(R + 1).toFixed(1)}px at ${x.toFixed(1)}px ${y.toFixed(1)}px,transparent ${R.toFixed(1)}px,#000 ${(R + 0.8).toFixed(1)}px)`);
-        cE!.lineWidth = Math.max(1, R * 0.08);
+        // Globo siempre claro, con el borde y la pupila siempre oscuros
+        cE!.fillStyle = EYE_GLOBE;
+        cE!.beginPath(); cE!.arc(x, y, R, 0, Math.PI * 2); cE!.fill();
+        cE!.lineWidth = Math.max(1.5, R * 0.14);
+        cE!.strokeStyle = EYE_PUPIL;
         cE!.beginPath(); cE!.arc(x, y, R, 0, Math.PI * 2); cE!.stroke();
+        cE!.fillStyle = EYE_PUPIL;
         drawPupil(cE!, x, y, R, look[2 * k], look[2 * k + 1]);
       }
       cF!.globalCompositeOperation = "source-over";
