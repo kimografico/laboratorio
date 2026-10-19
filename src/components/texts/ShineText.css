@@ -8,7 +8,7 @@
   background-image: linear-gradient(
     var(--tx-angle),
     currentColor 40%,
-    color-mix(in srgb, currentColor 52%, white) 50%,
+    rgba(255, 255, 255, 0.45) 50%,
     currentColor 60%
   );
   background-size: 250% 100%;

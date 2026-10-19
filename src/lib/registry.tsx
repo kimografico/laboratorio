@@ -9,6 +9,7 @@ import CobwebBackground from "../components/backgrounds/CobwebBackground";
 import ClothBackground from "../components/backgrounds/ClothBackground";
 import Contour2Background from "../components/backgrounds/Contour2Background";
 import CoralBackground from "../components/backgrounds/CoralBackground";
+import CrackBackground from "../components/backgrounds/CrackBackground";
 import CrossBackground from "../components/backgrounds/CrossBackground";
 import DandelionBackground from "../components/backgrounds/DandelionBackground";
 import DitherBackground from "../components/backgrounds/DitherBackground";
@@ -23,6 +24,7 @@ import FlowBackground from "../components/backgrounds/FlowBackground";
 import FogBackground from "../components/backgrounds/FogBackground";
 import GalaxyBackground from "../components/backgrounds/GalaxyBackground";
 import GlobeBackground from "../components/backgrounds/GlobeBackground";
+import GardenEelBackground from "../components/backgrounds/GardenEelBackground";
 import HexPulseBackground from "../components/backgrounds/HexPulseBackground";
 import HexGridBackground from "../components/backgrounds/HexGridBackground";
 import IsoBackground from "../components/backgrounds/IsoBackground";
@@ -66,6 +68,7 @@ import TendrilEyesBackground from "../components/backgrounds/TendrilEyesBackgrou
 import ThreadBackground from "../components/backgrounds/ThreadBackground";
 import TileBackground from "../components/backgrounds/TileBackground";
 import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
+import TrendilBackground from "../components/backgrounds/TrendilBackground";
 import TriangleBackground2 from "../components/backgrounds/TriangleBackground2";
 import TruchetBackground from "../components/backgrounds/TruchetBackground";
 import TuringBackground from "../components/backgrounds/TuringBackground";
@@ -102,6 +105,7 @@ export const registry: Record<string, ComponentType<any>> = {
   CrossBackground,
   Contour2Background,
   CoralBackground,
+  CrackBackground,
   DandelionBackground,
   DitherBackground,
   DotBackground,
@@ -115,6 +119,7 @@ export const registry: Record<string, ComponentType<any>> = {
   FogBackground,
   GalaxyBackground,
   GlobeBackground,
+  GardenEelBackground,
   HexPulseBackground,
   HexGridBackground,
   IsoBackground,
@@ -158,6 +163,7 @@ export const registry: Record<string, ComponentType<any>> = {
   ThreadBackground,
   TileBackground,
   TileSpinBackground,
+  TrendilBackground,
   TriangleBackground2,
   TruchetBackground,
   TuringBackground,
