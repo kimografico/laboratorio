@@ -224,7 +224,7 @@ export default function ExperimentPreview({
             {propDefs.length === 0 ? (
               <p className="text-sm text-faint">Este componente no expone props configurables.</p>
             ) : (
-              <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
                 {propDefs.map((p) => (
                   <Control key={p.name} def={p} value={values[p.name]} onChange={(v) => update(p.name, v)} />
                 ))}

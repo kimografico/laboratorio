@@ -130,11 +130,6 @@ props:
     min: 1
     max: 4
     step: 0.1
-  - name: "eyeColor"
-    label: "Color del globo"
-    type: "color"
-    default: "#dfdfb9"
-    themed: false
   - name: "alpha"
     label: "Opacidad"
     type: "number"
@@ -142,14 +137,6 @@ props:
     min: 0
     max: 1
     step: 0.02
-  - name: "goo"
-    label: "Filtro goo"
-    type: "boolean"
-    default: true
-  - name: "frame"
-    label: "Marco de cueva"
-    type: "boolean"
-    default: true
   - name: "blur"
     label: "Desenfoque (px)"
     type: "number"
@@ -174,6 +161,19 @@ props:
   - name: "color"
     label: "Color"
     type: "color"
+  - name: "eyeColor"
+    label: "Color del globo"
+    type: "color"
+    default: "#dfdfb9"
+    themed: false
+  - name: "goo"
+    label: "Filtro goo"
+    type: "boolean"
+    default: true
+  - name: "frame"
+    label: "Marco de cueva"
+    type: "boolean"
+    default: true
 ---
 
 ## Uso
