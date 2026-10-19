@@ -37,7 +37,7 @@ function LazyPreview({
     [props, category, sharedText]
   );
   const themed = useMemo(
-    () => props.filter((p) => p.type === "color").map((p) => p.name),
+    () => props.filter((p) => p.type === "color" && p.themed !== false).map((p) => p.name),
     [props]
   );
 

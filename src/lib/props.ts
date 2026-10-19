@@ -15,6 +15,8 @@ export interface PropDef {
   max?: number;
   step?: number;
   options?: string[];
+  /** Si es `false`, un color no se adapta al tema activo. */
+  themed?: boolean;
 }
 
 export type PropValues = Record<string, unknown>;

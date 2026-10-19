@@ -11,6 +11,7 @@ const propSchema = z.object({
   max: z.number().optional(),
   step: z.number().optional(),
   options: z.array(z.string()).optional(),
+  themed: z.boolean().optional(),
 });
 
 const experiments = defineCollection({

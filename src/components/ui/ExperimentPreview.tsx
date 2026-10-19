@@ -79,7 +79,10 @@ export default function ExperimentPreview({
     [componentId, propDefs, values, category]
   );
   const themed = useMemo(
-    () => propDefs.filter((p) => p.type === "color" && values[p.name] === p.default).map((p) => p.name),
+    () =>
+      propDefs
+        .filter((p) => p.type === "color" && p.themed !== false && values[p.name] === p.default)
+        .map((p) => p.name),
     [propDefs, values]
   );
 

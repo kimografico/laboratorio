@@ -49,6 +49,8 @@ export interface TrendilBackgroundProps {
   cut?: number;
   /** Color de la tinta. Sobrescribe la variable CSS --trendil-color del contenedor */
   color?: string;
+  /** Color del globo ocular. Si se omite, usa un claro fijo independiente del tema */
+  eyeColor?: string;
   /** Clases extra para el contenedor */
   className?: string;
 }
@@ -83,14 +85,14 @@ const ccw = (ax: number, ay: number, bx: number, by: number, cx: number, cy: num
 const crossSeg = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number) =>
   ccw(ax, ay, cx, cy, dx, dy) !== ccw(bx, by, cx, cy, dx, dy) && ccw(ax, ay, bx, by, cx, cy) !== ccw(ax, ay, bx, by, dx, dy);
 const MAXSEG = 64;
-// Los ojos no siguen el tema: globo claro y pupila oscura en ambos.
-const EYE_GLOBE = "#f7f7f6";
+// La pupila no sigue el tema y el globo es claro por defecto (configurable con eyeColor).
+const EYE_GLOBE = "#dfdfb9";
 const EYE_PUPIL = "#141416";
 
 export default function TrendilBackground({
-  anchors = 60, inner = 6, sparsity = 0.8, span = 0.3, far = 0.3, thick = 25, thin = 1.5, wave = 0.05,
+  anchors = 60, inner = 6, sparsity = 0.8, span = 0.3, far = 0.3, thick = 25, thin = 1.5, wave = 0,
   speed = 1, sag = 0.05, drift = 30, radius = 200, pull = 0.8, stiffness = 0.06, damping = 0.9, kick = 0.05,
-  eyes = 3, eyeSphere = 3, alpha = 0.8, goo = true, blur = 3, contrast = 60, cut = 3, color, className,
+  eyes = 3, eyeSphere = 3, eyeColor = EYE_GLOBE, alpha = 1, goo = true, blur = 3, contrast = 60, cut = 3, color, className,
 }: TrendilBackgroundProps) {
   const strands = 0; // esta versión no tiene hilos largos extra
   const fid = "goo" + useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -100,6 +102,8 @@ export default function TrendilBackground({
   const wrapRef = useRef<HTMLDivElement>(null);
   const alphaRef = useRef(alpha);
   alphaRef.current = alpha; // la opacidad cambia sin regenerar la red
+  const eyeColorRef = useRef(eyeColor);
+  eyeColorRef.current = eyeColor; // el color del globo cambia sin regenerar la red
 
   useEffect(() => {
     const front = frontRef.current!;
@@ -255,8 +259,13 @@ export default function TrendilBackground({
       // Los nodos interiores siguen la fuerza media de los zarcillos que llegan a ellos (con muelle: vibran)
       for (let i = 0; i < G.bx.length; i++) {
         if (G.wall[i]) continue;
-        G.nodeX[i] = G.bx[i] + noise(i * 1.7, time * 0.00012 * speed) * drift;
-        G.nodeY[i] = G.by[i] + noise(i * 1.7 + 31.7, time * 0.00012 * speed) * drift;
+        const c = G.deg[i] || 1;
+        G.nvx[i] = (G.nvx[i] + (0.7 * (G.acx[i] / c) - G.nox[i]) * stiffness + G.akx[i] / c) * damping;
+        G.nvy[i] = (G.nvy[i] + (0.7 * (G.acy[i] / c) - G.noy[i]) * stiffness + G.aky[i] / c) * damping;
+        G.nox[i] += G.nvx[i];
+        G.noy[i] += G.nvy[i];
+        G.nodeX[i] = G.bx[i] + noise(i * 1.7, time * 0.00012 * speed) * drift + G.nox[i];
+        G.nodeY[i] = G.by[i] + noise(i * 1.7 + 31.7, time * 0.00012 * speed) * drift + G.noy[i];
       }
       for (const e of G.edges) {
         const x0 = G.nodeX[e.a], y0 = G.nodeY[e.a], x1 = G.nodeX[e.b], y1 = G.nodeY[e.b];
@@ -402,8 +411,8 @@ export default function TrendilBackground({
         look[2 * k + 1] += (ty - look[2 * k + 1]) * 0.12;
         cF!.beginPath(); cF!.arc(x, y, R, 0, Math.PI * 2); cF!.fill(); // respaldo si el navegador no soporta máscaras
         holes.push(`radial-gradient(circle ${(R + 1).toFixed(1)}px at ${x.toFixed(1)}px ${y.toFixed(1)}px,transparent ${R.toFixed(1)}px,#000 ${(R + 0.8).toFixed(1)}px)`);
-        // Globo siempre claro, con el borde y la pupila siempre oscuros
-        cE!.fillStyle = EYE_GLOBE;
+        // Globo claro por defecto (o el color elegido), con el borde y la pupila siempre oscuros
+        cE!.fillStyle = eyeColorRef.current || EYE_GLOBE;
         cE!.beginPath(); cE!.arc(x, y, R, 0, Math.PI * 2); cE!.fill();
         cE!.lineWidth = Math.max(1.5, R * 0.14);
         cE!.strokeStyle = EYE_PUPIL;

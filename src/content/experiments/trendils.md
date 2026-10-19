@@ -56,7 +56,7 @@ props:
   - name: "wave"
     label: "Onda"
     type: "number"
-    default: 0.05
+    default: 0
     min: 0
     max: 1
     step: 0.05
@@ -130,10 +130,15 @@ props:
     min: 1
     max: 4
     step: 0.1
+  - name: "eyeColor"
+    label: "Color del globo"
+    type: "color"
+    default: "#dfdfb9"
+    themed: false
   - name: "alpha"
     label: "Opacidad"
     type: "number"
-    default: 0.8
+    default: 1
     min: 0
     max: 1
     step: 0.02
