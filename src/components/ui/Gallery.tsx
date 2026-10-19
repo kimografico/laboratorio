@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import Stage from "./Stage";
 import Button from "./Button";
@@ -18,6 +18,119 @@ export interface ExperimentMeta {
 interface GalleryProps {
   experiments: ExperimentMeta[];
   basePath?: string;
+}
+
+const PREVIEW_SCALE = 0.5;
+const POINTER_EVENTS = [
+  "mousemove",
+  "pointermove",
+  "mousedown",
+  "pointerdown",
+  "touchmove",
+  "touchstart",
+] as const;
+
+function ScaledPreview({ children }: { children: ReactNode }) {
+  return (
+    <div
+      data-preview-scale
+      className="absolute left-0 top-0 h-[200%] w-[200%] origin-top-left"
+      style={{ transform: `scale(${PREVIEW_SCALE})` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+const remapCoord = (value: number, origin: number, scale: number) =>
+  origin + (value - origin) / scale;
+
+const insideRect = (x: number, y: number, rect: DOMRect) =>
+  x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
+function redispatchPreviewPointer(e: Event) {
+  const target = e.target instanceof Element ? e.target : null;
+  const preview = target?.closest("a")?.querySelector<HTMLElement>("[data-preview-scale]");
+  if (!preview) return;
+
+  const rect = preview.getBoundingClientRect();
+  const scale = preview.offsetWidth > 0 ? rect.width / preview.offsetWidth : PREVIEW_SCALE;
+  if (!scale || Math.abs(scale - 1) < 0.001) return;
+
+  let clone: Event | null = null;
+
+  if (typeof TouchEvent !== "undefined" && e instanceof TouchEvent) {
+    const point = e.touches[0] ?? e.changedTouches[0];
+    if (!point || typeof Touch === "undefined" || !insideRect(point.clientX, point.clientY, rect)) {
+      return;
+    }
+    const remapTouches = (touches: TouchList) =>
+      Array.from(touches).map(
+        (t) =>
+          new Touch({
+            identifier: t.identifier,
+            target: t.target,
+            clientX: remapCoord(t.clientX, rect.left, scale),
+            clientY: remapCoord(t.clientY, rect.top, scale),
+            screenX: t.screenX,
+            screenY: t.screenY,
+            pageX: t.pageX,
+            pageY: t.pageY,
+            radiusX: t.radiusX,
+            radiusY: t.radiusY,
+            rotationAngle: t.rotationAngle,
+            force: t.force,
+          })
+      );
+    try {
+      clone = new TouchEvent(e.type, {
+        touches: remapTouches(e.touches),
+        targetTouches: remapTouches(e.targetTouches),
+        changedTouches: remapTouches(e.changedTouches),
+        bubbles: true,
+        cancelable: e.cancelable,
+        view: window,
+      });
+    } catch {
+      return;
+    }
+  } else if (e instanceof MouseEvent) {
+    if (!insideRect(e.clientX, e.clientY, rect)) return;
+    const init: MouseEventInit = {
+      clientX: remapCoord(e.clientX, rect.left, scale),
+      clientY: remapCoord(e.clientY, rect.top, scale),
+      screenX: e.screenX,
+      screenY: e.screenY,
+      bubbles: true,
+      cancelable: e.cancelable,
+      view: window,
+      detail: e.detail,
+      button: e.button,
+      buttons: e.buttons,
+      ctrlKey: e.ctrlKey,
+      shiftKey: e.shiftKey,
+      altKey: e.altKey,
+      metaKey: e.metaKey,
+    };
+    clone =
+      typeof PointerEvent !== "undefined" && e instanceof PointerEvent
+        ? new PointerEvent(e.type, {
+            ...init,
+            pointerId: e.pointerId,
+            pointerType: e.pointerType,
+            isPrimary: e.isPrimary,
+            pressure: e.pressure,
+            width: e.width,
+            height: e.height,
+            tiltX: e.tiltX,
+            tiltY: e.tiltY,
+          })
+        : new MouseEvent(e.type, init);
+  }
+
+  if (!clone) return;
+  e.stopImmediatePropagation();
+  e.target?.dispatchEvent(clone);
 }
 
 function LazyPreview({
@@ -58,13 +171,15 @@ function LazyPreview({
   }, []);
 
   const isText = category === "texts";
-  const isBackground = category === "backgrounds";
+  const isBackground = category === "backgrounds" || componentId.endsWith("Background");
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden">
       {visible &&
         (isBackground ? (
-          <Stage componentId={componentId} values={values} themed={themed} />
+          <ScaledPreview>
+            <Stage componentId={componentId} values={values} themed={themed} />
+          </ScaledPreview>
         ) : (
           <div
             className={`absolute inset-0 flex items-center justify-center p-4 text-center ${
@@ -87,6 +202,24 @@ function LazyPreview({
 }
 
 export default function Gallery({ experiments, basePath = "/experiment" }: GalleryProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const onPointer = (e: Event) => {
+      if (e.isTrusted) redispatchPreviewPointer(e);
+    };
+    for (const type of POINTER_EVENTS) {
+      root.addEventListener(type, onPointer, { capture: true });
+    }
+    return () => {
+      for (const type of POINTER_EVENTS) {
+        root.removeEventListener(type, onPointer, { capture: true });
+      }
+    };
+  }, []);
+
   const categories = useMemo(() => {
     const set = new Set(experiments.map((e) => e.category));
     const rest = Array.from(set).filter((c) => c !== "pendiente");
@@ -118,7 +251,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
   );
 
   return (
-    <div className="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pb-24">
+    <div ref={rootRef} className="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pb-24">
       {hasFilter && (
         <div className="sticky top-0 z-20 -mx-5 mb-8 border-b border-line bg-surface/85 px-5 py-4 backdrop-blur">
           <div className="flex flex-wrap items-center gap-3">
