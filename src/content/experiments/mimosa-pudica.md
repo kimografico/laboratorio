@@ -1,7 +1,7 @@
 ---
 title: Mimosa Pudica
 description: Helechos sensitivos que se cierran al tacto y se reabren lentamente, inspirados en la Mimosa pudica.
-category: backgrounds
+category: naturaleza
 component: MimosaPudicaBackground
 props:
   - name: near

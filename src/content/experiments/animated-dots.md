@@ -1,7 +1,7 @@
 ---
 title: Animated Dots
 description: Rejilla de círculos que crecen bajo el puntero y revelan una imagen (o quedan en color sólido).
-category: backgrounds
+category: geometria
 component: AnimatedBackground
 props:
   - name: image

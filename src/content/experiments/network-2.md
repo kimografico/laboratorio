@@ -1,7 +1,7 @@
 ---
 title: Network II
 description: Red de puntos conectados con una capa extra de puntos sueltos que flotan sin conectarse y una rejilla espacial para más rendimiento.
-category: backgrounds
+category: geometria
 component: NetworkBackground2
 props:
   - name: density

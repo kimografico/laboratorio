@@ -1,7 +1,7 @@
 ---
 title: Terreno isométrico
 description: Relieve de columnas isométricas que ondula y se levanta bajo el puntero como una colina.
-category: backgrounds
+category: geometria
 component: IsoBackground
 props:
   - name: size

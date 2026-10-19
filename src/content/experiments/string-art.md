@@ -1,7 +1,7 @@
 ---
 title: Arte con hilos
 description: Miles de hilos tensados entre puntos circulares se entrecruzan y siguen al puntero.
-category: backgrounds
+category: geometria
 component: StringArtBackground
 props:
   - name: points

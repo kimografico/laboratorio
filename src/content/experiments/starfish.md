@@ -1,7 +1,7 @@
 ---
 title: Estrellas de mar
 description: Estrellas de mar enrolladas que se estiran y desenroscan hacia el puntero antes de relajarse.
-category: backgrounds
+category: naturaleza
 component: StarfishBackground
 props:
   - name: count

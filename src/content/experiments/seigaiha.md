@@ -1,7 +1,7 @@
 ---
 title: Seigaiha
 description: El patrón japonés de olas concéntricas que se hinchan al pasar el puntero.
-category: backgrounds
+category: geometria
 component: SeigaihaBackground
 props:
   - name: size

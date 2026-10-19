@@ -1,7 +1,7 @@
 ---
 title: Isolíneas 2
 description: "Curvas de nivel (marching squares) sobre un campo de ruido con una colina bajo el puntero."
-category: backgrounds
+category: geometria
 component: Contour2Background
 props:
   - name: cell

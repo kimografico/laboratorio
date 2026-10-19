@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import ExperimentPreview from "../../components/ui/ExperimentPreview";
 import Button from "../../components/ui/Button";
 import { withBase } from "../../lib/base";
+import { CATEGORY_LABELS } from "../../lib/categories";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -31,7 +32,7 @@ const next = hasSiblings ? siblings[(index + 1) % siblings.length] : undefined;
   <section class="mx-auto max-w-6xl 2xl:max-w-8xl px-5 pt-10 pb-16">
     <div class="mb-8 flex flex-col gap-4 border-b border-line pb-8">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs uppercase tracking-wide text-faint">{category}</span>
+        <span class="text-xs uppercase tracking-wide text-faint">{CATEGORY_LABELS[category]}</span>
         <span class="text-xs text-faint">/</span>
         <code class="text-xs text-faint">{component}</code>
       </div>

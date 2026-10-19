@@ -1,7 +1,7 @@
 ---
 title: "Montón de arena"
 description: "Montón de arena (modelo de ablación) con avalanchas bajo el puntero."
-category: backgrounds
+category: simulacion
 component: "SandpileBackground"
 props:
   - name: "cell"

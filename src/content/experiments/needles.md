@@ -1,7 +1,7 @@
 ---
 title: Needles
 description: Agujas que apuntan hacia el puntero y se alargan al acercarse, con giro suave.
-category: backgrounds
+category: geometria
 component: NeedleBackground
 props:
   - name: size

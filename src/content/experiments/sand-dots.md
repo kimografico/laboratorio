@@ -1,7 +1,7 @@
 ---
 title: Arena (puntos)
 description: Retícula de puntos de arena que el puntero barre con un rastrillo, con piedras que se cruzan y cicatrizan despacio.
-category: backgrounds
+category: simulacion
 component: SandDotsBackground
 props:
   - name: spacing

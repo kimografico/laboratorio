@@ -1,7 +1,7 @@
 ---
 title: Coral de Turing II
 description: Colonias de coral que crecen con una reacción-difusión de Gray-Scott y se abren a su paso por el puntero.
-category: backgrounds
+category: simulacion
 component: CoralBackground
 props:
   - name: res

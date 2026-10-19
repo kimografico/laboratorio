@@ -1,7 +1,7 @@
 ---
 title: Flow Field
 description: Cientos de partículas que siguen un campo de corrientes y dejan estela, repelidas por el puntero.
-category: backgrounds
+category: simulacion
 component: FlowBackground
 props:
   - name: count

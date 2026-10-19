@@ -1,7 +1,7 @@
 ---
 title: "Fog"
 description: "Vaho interactivo que se disipa con el puntero y deja gotas que resbalan."
-category: backgrounds
+category: simulacion
 component: FogBackground
 props:
   - name: cell

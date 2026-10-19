@@ -1,7 +1,7 @@
 ---
 title: Lily
 description: Nenúfares flotantes que se mecen con la corriente y reaccionan al puntero.
-category: backgrounds
+category: naturaleza
 component: LilyBackground
 props:
   - name: count

@@ -1,7 +1,7 @@
 ---
 title: Copos de nieve
 description: Cristales de hielo que crecen rama a rama, se sostienen, se desvanecen y vuelven a formarse.
-category: backgrounds
+category: naturaleza
 component: SnowflakeBackground
 props:
   - name: count

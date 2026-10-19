@@ -1,7 +1,7 @@
 ---
 title: "Teselado Penrose"
 description: "Teselado de Penrose (P3) con rombos que se encogen bajo el puntero y respiran con onda ambiental."
-category: backgrounds
+category: geometria
 component: "PenroseBackground"
 props:
   - name: "size"

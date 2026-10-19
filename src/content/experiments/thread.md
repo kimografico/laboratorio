@@ -1,7 +1,7 @@
 ---
 title: Hilos
 description: Hilos que persiguen al puntero con retardo, grosor decreciente y ondulación lateral.
-category: backgrounds
+category: simulacion
 component: ThreadBackground
 props:
   - name: threads

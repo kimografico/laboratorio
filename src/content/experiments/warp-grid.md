@@ -1,7 +1,7 @@
 ---
 title: Warp Grid
 description: Rejilla que se deforma como un ojo de pez alrededor del puntero que la sigue con suavizado.
-category: backgrounds
+category: geometria
 component: WarpGridBackground
 props:
   - name: size

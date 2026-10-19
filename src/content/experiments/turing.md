@@ -1,7 +1,7 @@
 ---
 title: Coral de Turing I
 description: Manchas que reaccionan a su vecindad según un modelo de reactividad-difusión y generan patrones vivos.
-category: backgrounds
+category: simulacion
 component: TuringBackground
 props:
   - name: cell

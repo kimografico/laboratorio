@@ -1,7 +1,7 @@
 ---
 title: Arena
 description: Líneas de arena onduladas que el puntero rastrera y que se curvan alrededor de piedras.
-category: backgrounds
+category: simulacion
 component: SandBackground
 props:
   - name: spacing

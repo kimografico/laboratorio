@@ -1,7 +1,7 @@
 ---
 title: Capas de olas
 description: Capas superpuestas de olas que se cruzan con oleaje lento y se hunden bajo el puntero.
-category: backgrounds
+category: naturaleza
 component: WaveLayersBackground
 props:
   - name: layers

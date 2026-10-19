@@ -1,7 +1,7 @@
 ---
 title: Cáusticas planas
 description: Teselas de Voronoi en tres tonos planos que se separan alrededor del puntero.
-category: backgrounds
+category: geometria
 component: FlatCausticsBackground
 props:
   - name: scale

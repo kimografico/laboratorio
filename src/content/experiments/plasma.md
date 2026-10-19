@@ -1,7 +1,7 @@
 ---
 title: Plasma
 description: Rayos eléctricos que salen del puntero, zigzaguean y parpadean hacia el borde.
-category: backgrounds
+category: simulacion
 component: PlasmaBackground
 props:
   - name: lines

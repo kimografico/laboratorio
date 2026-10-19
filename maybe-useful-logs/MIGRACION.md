@@ -282,3 +282,13 @@ No fue necesario añadir reglas numeradas nuevas a la tabla de la sección 3. La
 1. Que en tema claro se vea idéntico a antes (el color del default antiguo aplicado por la página).
 2. Que en tema oscuro sea legible y sutil (opacidades 1.2-1.6).
 3. Especialmente `Coral`, `Julia`, `LavaLamp`, `Physarum`, `Turing`, `Fog` (máscara de alfa + `source-in`) y `Flow` / `Ridge` (destination-out), que son los que más tocan el pipeline de dibujo.
+
+---
+
+## Nota posterior: cambio de categorías
+
+Este documento es histórico. La categoría `backgrounds` se eliminó: los fondos
+se reparten ahora entre `geometria`, `naturaleza` y `simulacion`, y los textos
+mantienen `texts`. Las referencias a `backgrounds` de este texto describen el
+estado de la época, no la convención actual. La fuente de verdad es
+`src/lib/categories.ts` (`EXPERIMENT_CATEGORIES`).

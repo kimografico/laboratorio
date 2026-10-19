@@ -1,7 +1,7 @@
 ---
 title: "Pradera"
 description: "Pradera de hierba al viento con plantas que brotan al pasar el puntero."
-category: backgrounds
+category: naturaleza
 component: "MeadowBackground"
 props:
   - name: "spacing"

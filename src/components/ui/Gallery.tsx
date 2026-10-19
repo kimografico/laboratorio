@@ -5,12 +5,17 @@ import Button from "./Button";
 import { defaultsFromProps, type PropDef } from "../../lib/props";
 import { applySharedText, useSharedText } from "../../lib/text";
 import { withBase } from "../../lib/base";
+import {
+  EXPERIMENT_CATEGORIES,
+  categoryLabel,
+  isBackgroundCategory,
+} from "../../lib/categories";
 
 export interface ExperimentMeta {
   id: string;
   title: string;
   description: string;
-  category: "backgrounds" | "texts" | string;
+  category: string;
   component: string;
   props: PropDef[];
 }
@@ -171,7 +176,7 @@ function LazyPreview({
   }, []);
 
   const isText = category === "texts";
-  const isBackground = category === "backgrounds" || componentId.endsWith("Background");
+  const isBackground = isBackgroundCategory(category) || componentId.endsWith("Background");
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden">
@@ -221,9 +226,12 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
   }, []);
 
   const categories = useMemo(() => {
-    const set = new Set(experiments.map((e) => e.category));
-    const rest = Array.from(set).filter((c) => c !== "pendiente");
-    return [...(set.has("pendiente") ? ["pendiente"] : []), ...rest];
+    const present = new Set(experiments.map((e) => e.category));
+    const known = EXPERIMENT_CATEGORIES.filter((c) => present.has(c));
+    const unknown = Array.from(present).filter(
+      (c) => !(EXPERIMENT_CATEGORIES as readonly string[]).includes(c)
+    );
+    return [...known, ...unknown];
   }, [experiments]);
 
   const defaultCategory = categories.includes("pendiente") ? "pendiente" : null;
@@ -262,10 +270,9 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
                 <Button
                   key={c}
                   variant={active ? "solid" : "outline"}
-                  label={c === "pendiente" ? "Pendientes" : c}
+                  label={categoryLabel(c)}
                   badge={counts[c] ?? 0}
                   onClick={() => setCategory(active ? null : c)}
-                  className="capitalize"
                 />
               );
             })}
@@ -287,7 +294,7 @@ export default function Gallery({ experiments, basePath = "/experiment" }: Galle
                 <LazyPreview componentId={exp.component} props={exp.props} category={exp.category} />
                 {hasFilter && (
                   <span className="absolute right-3 top-3 z-10 rounded-full bg-surface/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted backdrop-blur">
-                    {exp.category}
+                    {categoryLabel(exp.category)}
                   </span>
                 )}
               </div>

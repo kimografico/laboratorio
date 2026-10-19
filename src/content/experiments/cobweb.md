@@ -1,7 +1,7 @@
 ---
 title: "Telaraña"
 description: "Telaraña que se teje desde una esquina con hilos vibrantes, gotas de rocío y reacción al puntero."
-category: backgrounds
+category: naturaleza
 component: "CobwebBackground"
 props:
   - name: "corner"

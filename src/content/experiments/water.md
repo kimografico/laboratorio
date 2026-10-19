@@ -1,7 +1,7 @@
 ---
 title: Agua
 description: Red de canales que ondula, se ensancha con las olas y reacciona a la estela del puntero.
-category: backgrounds
+category: naturaleza
 component: WaterBackground
 props:
   - name: scale

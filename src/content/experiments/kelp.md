@@ -1,7 +1,7 @@
 ---
 title: Bosque de algas
 description: Algas que se mecen con la corriente y se apartan suavemente al paso del puntero.
-category: backgrounds
+category: naturaleza
 component: KelpBackground
 props:
   - name: near

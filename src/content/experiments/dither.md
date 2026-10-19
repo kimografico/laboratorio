@@ -1,7 +1,7 @@
 ---
 title: Tramado
 description: Retícula de píxeles tramados con una matriz de Bayer que se enciende alrededor del puntero.
-category: backgrounds
+category: geometria
 component: DitherBackground
 props:
   - name: cell

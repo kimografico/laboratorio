@@ -1,7 +1,7 @@
 ---
 title: Cuerdas
 description: Cuerdas horizontales que el puntero pulsa y que vibran con ondas amortiguadas hasta quietarse.
-category: backgrounds
+category: geometria
 component: StringsBackground
 props:
   - name: strings

@@ -1,7 +1,7 @@
 ---
 title: "Jardín de anguilas"
 description: "Anguilas de jardín que se esconden en sus madrigueras al acercar el ratón y vuelven a salir con suavidad. Dos planos de profundidad: cercanas (con ojo y contorno) y lejanas (silueta)."
-category: backgrounds
+category: naturaleza
 component: "GardenEelBackground"
 props:
   - name: "near"

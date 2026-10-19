@@ -1,7 +1,7 @@
 ---
 title: Fuegos artificiales
 description: Cohetes que ascienden y estallan en lluvias de chispas con gravedad, estela y modo arcoíris.
-category: backgrounds
+category: simulacion
 component: FireworksBackground
 props:
   - name: rate

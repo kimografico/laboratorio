@@ -1,7 +1,7 @@
 ---
 title: Circuito
 description: Pistas de circuito impreso que avanzan por una cuadrícula y nacen bajo el puntero.
-category: backgrounds
+category: geometria
 component: CircuitBackground
 props:
   - name: grid

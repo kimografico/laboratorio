@@ -1,7 +1,7 @@
 ---
 title: Dot Spring
 description: "Malla de puntos con muelles: el puntero los repele y vuelven a su sitio con rebote."
-category: backgrounds
+category: geometria
 component: DotBackground
 props:
   - name: size

@@ -200,7 +200,7 @@ En la galería, los experimentos de fondo se renderizan dentro de un card con `b
 <canvas ref={canvasRef} style={{ backgroundColor: "var(--panel)" }} />
 ```
 
-Esto garantiza que el experimento se vea igual en la galería, en la página de detalle y en fullscreen, independientemente de la categoría del frontmatter (`pendiente`, `backgrounds`, etc.).
+Esto garantiza que el experimento se vea igual en la galería, en la página de detalle y en fullscreen, independientemente de la categoría del frontmatter (`pendiente`, `geometria`, `naturaleza`, `simulacion`, etc.).
 
 Referencia: `src/components/backgrounds/TruchetBackground.tsx` (línea 165) y otros backgrounds corregidos.
 
@@ -295,8 +295,8 @@ Contratos que siguen siendo tuyos:
 - Respeta el contrato de colores y temas descrito arriba.
 - Incluye una sección `## Uso` breve y un ejemplo TSX representativo (pásalo como `usage`).
 - **Categoría:** todo experimento entra siempre con `category: pendiente` (el
-  script lo hace por ti). No la reclasifiques a `backgrounds`/`texts`; es
-  revisión manual posterior.
+  script lo hace por ti). No la reclasifiques a las categorías temáticas ni a
+  `texts`; es revisión manual posterior.
 - En YAML, entrecomilla los escalares que contengan `: ` y conserva los acentos (UTF-8).
 - No sobrescribas páginas existentes sin autorización: si el `.md` ya existe, el
   script lo omite y decides tú.

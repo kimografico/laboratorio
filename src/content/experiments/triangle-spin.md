@@ -1,7 +1,7 @@
 ---
 title: Triangle Spin
 description: Rejilla de triángulos donde cada uno elige un giro aleatorio al entrar en la zona del puntero.
-category: backgrounds
+category: geometria
 component: TriangleBackground2
 props:
   - name: size

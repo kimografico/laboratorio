@@ -1,7 +1,7 @@
 ---
 title: Dandelion
 description: Semillas de diente de león que flotan con el viento y se apartan al pasar el puntero.
-category: backgrounds
+category: naturaleza
 component: DandelionBackground
 props:
   - name: near

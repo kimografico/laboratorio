@@ -3,7 +3,7 @@ name: change-experiment-category
 description: >-
   Use when the user asks to change or reclassify experiment categories, e.g.
   "añade a la categoría pendiente", "pasa esto a pendientes", "mueve X a
-  backgrounds/texts", usually with a list of names/titles. Edits the
+  naturaleza/geometría/simulación", usually with a list of names/titles. Edits the
   `category:` frontmatter of `src/content/experiments/*.md`, mapping loose
   names to slugs, and verifies. Do not use for UI pieces or for creating
   experiments.
@@ -14,7 +14,7 @@ description: >-
 ## Cuándo se activa
 
 - El usuario da una lista de nombres y dice "añádelos a la categoría
-  'pendientes'", "mueve estos a backgrounds", "pásalos a texts", etc.
+  'pendientes'", "mueve estos a naturaleza", "pásalos a texts", etc.
 - Pide reclasificar uno o varios experimentos.
 
 No es para crear experimentos nuevos (eso lo hacen el agente
@@ -164,9 +164,9 @@ Las ediciones son independientes: lanza todas en un mismo mensaje (varios
 
 2. `npm run check` (valida que el valor destino está en el enum)
 3. `npm run build`
-4. Filtro renderizado en la galería (el valor aparece en minúsculas, la
-   `capitalize` del botón lo muestra capitalizado). Sustituye `<categoria>` por
-   el valor destino:
+4. Filtro renderizado en la galería (la etiqueta visible sale de
+   `CATEGORY_LABELS`, en `src/lib/categories.ts`). Sustituye `<categoria>` por
+   la etiqueta visible:
 
    ```powershell
    $html = Get-Content -Raw dist-site/index.html
@@ -176,10 +176,11 @@ Las ediciones son independientes: lanza todas en un mismo mensaje (varios
 ## Notas
 
 - La galería (`Gallery.tsx`) deriva los filtros de las categorías presentes y
-  los muestra con `capitalize` (`pendiente` → "Pendiente"). El valor es singular.
-- `LazyPreview` trata `backgrounds` y `texts` de forma especial; `pendiente`
-  cae en la rama genérica y **igual muestra preview**, así que reclasificar no
-  deja tarjetas vacías.
+  los etiqueta con `CATEGORY_LABELS` (`src/lib/categories.ts`). El valor es singular.
+- `LazyPreview` y `ExperimentPreview` tratan `texts` de forma especial y
+  `isBackgroundCategory` (geometría, naturaleza, simulación) como fondos;
+  `pendiente` cae en la rama genérica y **igual muestra preview**, así que
+  reclasificar no deja tarjetas vacías.
 - No toques `flip-text` (es `texts`) ni otras categorías fuera de la lista.
 
 ## Cierre

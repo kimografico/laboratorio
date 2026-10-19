@@ -1,7 +1,7 @@
 ---
 title: "Grietas"
 description: "Impactos que generan redes de grietas radiales con ramificación, anillos y facetas, como un cristal astillado. Al hacer clic se crea un impacto en el cursor."
-category: backgrounds
+category: simulacion
 component: "CrackBackground"
 props:
   - name: "interval"

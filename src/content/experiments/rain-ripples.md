@@ -1,7 +1,7 @@
 ---
 title: Lluvia y ondas
 description: Gotas que caen con estela y generan ondas elípticas aplanadas al impactar.
-category: backgrounds
+category: naturaleza
 component: RainRipplesBackground
 props:
   - name: rain

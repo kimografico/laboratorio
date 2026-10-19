@@ -1,7 +1,7 @@
 ---
 title: "Arboleda Fibonacci"
 description: "Bosque de árboles que crecen siguiendo la sucesión de Fibonacci; reaccionan al puntero y se plantan con clic."
-category: backgrounds
+category: naturaleza
 component: "FibonacciGroveBackground"
 props:
   - name: "max"

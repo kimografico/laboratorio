@@ -1,7 +1,7 @@
 ---
 title: Galaxia
 description: Espiral de estrellas giratoria con brazos definidos, dispersión y parpadeo individual.
-category: backgrounds
+category: naturaleza
 component: GalaxyBackground
 props:
   - name: arms

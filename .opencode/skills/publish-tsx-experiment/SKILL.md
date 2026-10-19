@@ -20,7 +20,7 @@ adaptación de compatibilidad y decisiones de conflicto) vive en el agente
 Todo experimento nuevo que se añada en `src/content/experiments/` (fondo, texto
 o cualquier otro) entra **siempre** con `category: pendiente`, sin importar su
 técnica de renderizado. `pendiente` es la categoría de entrada y revisión: la
-reclasificación a `backgrounds`/`texts` la hace una persona después (con el
+reclasificación a `geometria`/`naturaleza`/`simulacion`/`texts` la hace una persona después (con el
 skill `change-experiment-category`). El valor debe existir en el enum de
 `src/content.config.ts`.
 

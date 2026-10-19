@@ -1,7 +1,7 @@
 ---
 title: "Lava Lamp"
 description: "Burbujas de cera que suben y bajan con interacción del puntero"
-category: backgrounds
+category: simulacion
 component: LavaLampBackground
 props:
   - name: count

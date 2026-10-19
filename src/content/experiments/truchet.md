@@ -1,7 +1,7 @@
 ---
 title: Azulejos Truchet
 description: Azulejos con arcos que el puntero gira permanentemente (90°) formando laberintos serpenteantes. El slider controla el radio de acción.
-category: backgrounds
+category: geometria
 component: TruchetBackground
 props:
   - name: size

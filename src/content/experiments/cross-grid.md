@@ -1,7 +1,7 @@
 ---
 title: Cross Grid
 description: Rejilla de cruces que se alargan y giran hacia el puntero, convirtiendo la "+" en "×".
-category: backgrounds
+category: geometria
 component: CrossBackground
 props:
   - name: size

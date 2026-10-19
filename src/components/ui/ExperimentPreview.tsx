@@ -5,6 +5,7 @@ import Button from "./Button";
 import { defaultsFromProps, type PropDef, type PropValues } from "../../lib/props";
 import { applySharedText, resolveSharedText, setSharedText } from "../../lib/text";
 import { withBase } from "../../lib/base";
+import { isBackgroundCategory } from "../../lib/categories";
 
 interface ExperimentPreviewProps {
   componentId: string;
@@ -29,7 +30,7 @@ function formatValue(v: unknown): string {
 
 function importPath(category: string, componentId: string): string {
   if (category === "texts") return `@/components/texts/${componentId}`;
-  if (category === "backgrounds") return `@/components/backgrounds/${componentId}`;
+  if (isBackgroundCategory(category)) return `@/components/backgrounds/${componentId}`;
   return `@/components/ui/${componentId}`;
 }
 
@@ -73,7 +74,7 @@ export default function ExperimentPreview({
   const [copied, setCopied] = useState(false);
 
   const isText = category === "texts";
-  const isBackground = category === "backgrounds";
+  const isBackground = isBackgroundCategory(category);
   const snippet = useMemo(
     () => buildSnippet(componentId, propDefs, values, category),
     [componentId, propDefs, values, category]

@@ -1,7 +1,7 @@
 ---
 title: Burbujas
 description: Burbujas que ascienden con vaivén, se apartan del puntero y reventón al tocarlas.
-category: backgrounds
+category: naturaleza
 component: BubbleBackground
 props:
   - name: count

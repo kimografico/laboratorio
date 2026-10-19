@@ -1,7 +1,7 @@
 ---
 title: Estanque de carpas
 description: Carpas koi que nadan en profundidad y sienten curiosidad por el puntero, al que rodean sin tocarlo.
-category: backgrounds
+category: naturaleza
 component: KoiBackground
 props:
   - name: near

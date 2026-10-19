@@ -1,7 +1,7 @@
 ---
 title: Manta Ray
 description: Mantas que nadan de izquierda a derecha, con profundidad, aleteo y esquiva del puntero.
-category: backgrounds
+category: naturaleza
 component: MantaBackground
 props:
   - name: count

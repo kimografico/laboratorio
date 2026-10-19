@@ -1,7 +1,7 @@
 ---
 title: Voronoi
 description: Celdas de Voronoi vivas cuyas semillas derivan y se apartan del puntero.
-category: backgrounds
+category: geometria
 component: VoronoiBackground
 props:
   - name: density

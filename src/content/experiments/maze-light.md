@@ -1,7 +1,7 @@
 ---
 title: "Laberinto con Luz"
 description: "Laberinto perfecto con iluminación por raycasting DDA desde el puntero; la luz choca contra muros y se corta en esquinas."
-category: backgrounds
+category: geometria
 component: "MazeLightBackground"
 props:
   - name: "cell"

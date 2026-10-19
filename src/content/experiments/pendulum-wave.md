@@ -1,7 +1,7 @@
 ---
 title: Onda de péndulos
 description: Filas de puntos que oscilan con frecuencias distintas y forman ondas que viajan hasta realinearse.
-category: backgrounds
+category: simulacion
 component: PendulumWaveBackground
 props:
   - name: count

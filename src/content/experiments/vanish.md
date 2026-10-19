@@ -1,7 +1,7 @@
 ---
 title: Fuga de estrellas
 description: Un enjambre de estrellas huye del foco central y deja estelas que se estiran al alejarse.
-category: backgrounds
+category: simulacion
 component: VanishBackground
 props:
   - name: count

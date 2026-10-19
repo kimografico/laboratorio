@@ -1,7 +1,7 @@
 ---
 title: Caleidoscopio
 description: Trazos simétricos que se replican en cuñas giratorias alrededor del centro formando un caleidoscopio.
-category: backgrounds
+category: geometria
 component: KaleidoscopeBackground
 props:
   - name: slices

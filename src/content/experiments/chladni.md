@@ -1,7 +1,7 @@
 ---
 title: Chladni
 description: Arena que se asienta en las líneas nodales de una placa de Chladni animada, guiada por el puntero.
-category: backgrounds
+category: simulacion
 component: ChladniBackground
 props:
   - name: density

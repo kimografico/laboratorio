@@ -1,7 +1,7 @@
 ---
 title: "Reticula hexagonal"
 description: "Rejilla hexagonal solo linea sin relleno, con efecto hover que aumenta opacidad y grosor."
-category: backgrounds
+category: geometria
 component: "HexGridBackground"
 props:
   - name: "size"

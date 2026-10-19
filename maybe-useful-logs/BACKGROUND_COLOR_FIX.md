@@ -46,3 +46,13 @@ Al usar `var(--panel)` en el canvas, este hereda el color del card independiente
 - `npm run check` → 0 errores
 - `npm run build` → build exitoso
 - Los 6 experimentos ahora muestran el mismo fondo que el resto de cards en la galería
+
+---
+
+## Nota posterior: cambio de categorías
+
+Este documento es histórico. La categoría `backgrounds` se eliminó: los fondos
+se reparten ahora entre `geometria`, `naturaleza` y `simulacion`, y los textos
+mantienen `texts`. Las referencias a `backgrounds` de este texto describen el
+estado de la época, no la convención actual. La fuente de verdad es
+`src/lib/categories.ts` (`EXPERIMENT_CATEGORIES`).

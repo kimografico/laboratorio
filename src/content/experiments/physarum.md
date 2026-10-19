@@ -1,7 +1,7 @@
 ---
 title: Physarum
 description: Red de venas de moho polimorfo que crece sobre el fondo y converge hacia el alimento del puntero.
-category: backgrounds
+category: simulacion
 component: PhysarumBackground
 props:
   - name: density

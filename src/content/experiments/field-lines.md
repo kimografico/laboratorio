@@ -1,7 +1,7 @@
 ---
 title: Líneas de campo
 description: Líneas de campo eléctrico que salen del puntero y son atraídas por polos opuestos en órbita lenta.
-category: backgrounds
+category: simulacion
 component: FieldLinesBackground
 props:
   - name: lines

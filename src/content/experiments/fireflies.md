@@ -1,7 +1,7 @@
 ---
 title: Luciérnagas
 description: Enjambre de luciérnagas que destellan sincronizadas según el modelo de Kuramoto y reaccionan al puntero.
-category: backgrounds
+category: naturaleza
 component: FirefliesBackground
 props:
   - name: count

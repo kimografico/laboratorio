@@ -1,7 +1,7 @@
 ---
 title: Ballenas
 description: Ballenas que nadan lentas en dos planos de profundidad, se esquivan entre ellas y emergen a respirar.
-category: backgrounds
+category: naturaleza
 component: WhaleBackground
 props:
   - name: near

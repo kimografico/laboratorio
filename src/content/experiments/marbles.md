@@ -1,7 +1,7 @@
 ---
 title: Canicas
 description: Canicas que caen, chocan entre sí y rebotan contra las paredes, y huyen del puntero.
-category: backgrounds
+category: simulacion
 component: MarblesBackground
 props:
   - name: count

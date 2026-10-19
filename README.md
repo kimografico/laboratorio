@@ -10,7 +10,7 @@ incrustar en **Astro**, **Next.js** o **Vite**.
 
 Todos se importan por **subruta** (un archivo por componente), así que solo traes lo que usas.
 
-- **`backgrounds/…`** — 75 fondos de canvas (`AuroraBackground`, `LavaLampBackground`,
+- **`backgrounds/…`** — fondos de canvas (`AuroraBackground`, `LavaLampBackground`,
   `MatrixBackground`, `PlanktonBackground`, …). Cada uno exporta además su tipo
   `*BackgroundProps`. El listado completo vive en el showcase del repositorio.
 - **`texts/…`** — 11 efectos de texto, render puro con CSS (sin hidratación): `FlipText`,

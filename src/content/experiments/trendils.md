@@ -1,7 +1,7 @@
 ---
 title: "Trendils"
 description: "Red de zarcillos con física de muelles y filtro goo; en esta versión los nudos son círculos y los mayores llevan esferas con ojos que siguen al puntero."
-category: pendiente
+category: simulacion
 component: "TrendilBackground"
 props:
   - name: "anchors"

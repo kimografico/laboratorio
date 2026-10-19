@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { EXPERIMENT_CATEGORIES } from "./lib/categories";
 
 const propSchema = z.object({
   name: z.string(),
@@ -20,7 +21,7 @@ const experiments = defineCollection({
     title: z.string(),
     description: z.string(),
     // Categoría de entrada: todo experimento nuevo entra como "pendiente" y se revisa después.
-    category: z.enum(["backgrounds", "texts", "pendiente"]),
+    category: z.enum(EXPERIMENT_CATEGORIES),
     component: z.string(),
     props: z.array(propSchema).default([]),
   }),
