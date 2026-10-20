@@ -9,6 +9,7 @@ import BlobBackground from "../components/backgrounds/BlobBackground";
 import BrushBackground from "../components/backgrounds/BrushBackground";
 import BubbleBackground from "../components/backgrounds/BubbleBackground";
 import CardioideDeCuerdasBackground from "../components/backgrounds/CardioideDeCuerdasBackground";
+import CatEyesBackground from "../components/backgrounds/CatEyesBackground";
 import CerraduraDeArcosBackground from "../components/backgrounds/CerraduraDeArcosBackground";
 import ChevronesBackground from "../components/backgrounds/ChevronesBackground";
 import ChladniBackground from "../components/backgrounds/ChladniBackground";
@@ -136,6 +137,7 @@ export const registry: Record<string, ComponentType<any>> = {
   BrushBackground,
   BubbleBackground,
   CardioideDeCuerdasBackground,
+  CatEyesBackground,
   CerraduraDeArcosBackground,
   ChevronesBackground,
   ChladniBackground,
@@ -255,5 +257,6 @@ export const registry: Record<string, ComponentType<any>> = {
 export function getComponent(id: string): ComponentType<any> | undefined {
   return registry[id];
 }
+
 
 

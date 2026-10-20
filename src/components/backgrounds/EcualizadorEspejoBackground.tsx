@@ -20,12 +20,12 @@ export interface EcualizadorEspejoBackgroundProps {
 }
 
 const DEFAULTS = {
-  gap: 12,
-  ratio: 0.35,
+  gap: 21,
+  ratio: 0.25,
   amp: 0.5,
-  speed: 1,
-  bump: 0.8,
-  alpha: 0.45,
+  speed: 1.75,
+  bump: 1.25,
+  alpha: 0.25,
 };
 
 type Params = typeof DEFAULTS;

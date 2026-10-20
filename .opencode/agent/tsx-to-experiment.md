@@ -94,7 +94,7 @@ Antes de crear, editar, mover o borrar archivos:
 Para cada candidato, registra internamente:
 
 - Ruta de origen y nombre del componente exportado.
-- Categoría probable: `background`, `texts` o `ui` (solo para elegir la carpeta de destino; en el frontmatter del experimento la categoría siempre es `pendiente`, ver más abajo).
+- Categoría probable: `background`, `texts` o `ui` (solo para elegir la carpeta de destino; en el frontmatter del experimento el scaffold escribe `pendiente` y la categoría temática se decide al publicar, ver más abajo).
 - Props, tipos y valores por defecto.
 - Técnica de renderizado: canvas, DOM, SVG, WebGL u otra.
 - Animaciones, interacciones, listeners, timers y observers.
@@ -200,7 +200,7 @@ En la galería, los experimentos de fondo se renderizan dentro de un card con `b
 <canvas ref={canvasRef} style={{ backgroundColor: "var(--panel)" }} />
 ```
 
-Esto garantiza que el experimento se vea igual en la galería, en la página de detalle y en fullscreen, independientemente de la categoría del frontmatter (`pendiente`, `geometria`, `naturaleza`, `simulacion`, etc.).
+Esto garantiza que el experimento se vea igual en la galería, en la página de detalle y en fullscreen, independientemente de la categoría del frontmatter (`pendiente`, `geometria`, `matematica`, `naturaleza`, `simulacion`, etc.).
 
 Referencia: `src/components/backgrounds/TruchetBackground.tsx` (línea 165) y otros backgrounds corregidos.
 
@@ -294,9 +294,12 @@ Contratos que siguen siendo tuyos:
 - No inventes props, opciones ni valores; no expongas detalles internos.
 - Respeta el contrato de colores y temas descrito arriba.
 - Incluye una sección `## Uso` breve y un ejemplo TSX representativo (pásalo como `usage`).
-- **Categoría:** todo experimento entra siempre con `category: pendiente` (el
-  script lo hace por ti). No la reclasifiques a las categorías temáticas ni a
-  `texts`; es revisión manual posterior.
+- **Categoría:** el scaffold escribe `category: pendiente`. Al cerrar, si el
+  usuario pidió publicar o clasificar, aplica el modo publicación de
+  `change-experiment-category` y asigna `geometria`, `matematica`, `naturaleza`,
+  `simulacion` o `texts` según la guía de decisión. Si no se pidió o hay un
+  empate real, deja `pendiente` y pregúntalo; no reclasifiques por tu cuenta
+  cuando no haya petición.
 - En YAML, entrecomilla los escalares que contengan `: ` y conserva los acentos (UTF-8).
 - No sobrescribas páginas existentes sin autorización: si el `.md` ya existe, el
   script lo omite y decides tú.

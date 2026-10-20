@@ -1,7 +1,7 @@
 ---
 title: "Chevrones"
 description: "Filas de chevrones en zigzag que ondulan y se abren bajo el puntero."
-category: pendiente
+category: geometria
 component: "ChevronesBackground"
 props:
   - name: "row"
@@ -14,7 +14,7 @@ props:
   - name: "wl"
     label: "Ancho pico (px)"
     type: "number"
-    default: 44
+    default: 50
     min: 16
     max: 100
     step: 1
@@ -28,14 +28,14 @@ props:
   - name: "mouse"
     label: "Efecto puntero"
     type: "number"
-    default: 1.2
+    default: 1.5
     min: 0
     max: 3
     step: 0.1
   - name: "reach"
     label: "Alcance (px)"
     type: "number"
-    default: 180
+    default: 250
     min: 50
     max: 400
     step: 5

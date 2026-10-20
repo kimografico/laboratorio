@@ -7,28 +7,28 @@ props:
   - name: "rows"
     label: "Trazas"
     type: "number"
-    default: 7
+    default: 6
     min: 2
     max: 14
     step: 1
   - name: "speed"
     label: "Velocidad"
     type: "number"
-    default: 1
+    default: 0.5
     min: 0.2
     max: 3
     step: 0.05
   - name: "amp"
     label: "Amplitud"
     type: "number"
-    default: 0.7
+    default: 1
     min: 0.1
     max: 1.5
     step: 0.05
   - name: "boost"
     label: "Efecto puntero"
     type: "number"
-    default: 1.2
+    default: 1.5
     min: 0
     max: 3
     step: 0.1

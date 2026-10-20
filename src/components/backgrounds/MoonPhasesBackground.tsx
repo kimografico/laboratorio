@@ -22,11 +22,11 @@ export interface MoonPhasesBackgroundProps {
 const NP = 48;
 
 export default function MoonPhasesBackground({
-  size = 52,
+  size = 40,
   speed = 1,
   spread = 1,
-  radius = 170,
-  decay = 0.97,
+  radius = 300,
+  decay = 0.95,
   alpha = 0.3,
   color,
   className,

@@ -1,13 +1,13 @@
 ---
 title: "Interferencia de puntos"
 description: "Patrón de puntos regido por la interferencia de tres focos, uno de ellos el puntero."
-category: pendiente
+category: geometria
 component: "InterferenciaDePuntosBackground"
 props:
   - name: "step"
     label: "Paso (px)"
     type: "number"
-    default: 14
+    default: 12
     min: 8
     max: 28
     step: 1
@@ -21,14 +21,21 @@ props:
   - name: "speed"
     label: "Velocidad"
     type: "number"
-    default: 1
+    default: 1.9
     min: 0
     max: 3
     step: 0.05
+  - name: "ease"
+    label: "Easing"
+    type: "number"
+    default: 0.04
+    min: 0.01
+    max: 1
+    step: 0.01
   - name: "size"
     label: "Tamaño"
     type: "number"
-    default: 1
+    default: 1.05
     min: 0.3
     max: 1.5
     step: 0.05

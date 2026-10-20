@@ -1,7 +1,7 @@
 ---
 title: "Árbol de Pitágoras"
 description: "Fractal de cuadrados y triángulos que crece desde la base y se mece con el viento y el puntero."
-category: pendiente
+category: matematica
 component: "ArbolDePitagorasBackground"
 props:
   - name: "depth"

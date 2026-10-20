@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 export interface EngranajesBackgroundProps {
   /** Tamaño (px) (40 a 140) */
   step?: number;
+  /** Separación entre engranajes (px) (0 a 60) */
+  sep?: number;
   /** Dientes (6 a 24) */
   teeth?: number;
   /** Velocidad (0 a 3) */
@@ -20,11 +22,12 @@ export interface EngranajesBackgroundProps {
 }
 
 const DEFAULTS = {
-  step: 76,
-  teeth: 12,
+  step: 44,
+  sep: 0,
+  teeth: 8,
   speed: 1,
-  ctrl: 1.2,
-  lw: 1.1,
+  ctrl: 1.5,
+  lw: 0.7,
   alpha: 0.5,
 };
 
@@ -33,9 +36,9 @@ type Pointer = { x: number; y: number; sx: number; sy: number; on: boolean };
 
 function init(W: number, H: number, P: Params, S: any) {}
 
-function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const s=P.step,N=P.teeth,r0=s/2,ro=r0*1.1,ri=r0*.86,ta=6.2832/N;S.a=(S.a||0)+dt*.001*P.speed*(1+(m.sx/W-.5)*2*P.ctrl);
+function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const s=P.step,sp=s+P.sep,N=P.teeth,r0=s/2,ro=r0*1.1,ri=r0*.86,ta=6.2832/N;S.a=(S.a||0)+dt*.001*P.speed*(1+(m.sx/W-.5)*2*P.ctrl);
 c.strokeStyle=ink;c.lineWidth=P.lw;c.lineJoin='round';c.globalAlpha=P.alpha;c.beginPath();
-for(let j=0;j*s<H+s;j++)for(let i=0;i*s<W+s;i++){const x=(i+.5)*s,y=(j+.5)*s,od=(i+j)&1,rot=(od?-1:1)*S.a+(od?Math.PI/N:0);
+for(let j=0;j*sp<H+s;j++)for(let i=0;i*sp<W+s;i++){const x=(i+.5)*sp,y=(j+.5)*sp,od=(i+j)&1,rot=(od?-1:1)*S.a+(od?Math.PI/N:0);
 for(let k=0;k<N;k++){const b=rot+k*ta;for(const q of [[0,ri],[.15,ro],[.5,ro],[.65,ri]]){const a=b+q[0]*ta,px=x+q[1]*Math.cos(a),py=y+q[1]*Math.sin(a);k||q[0]?c.lineTo(px,py):c.moveTo(px,py)}}
 c.closePath();c.moveTo(x+r0*.2,y);c.arc(x,y,r0*.2,0,6.2832)}c.stroke()}
 

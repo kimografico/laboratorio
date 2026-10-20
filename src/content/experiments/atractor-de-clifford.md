@@ -1,7 +1,7 @@
 ---
 title: "Atractor de Clifford"
 description: "Atractor extraño de Clifford dibujado punto a punto, con deriva temporal y parámetros que responden al puntero."
-category: pendiente
+category: matematica
 component: "AtractorDeCliffordBackground"
 props:
   - name: "a"
@@ -35,14 +35,14 @@ props:
   - name: "mouse"
     label: "Efecto puntero"
     type: "number"
-    default: 0.75
+    default: 0.9
     min: 0
     max: 1
     step: 0.01
   - name: "drift"
     label: "Deriva"
     type: "number"
-    default: 2
+    default: 0.05
     min: 0
     max: 2
     step: 0.05
@@ -53,6 +53,13 @@ props:
     min: 2000
     max: 40000
     step: 500
+  - name: "zoom"
+    label: "Zoom"
+    type: "number"
+    default: 1.35
+    min: 0.5
+    max: 2.5
+    step: 0.05
   - name: "alpha"
     label: "Opacidad"
     type: "number"

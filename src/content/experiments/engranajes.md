@@ -7,14 +7,21 @@ props:
   - name: "step"
     label: "Tamaño (px)"
     type: "number"
-    default: 76
+    default: 44
     min: 40
     max: 140
     step: 2
+  - name: "sep"
+    label: "Separación (px)"
+    type: "number"
+    default: 0
+    min: 0
+    max: 60
+    step: 1
   - name: "teeth"
     label: "Dientes"
     type: "number"
-    default: 12
+    default: 8
     min: 6
     max: 24
     step: 1
@@ -28,14 +35,14 @@ props:
   - name: "ctrl"
     label: "Control puntero"
     type: "number"
-    default: 1.2
+    default: 1.5
     min: 0
     max: 2
     step: 0.05
   - name: "lw"
     label: "Grosor (px)"
     type: "number"
-    default: 1.1
+    default: 0.7
     min: 0.5
     max: 3
     step: 0.1

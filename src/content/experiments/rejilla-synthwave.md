@@ -1,7 +1,7 @@
 ---
 title: "Rejilla synthwave"
 description: "Rejilla en perspectiva con horizonte y sol que se desplaza con el puntero."
-category: pendiente
+category: simulacion
 component: "RejillaSynthwaveBackground"
 props:
   - name: "cols"

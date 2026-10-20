@@ -20,6 +20,11 @@ description: >-
 No es para crear experimentos nuevos ni para tocar el algoritmo visual. Es solo
 sincronizar valores por defecto.
 
+Si el mensaje además pide publicar ("publícala", "publica este experimento") o
+asignar categoría, después de sincronizar los defaults continúa con el **modo
+publicación** de `change-experiment-category`: decide y escribe la categoría en
+el `.md`. No te quedes solo en los defaults.
+
 ## Dónde viven los defaults (hay que tocar AMBOS)
 
 1. **Componente React** — en el destructuring de props, p. ej. `count = 12`.
@@ -82,4 +87,6 @@ Entrada:
 ## Cierre
 
 - Ejecuta `npm run check`.
+- Si se pidió publicar, reporta también la categoría final (o que queda
+  `pendiente` por ambigüedad).
 - Reporta en una línea por cada archivo modificado (componente + `.md`).

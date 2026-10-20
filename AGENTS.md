@@ -53,10 +53,13 @@ El mismo repo se publica como **librería** (`@kimografico/laboratorio`): la bui
   en `src/content/experiments/` y las piezas de interfaz en `src/content/ui/`. El listado de piezas
   reutiliza `Gallery` con `basePath="/ui"`.
 - **Categoría de entrada:** todo experimento nuevo en `src/content/experiments/` entra con
-  `category: pendiente` (fondo, texto o cualquier otro tipo). No lo reclasifiques al crearlo; esa
-  revisión es manual, con el skill `change-experiment-category`. Las categorías válidas viven en
-  `src/lib/categories.ts` (`EXPERIMENT_CATEGORIES`): los fondos se reparten entre `geometria`
-  (rejillas, teselados y patrones), `naturaleza` (flora, fauna, agua y paisaje) y `simulacion`
+  `category: pendiente` (fondo, texto o cualquier otro tipo). Si el usuario pide publicarlo y la
+  categoría es clara, el modo publicación del skill `change-experiment-category` la asigna en ese
+  momento; si no, queda `pendiente` para revisión. Las categorías válidas viven en
+  `src/lib/categories.ts`: `EXPERIMENT_CATEGORIES` (valores), `CATEGORY_LABELS` (etiquetas) y
+  `BACKGROUND_CATEGORIES` (categorías que renderizan fondos). Los fondos se reparten entre
+  `geometria` (rejillas, teselados y patrones), `matematica` (fractales, curvas, atractores,
+  fórmulas paramétricas y caos), `naturaleza` (flora, fauna, agua y paisaje) y `simulacion`
   (partículas, muelles, fluidos y autómatas); los efectos de texto usan `texts`. Las piezas de
   `src/content/ui/` usan su propia categoría de colección (por defecto `buttons`).
 - Los componentes reutilizables (fondos, `FlipText`, `Button`, `ThemeToggle`) se publican como

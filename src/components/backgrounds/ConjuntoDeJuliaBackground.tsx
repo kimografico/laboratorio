@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 
 export interface ConjuntoDeJuliaBackgroundProps {
-  /** Celda (px) (3 a 12) */
+  /** Celda (px) (1 a 12) */
   cell?: number;
   /** Iteraciones (10 a 80) */
   iter?: number;
@@ -20,12 +20,12 @@ export interface ConjuntoDeJuliaBackgroundProps {
 }
 
 const DEFAULTS = {
-  cell: 3,
+  cell: 1,
   iter: 32,
-  zoom: 0.9,
-  mouse: 0.6,
-  drift: 1,
-  alpha: 0.7,
+  zoom: 2,
+  mouse: 0.4,
+  drift: 2,
+  alpha: 0.25,
 };
 
 type Params = typeof DEFAULTS;

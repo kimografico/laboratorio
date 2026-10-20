@@ -1,7 +1,7 @@
 ---
 title: "Curva de Hilbert"
 description: "Curva fractal que llena el plano; el puntero la repele y una cola luminosa la recorre."
-category: pendiente
+category: matematica
 component: "CurvaDeHilbertBackground"
 props:
   - name: "lv"

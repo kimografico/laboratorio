@@ -1,7 +1,7 @@
 ---
 title: "Halftone"
 description: "Retícula de puntos de semitono cuyo tamaño dibuja ondas y una lupa bajo el puntero."
-category: pendiente
+category: geometria
 component: "HalftoneBackground"
 props:
   - name: "step"
@@ -14,21 +14,21 @@ props:
   - name: "speed"
     label: "Velocidad"
     type: "number"
-    default: 1
+    default: 2.5
     min: 0
     max: 3
     step: 0.05
   - name: "contrast"
     label: "Contraste"
     type: "number"
-    default: 1.4
+    default: 1.5
     min: 0.5
     max: 3
     step: 0.05
   - name: "lens"
     label: "Radio lupa (px)"
     type: "number"
-    default: 160
+    default: 300
     min: 40
     max: 400
     step: 5

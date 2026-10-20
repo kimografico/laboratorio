@@ -72,6 +72,7 @@ export default function ExperimentPreview({
   const [fullscreen, setFullscreen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showHeroText, setShowHeroText] = useState(true);
 
   const isText = category === "texts";
   const isBackground = isBackgroundCategory(category);
@@ -113,18 +114,20 @@ export default function ExperimentPreview({
       {isBackground ? (
         <>
           <Stage componentId={componentId} values={values} themed={themed} />
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5 px-6 text-center">
-            <h1 className="max-w-2xl text-3xl font-bold text-fg drop-shadow-sm sm:text-5xl">
-              Construye héroes que reaccionan
-            </h1>
-            <p className="max-w-lg text-sm text-muted sm:text-base">
-              Mueve el cursor sobre el lienzo para explorar el efecto en vivo.
-            </p>
-            <div className="pointer-events-auto flex gap-3">
-              <Button variant="solid" size="md" label="Empezar" />
-              <Button variant="outline" size="md" label="Ver más" />
+          {showHeroText && (
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5 px-6 text-center">
+              <h1 className="max-w-2xl text-3xl font-bold text-fg drop-shadow-sm sm:text-5xl">
+                Construye héroes que reaccionan
+              </h1>
+              <p className="max-w-lg text-sm text-muted sm:text-base">
+                Mueve el cursor sobre el lienzo para explorar el efecto en vivo.
+              </p>
+              <div className="pointer-events-auto flex gap-3">
+                <Button variant="solid" size="md" label="Empezar" />
+                <Button variant="outline" size="md" label="Ver más" />
+              </div>
             </div>
-          </div>
+          )}
         </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-panel p-8 text-center">
@@ -145,7 +148,7 @@ export default function ExperimentPreview({
         >
           <ArrowLeft className="h-4 w-4" /> {backLabel}
         </a>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {prevHref && (
             <Button
               size="sm"
@@ -178,6 +181,14 @@ export default function ExperimentPreview({
               )
             }
           />
+          {isBackground && (
+            <Button
+              size="sm"
+              variant="outline"
+              label={showHeroText ? "Ocultar texto" : "Mostrar texto"}
+              onClick={() => setShowHeroText((v) => !v)}
+            />
+          )}
           {allowFullscreen && (
             <Button
               size="sm"
@@ -203,6 +214,15 @@ export default function ExperimentPreview({
             onClick={() => setFullscreen(false)}
             className="absolute right-5 top-5 z-10 bg-surface/60 backdrop-blur"
           />
+          {isBackground && (
+            <Button
+              size="sm"
+              variant="outline"
+              label={showHeroText ? "Ocultar texto" : "Mostrar texto"}
+              onClick={() => setShowHeroText((v) => !v)}
+              className="absolute left-5 top-5 z-10 bg-surface/60 backdrop-blur"
+            />
+          )}
         </div>
       ) : (
         stage

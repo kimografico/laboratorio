@@ -68,7 +68,7 @@ function usage() {
 
 Opciones:
   --json               Salida JSON (total, counts y experiments).
-  --category <slug>    Filtra por categoría (geometria, naturaleza, simulacion, texts, pendiente).
+  --category <slug>    Filtra por categoría (geometria, matematica, naturaleza, simulacion, texts, pendiente).
   -h, --help           Muestra esta ayuda.`);
 }
 

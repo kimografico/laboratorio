@@ -1,7 +1,7 @@
 ---
 title: "Filotaxis"
 description: "Espiral de Filotaxis (ángulo áureo) con puntos que reaccionan al puntero hinchándose y desplazándose."
-category: geometria
+category: matematica
 component: "PhyllotaxisBackground"
 props:
   - name: "count"

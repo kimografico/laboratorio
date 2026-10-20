@@ -50,13 +50,13 @@ node .opencode/skills/list-experiments/scripts/list-experiments.mjs --category n
 Salida por defecto:
 
 ```text
-Experimentos: 87
+Experimentos: 122
 
-geometria (27)
+geometria (24)
   animated-dots  Animated Dots  AnimatedBackground
   ...
 
-naturaleza (24)
+matematica (3)
   ...
 ```
 

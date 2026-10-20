@@ -19,9 +19,9 @@ export interface HalftoneBackgroundProps {
 
 const DEFAULTS = {
   step: 14,
-  speed: 1,
-  contrast: 1.4,
-  lens: 160,
+  speed: 2.5,
+  contrast: 1.5,
+  lens: 300,
   alpha: 0.4,
 };
 

@@ -15,14 +15,23 @@ Aporta los **scripts deterministas**; el criterio (auditoría, duplicados,
 adaptación de compatibilidad y decisiones de conflicto) vive en el agente
 `tsx-to-experiment`. Los scripts pueden ejecutarse también por sí solos.
 
-## Regla de oro: categoría `pendiente`
+## Categoría: entrada `pendiente`, decisión al publicar
 
-Todo experimento nuevo que se añada en `src/content/experiments/` (fondo, texto
-o cualquier otro) entra **siempre** con `category: pendiente`, sin importar su
-técnica de renderizado. `pendiente` es la categoría de entrada y revisión: la
-reclasificación a `geometria`/`naturaleza`/`simulacion`/`texts` la hace una persona después (con el
-skill `change-experiment-category`). El valor debe existir en el enum de
-`src/content.config.ts`.
+El scaffold crea todo experimento nuevo de `src/content/experiments/` (fondo,
+texto o cualquier otro) con `category: pendiente`. Es la categoría de entrada y
+revisión, no una decisión final.
+
+Al terminar la integración, si el usuario pidió publicar o clasificar, usa el
+**modo publicación** del skill `change-experiment-category`: decide la categoría
+a partir del título, la descripción y el componente (fondo, texto, técnica) y
+edita el `.md`. Si la decisión es clara, asígnala directamente; si hay empate
+real, deja `pendiente` y pregunta. No dejes en `pendiente` un experimento cuya
+categoría es evidente.
+
+La fuente de verdad es `src/lib/categories.ts`: `EXPERIMENT_CATEGORIES`,
+`CATEGORY_LABELS` y `BACKGROUND_CATEGORIES` (esta última debe incluir toda
+categoría de fondos, p. ej. `matematica`). No edites un enum literal en
+`src/content.config.ts`: ese archivo importa la lista.
 
 Las piezas de UI (`src/content/ui/`) usan su propia categoría de colección
 (por defecto `buttons`), no `pendiente`.
@@ -51,7 +60,12 @@ Las piezas de UI (`src/content/ui/`) usan su propia categoría de colección
    Es idempotente: una segunda pasada no duplica imports ni `.md`, y
    nunca sobrescribe un `.md` existente.
 
-4. **Verificar.** Chequeos estáticos y, opcionalmente, build + rutas:
+4. **Categoría (si se pidió publicar).** Con el `.md` creado, aplica el modo
+   publicación de `change-experiment-category`: actualiza defaults si el usuario
+   los dio y decide la categoría final. Si no hay una petición de publicación o
+   la categoría no está clara, déjala en `pendiente`.
+
+5. **Verificar.** Chequeos estáticos y, opcionalmente, build + rutas:
 
    ```powershell
    pwsh .opencode/skills/publish-tsx-experiment/scripts/verify.ps1
@@ -90,7 +104,8 @@ Array de entradas (o una sola). Campos por entrada:
 | `usage`       | no          | cuerpo markdown tras el frontmatter (`## Uso`)                         |
 
 Para `kind: background`/`text`, el `.md` se crea con `category: pendiente`
-siempre. Ejemplo:
+siempre (el scaffold no decide categorías). La categoría final se asigna después
+con `change-experiment-category`, no añadiendo un campo al spec. Ejemplo:
 
 ````json
 [

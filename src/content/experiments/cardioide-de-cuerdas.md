@@ -1,7 +1,7 @@
 ---
 title: "Cardioide de cuerdas"
 description: "Cuerdas tensadas entre puntos de una circunferencia que dibujan la envolvente de una cardioide y reaccionan al puntero."
-category: pendiente
+category: matematica
 component: "CardioideDeCuerdasBackground"
 props:
   - name: "n"

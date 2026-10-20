@@ -16,6 +16,8 @@ export interface AtractorDeCliffordBackgroundProps {
   drift?: number;
   /** Puntos (2000 a 40000) */
   n?: number;
+  /** Zoom (0.5 a 2.5) */
+  zoom?: number;
   /** Opacidad (0.05 a 1) */
   alpha?: number;
   /** Opcional: fija el color. Por defecto se hereda del CSS de la pagina (color). */
@@ -28,9 +30,10 @@ const DEFAULTS = {
   b: 1.6,
   cc: 1,
   d: 0.7,
-  mouse: 0.75,
-  drift: 2,
+  mouse: 0.9,
+  drift: 0.05,
   n: 20000,
+  zoom: 1.35,
   alpha: 0.35,
 };
 
@@ -39,7 +42,7 @@ type Pointer = { x: number; y: number; sx: number; sy: number; on: boolean };
 
 function init(W: number, H: number, P: Params, S: any) {}
 
-function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const a=P.a+(m.sx/W-.5)*P.mouse+Math.sin(t*.0002)*.1*P.drift,b=P.b+(m.sy/H-.5)*P.mouse+Math.cos(t*.00017)*.1*P.drift,cc=P.cc,d=P.d,sc=Math.min(W,H)*.2,ox=W/2,oy=H/2;
+function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const a=P.a+(m.sx/W-.5)*P.mouse+Math.sin(t*.0002)*.1*P.drift,b=P.b+(m.sy/H-.5)*P.mouse+Math.cos(t*.00017)*.1*P.drift,cc=P.cc,d=P.d,sc=Math.min(W,H)*.2*P.zoom,ox=W/2,oy=H/2;
 let x=.1,y=.1;c.fillStyle=ink;c.globalAlpha=P.alpha;for(let i=0;i<P.n;i++){const nx=Math.sin(a*y)+cc*Math.cos(a*x);y=Math.sin(b*x)+d*Math.cos(b*y);x=nx;if(i>20)c.fillRect(ox+x*sc,oy+y*sc,1.2,1.2)}}
 
 export default function AtractorDeCliffordBackground(props: AtractorDeCliffordBackgroundProps) {

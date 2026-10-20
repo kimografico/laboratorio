@@ -8,6 +8,8 @@ export interface InterferenciaDePuntosBackgroundProps {
   wave?: number;
   /** Velocidad (0 a 3) */
   speed?: number;
+  /** Easing puntero (0.01 a 1) */
+  ease?: number;
   /** Tamaño (0.3 a 1.5) */
   size?: number;
   /** Opacidad (0.05 a 1) */
@@ -18,10 +20,11 @@ export interface InterferenciaDePuntosBackgroundProps {
 }
 
 const DEFAULTS = {
-  step: 14,
+  step: 12,
   wave: 110,
-  speed: 1,
-  size: 1,
+  speed: 1.9,
+  ease: 0.04,
+  size: 1.05,
   alpha: 0.5,
 };
 
@@ -80,8 +83,8 @@ export default function InterferenciaDePuntosBackground(props: InterferenciaDePu
     function animate(t: number) {
       const dt = Math.min(t - last, 50);
       last = t;
-      m.sx += (m.x - m.sx) * 0.12;
-      m.sy += (m.y - m.sy) * 0.12;
+      m.sx += (m.x - m.sx) * P.ease;
+      m.sy += (m.y - m.sy) * P.ease;
       // Tinta y opacidad leidas del CSS de la pagina en cada fotograma
       const ink = style.getPropertyValue('--interferencia-de-puntos-color').trim() || style.color;
       const k = style.getPropertyValue('--interferencia-de-puntos-opacity').trim();

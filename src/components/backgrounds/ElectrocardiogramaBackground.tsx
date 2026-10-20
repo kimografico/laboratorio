@@ -20,10 +20,10 @@ export interface ElectrocardiogramaBackgroundProps {
 }
 
 const DEFAULTS = {
-  rows: 7,
-  speed: 1,
-  amp: 0.7,
-  boost: 1.2,
+  rows: 6,
+  speed: 0.5,
+  amp: 1,
+  boost: 1.5,
   lw: 1.2,
   alpha: 0.5,
 };

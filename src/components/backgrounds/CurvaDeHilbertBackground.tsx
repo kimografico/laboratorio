@@ -31,13 +31,12 @@ const DEFAULTS = {
 type Params = typeof DEFAULTS;
 type Pointer = { x: number; y: number; sx: number; sy: number; on: boolean };
 
-function init(W: number, H: number, P: Params, S: any) {const n=1<<P.lv,N=n*n;S.N=N;S.q=new Float32Array(2*N);S.p=new Float32Array(2*N);for(let d=0;d<N;d++){let x=0,y=0,t=d;for(let s=1;s<n;s*=2){const rx=1&(t>>1),ry=1&(t^rx);if(!ry){if(rx){x=s-1-x;y=s-1-y}const q=x;x=y;y=q}x+=s*rx;y+=s*ry;t>>=2}S.q[2*d]=(x+.5)/n;S.q[2*d+1]=(y+.5)/n}}
+function init(W: number, H: number, P: Params, S: any) {const n=1<<P.lv,N=n*n,z=Math.max(1,Math.min(W,H)),cols=Math.max(1,Math.ceil(W/z));S.N=N;S.cols=cols;S.q=new Float32Array(2*N);S.p=new Float32Array(2*N*cols);for(let d=0;d<N;d++){let x=0,y=0,t=d;for(let s=1;s<n;s*=2){const rx=1&(t>>1),ry=1&(t^rx);if(!ry){if(rx){x=s-1-x;y=s-1-y}const q=x;x=y;y=q}x+=s*rx;y+=s*ry;t>>=2}S.q[2*d]=(x+.5)/n;S.q[2*d+1]=(y+.5)/n}}
 
-function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const z=Math.min(W,H)*.9,ox=(W-z)/2,oy=(H-z)/2,N=S.N,q=S.q,p=S.p;
-for(let i=0;i<N;i++){let x=ox+q[2*i]*z,y=oy+q[2*i+1]*z;const dx=x-m.sx,dy=y-m.sy,d=Math.hypot(dx,dy);if(d<P.reach&&d>.01){const f=(1-d/P.reach)*P.push;x+=dx/d*f;y+=dy/d*f}p[2*i]=x;p[2*i+1]=y}
-c.strokeStyle=ink;c.lineWidth=1;c.globalAlpha=P.alpha;c.beginPath();c.moveTo(p[0],p[1]);for(let i=1;i<N;i++)c.lineTo(p[2*i],p[2*i+1]);c.stroke();
-const hd=Math.floor(t*N*P.speed*.00004)%N,L=Math.floor(N*P.tail),s0=(hd-L+N)%N;c.lineWidth=2.2;c.lineCap='round';c.globalAlpha=Math.min(1,P.alpha*2.5);c.beginPath();c.moveTo(p[2*s0],p[2*s0+1]);
-for(let i=1;i<=L;i++){const k=(s0+i)%N;c.lineTo(p[2*k],p[2*k+1])}c.stroke()}
+function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const z=Math.max(1,Math.min(W,H)),cols=S.cols,ox=(W-cols*z)/2,oy=(H-z)/2,N=S.N,q=S.q,p=S.p;
+for(let j=0;j<cols;j++)for(let i=0;i<N;i++){const o=(j*N+i)*2;let x=ox+j*z+q[2*i]*z,y=oy+q[2*i+1]*z;const dx=x-m.sx,dy=y-m.sy,d=Math.hypot(dx,dy);if(d<P.reach&&d>.01){const f=(1-d/P.reach)*P.push;x+=dx/d*f;y+=dy/d*f}p[o]=x;p[o+1]=y}
+c.strokeStyle=ink;c.lineWidth=1;c.globalAlpha=P.alpha;c.beginPath();for(let j=0;j<cols;j++){const b=j*N*2;c.moveTo(p[b],p[b+1]);for(let i=1;i<N;i++)c.lineTo(p[b+2*i],p[b+2*i+1])}c.stroke();
+const hd=Math.floor(t*N*P.speed*.00004)%N,L=Math.floor(N*P.tail),s0=(hd-L+N)%N;c.lineWidth=2.2;c.lineCap='round';c.globalAlpha=Math.min(1,P.alpha*2.5);c.beginPath();for(let j=0;j<cols;j++){const b=j*N*2,s=b+2*s0;c.moveTo(p[s],p[s+1]);for(let i=1;i<=L;i++){const k=(s0+i)%N,idx=b+2*k;c.lineTo(p[idx],p[idx+1])}}c.stroke()}
 
 export default function CurvaDeHilbertBackground(props: CurvaDeHilbertBackgroundProps) {
   const { color, className, ...rest } = props;

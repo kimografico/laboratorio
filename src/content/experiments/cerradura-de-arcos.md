@@ -1,43 +1,43 @@
 ---
 title: "Cerradura de arcos"
 description: "Anillos de arcos que giran a distinta velocidad y se aceleran al acercar el puntero."
-category: pendiente
+category: geometria
 component: "CerraduraDeArcosBackground"
 props:
   - name: "rings"
     label: "Anillos"
     type: "number"
-    default: 16
+    default: 30
     min: 4
     max: 30
     step: 1
   - name: "gap"
     label: "Separación (px)"
     type: "number"
-    default: 22
+    default: 25
     min: 8
     max: 40
     step: 1
   - name: "thick"
     label: "Grosor"
     type: "number"
-    default: 0.45
+    default: 0.35
     min: 0.1
     max: 0.9
     step: 0.01
   - name: "speed"
     label: "Velocidad"
     type: "number"
-    default: 0.5
+    default: 0.25
     min: 0
     max: 2
     step: 0.05
   - name: "boost"
     label: "Impulso puntero"
     type: "number"
-    default: 3
+    default: 6
     min: 0
-    max: 6
+    max: 10
     step: 0.1
   - name: "alpha"
     label: "Opacidad"

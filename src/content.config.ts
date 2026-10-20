@@ -20,7 +20,7 @@ const experiments = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    // Categoría de entrada: todo experimento nuevo entra como "pendiente" y se revisa después.
+    // Entrada: el scaffold crea "pendiente"; al publicar, change-experiment-category decide la final.
     category: z.enum(EXPERIMENT_CATEGORIES),
     component: z.string(),
     props: z.array(propSchema).default([]),

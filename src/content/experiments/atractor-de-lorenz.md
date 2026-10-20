@@ -1,7 +1,7 @@
 ---
 title: "Atractor de Lorenz"
 description: "Estela tridimensional del atractor de Lorenz que gira con el puntero y se desvanece por tramos."
-category: pendiente
+category: matematica
 component: "AtractorDeLorenzBackground"
 props:
   - name: "rho"

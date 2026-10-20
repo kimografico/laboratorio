@@ -10,7 +10,7 @@ export interface CerraduraDeArcosBackgroundProps {
   thick?: number;
   /** Velocidad (0 a 2) */
   speed?: number;
-  /** Impulso puntero (0 a 6) */
+  /** Impulso puntero (0 a 10) */
   boost?: number;
   /** Opacidad (0.05 a 1) */
   alpha?: number;
@@ -20,11 +20,11 @@ export interface CerraduraDeArcosBackgroundProps {
 }
 
 const DEFAULTS = {
-  rings: 16,
-  gap: 22,
-  thick: 0.45,
-  speed: 0.5,
-  boost: 3,
+  rings: 30,
+  gap: 25,
+  thick: 0.35,
+  speed: 0.25,
+  boost: 6,
   alpha: 0.4,
 };
 

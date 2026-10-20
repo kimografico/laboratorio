@@ -1,13 +1,13 @@
 ---
 title: "Fases lunares"
 description: "Retícula de lunas que recorren todas sus fases; el puntero y los clics propagan ondas."
-category: pendiente
+category: naturaleza
 component: "MoonPhasesBackground"
 props:
   - name: "size"
     label: "Celda (px)"
     type: "number"
-    default: 52
+    default: 40
     min: 20
     max: 120
     step: 2
@@ -28,14 +28,14 @@ props:
   - name: "radius"
     label: "Radio puntero (px)"
     type: "number"
-    default: 170
+    default: 300
     min: 20
     max: 400
     step: 5
   - name: "decay"
     label: "Persistencia"
     type: "number"
-    default: 0.97
+    default: 0.95
     min: 0.8
     max: 0.999
     step: 0.001

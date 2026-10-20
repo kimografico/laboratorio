@@ -1,20 +1,20 @@
 ---
 title: "Ecualizador espejo"
 description: "Barras verticales espejadas que ondulan como un ecualizador y se levantan bajo el puntero."
-category: pendiente
+category: geometria
 component: "EcualizadorEspejoBackground"
 props:
   - name: "gap"
     label: "Separación (px)"
     type: "number"
-    default: 12
+    default: 21
     min: 5
     max: 30
     step: 1
   - name: "ratio"
     label: "Grosor barra"
     type: "number"
-    default: 0.35
+    default: 0.25
     min: 0.1
     max: 0.9
     step: 0.01
@@ -28,21 +28,21 @@ props:
   - name: "speed"
     label: "Velocidad"
     type: "number"
-    default: 1
+    default: 1.75
     min: 0
     max: 3
     step: 0.05
   - name: "bump"
     label: "Joroba puntero"
     type: "number"
-    default: 0.8
+    default: 1.25
     min: 0
     max: 1.5
     step: 0.05
   - name: "alpha"
     label: "Opacidad"
     type: "number"
-    default: 0.45
+    default: 0.25
     min: 0.05
     max: 1
     step: 0.01

@@ -3,7 +3,8 @@
 #   - crea el .md de contenido (NUNCA sobrescribe uno existente)
 #   - inserta el import + la entrada en src/lib/registry.tsx (ordenado por categoría)
 #
-# Todo experimento nuevo (fondos y textos) entra SIEMPRE con `category: pendiente`.
+# Todo experimento nuevo (fondos y textos) entra SIEMPRE con `category: pendiente`;
+# la categoría temática final se decide al publicar con change-experiment-category.
 # Las piezas de UI usan su propia categoría de la colección ui (por defecto "buttons").
 #
 # Uso:

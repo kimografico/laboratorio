@@ -23,10 +23,10 @@ export interface ChevronesBackgroundProps {
 
 const DEFAULTS = {
   row: 22,
-  wl: 44,
+  wl: 50,
   amp: 0.5,
-  mouse: 1.2,
-  reach: 180,
+  mouse: 1.5,
+  reach: 250,
   speed: 0.4,
   alpha: 0.4,
 };
