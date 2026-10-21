@@ -17,7 +17,7 @@ export interface CatEyesBackgroundProps {
   radius?: number;
   /** Opacidad del globo y el borde (0-1); la pupila es siempre opaca */
   alpha?: number;
-  /** Opcional: color del globo ocular. Por defecto: fondo en tema claro, blanco en oscuro */
+  /** Opcional: color del globo ocular. Por defecto: #ffff7d */
   eyeColor?: string;
   /** Opcional: color del globo ocular; `eyeColor` tiene prioridad. El borde siempre es negro */
   color?: string;
@@ -72,15 +72,15 @@ function isLightColor(input: string): boolean {
 }
 
 export default function CatEyesBackground({
-  pairs = 12,
+  pairs = 500,
   spacing = 30,
   eyeWidth = 45,
-  eyeOpenness = 1,
+  eyeOpenness = 1.15,
   roundness = 1,
   pairGap = 1.5,
-  radius = 80,
-  alpha = 0.47,
-  eyeColor,
+  radius = 120,
+  alpha = 0.7,
+  eyeColor = "#ffff7d",
   color,
   className,
 }: CatEyesBackgroundProps) {
@@ -120,7 +120,8 @@ export default function CatEyesBackground({
         next.push({
           x, y,
           scale: 0.82 + Math.random() * 0.34,
-          tilt: (Math.random() - 0.5) * 0.16,
+          // Inclinación hacia fuera: la esquina exterior sube y la interior baja.
+          tilt: 0.10 + Math.random() * 0.03,
           phase: Math.random() * Math.PI * 2,
           open: 0,
           clickOpen: 0,
@@ -207,8 +208,8 @@ export default function CatEyesBackground({
         const dx = px - pair.x, dy = py - pair.y;
         const d = hasPointer ? Math.hypot(dx, dy) : Infinity;
         const proximity = clamp(1 - d / Math.max(1, radius), 0, 1);
-        // La dilatación solo ocurre con el botón pulsado y en la zona más cercana al puntero.
-        const near = clamp((proximity - 0.55) / 0.45, 0, 1);
+        // La dilatación solo ocurre con el botón pulsado y en la zona cercana al puntero.
+        const near = clamp((proximity - 0.45) / 0.45, 0, 1);
         const dilation = pointerDown ? near * near * (3 - 2 * near) : 0;
         // Curva de apertura con gamma < 1: los ojos empiezan a abrirse antes dentro del radio.
         const target = globalClick ? 1 : Math.pow(proximity, 0.55);
@@ -237,7 +238,7 @@ export default function CatEyesBackground({
         ctx.save();
         ctx.translate(pair.x, pair.y);
         drawEye(-gap / 2, 0, ew, shown, pair.lookLX, pair.lookLY, contourInk, eyeInk, dilation, pair.tilt);
-        drawEye(gap / 2, 0, ew, shown, pair.lookRX, pair.lookRY, contourInk, eyeInk, dilation, pair.tilt);
+        drawEye(gap / 2, 0, ew, shown, pair.lookRX, pair.lookRY, contourInk, eyeInk, dilation, -pair.tilt);
         ctx.restore();
       }
       ctx.globalAlpha = 1;
