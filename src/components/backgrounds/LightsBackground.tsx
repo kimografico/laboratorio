@@ -5,8 +5,12 @@ export interface LightsBackgroundProps {
   strands?: number;
   /** Bombillas por guirnalda */
   bulbs?: number;
-  /** Holgura de la cuerda: cuánto cuelga, como fracción de la distancia entre anclajes */
-  sag?: number;
+  /** Alterna las bombillas multicolor */
+  multicolor?: boolean;
+  /** Peso de las bombillas, aplicado como gravedad a cada punto de la cuerda */
+  weight?: number;
+  /** Tensión de la cuerda en escala 0-100 */
+  tension?: number;
   /** Radio de cada bombilla (px) */
   size?: number;
   /** Intensidad de la brisa (0 = quietas) */
@@ -36,15 +40,18 @@ type Strand = {
   rest: number;
   phase: number;
   depth: number;
+  bulbOffset: number;
   glow: Float32Array; // encendido suavizado por cercanía del puntero
 };
 
 export default function LightsBackground({
-  strands = 3,
-  bulbs = 14,
-  sag = 0.12,
+  strands = 4,
+  bulbs = 16,
+  multicolor = true,
+  weight = 0.4,
+  tension = 50,
   size = 7,
-  wind = 0.4,
+  wind = 2,
   damping = 0.93,
   glow = 170,
   pulse = 600,
@@ -63,7 +70,11 @@ export default function LightsBackground({
 
     const style = getComputedStyle(canvas);
     const NB = Math.max(3, Math.round(bulbs));
-    const n = NB * 3 + 1; // la bombilla b cuelga del nodo 3b+2
+    const n = NB * 6 + 1;
+    const tensionRatio = Math.min(100, Math.max(0, tension)) / 100;
+    const iterations = Math.round(
+      10 + (990 * (Math.exp(2.3 * tensionRatio) - 1)) / (Math.exp(2.3) - 1),
+    );
     let w = 0;
     let h = 0;
     let px = -9999;
@@ -85,8 +96,8 @@ export default function LightsBackground({
         const depth = 0.5 + 0.5 * Math.random();
         const ax = -20;
         const bx = w + 20;
-        const ay = h * (0.08 + (0.6 * k) / Math.max(1, strands) + 0.1 * Math.random());
-        const by = h * (0.08 + (0.6 * k) / Math.max(1, strands) + 0.1 * Math.random());
+        const ay = h * (0.01 + (0.5 * k) / Math.max(1, strands) + 0.04 * Math.random());
+        const by = h * (0.01 + (0.5 * k) / Math.max(1, strands) + 0.04 * Math.random());
         const chord = Math.hypot(bx - ax, by - ay);
         const s: Strand = {
           n,
@@ -94,16 +105,16 @@ export default function LightsBackground({
           y: new Float32Array(n),
           ox: new Float32Array(n),
           oy: new Float32Array(n),
-          // Longitud de un arco parabólico con flecha sag·cuerda: la cuerda sobrante es la que cuelga
-          rest: (chord * (1 + (8 * sag * sag) / 3)) / (n - 1),
+          rest: chord / (n - 1),
           phase: Math.random() * 10,
           depth,
+          bulbOffset: k % 2 === 0 ? 5 : 2,
           glow: new Float32Array(NB),
         };
         for (let i = 0; i < n; i++) {
           const u = i / (n - 1);
           s.x[i] = ax + (bx - ax) * u;
-          s.y[i] = ay + (by - ay) * u + 4 * sag * chord * u * (1 - u);
+          s.y[i] = ay + (by - ay) * u;
           s.ox[i] = s.x[i];
           s.oy[i] = s.y[i];
         }
@@ -144,7 +155,7 @@ export default function LightsBackground({
         ox[i] = x[i];
         oy[i] = y[i];
         x[i] += vx + Math.sin(time * 0.0006 + s.phase + i * 0.2) * wind * 0.05;
-        y[i] += vy + 0.4;
+        y[i] += vy + weight;
         if (hasPointer) {
           const d = Math.hypot(x[i] - px, y[i] - py);
           if (d < radius) {
@@ -154,7 +165,7 @@ export default function LightsBackground({
           }
         }
       }
-      for (let it = 0; it < 12; it++) {
+      for (let it = 0; it < iterations; it++) {
         for (let i = 0; i < s.n - 1; i++) {
           const dx = x[i + 1] - x[i];
           const dy = y[i + 1] - y[i];
@@ -196,7 +207,7 @@ export default function LightsBackground({
 
         const r = size * s.depth;
         for (let b = 0; b < NB; b++) {
-          const i = 3 * b + 2;
+          const i = 6 * b + s.bulbOffset;
           const bx = s.x[i];
           const by = s.y[i] + r * 1.9;
           // Encendido: onda de los clics (gaussiana que viaja y se apaga) + un titileo ambiental muy leve
@@ -207,7 +218,8 @@ export default function LightsBackground({
             lit += Math.exp(-e * e) * Math.exp(-age * 0.8);
           }
           // El puntero enciende las bombillas cercanas con easing: se prenden al acercarse y se apagan despacio al irse
-          const near = hasPointer ? Math.pow(Math.max(0, 1 - Math.hypot(bx - px, by - py) / glow), 1.5) : 0;
+          const near =
+            hasPointer ? Math.pow(Math.max(0, 1 - Math.hypot(bx - px, by - py) / glow), 1.5) : 0;
           s.glow[b] += (near - s.glow[b]) * (near > s.glow[b] ? 0.18 : 0.05);
           lit = Math.min(1, lit + s.glow[b]);
           ctx!.beginPath();
@@ -216,17 +228,39 @@ export default function LightsBackground({
           setAlpha(a);
           ctx!.stroke();
           const rr = r * (1 + 0.3 * lit);
-          ctx!.beginPath();
-          ctx!.arc(bx, by, rr, 0, Math.PI * 2);
-          setAlpha(a * (0.1 + 0.5 * lit));
-          ctx!.fill();
-          setAlpha(a);
-          ctx!.stroke();
-          if (lit > 0.05) {
+          if (!multicolor) {
+            ctx!.fillStyle = "#fff";
             ctx!.beginPath();
-            ctx!.arc(bx, by, rr * (1.8 + 1.4 * lit), 0, Math.PI * 2);
-            setAlpha(a * 0.6 * lit);
+            ctx!.arc(bx, by, rr * 2.4, 0, Math.PI * 2);
+            setAlpha(a * 0.06);
+            ctx!.fill();
+            ctx!.beginPath();
+            ctx!.arc(bx, by, rr, 0, Math.PI * 2);
+            setAlpha(a * 0.12);
+            ctx!.fill();
+          } else {
+            const hue = (b * 40 + time * 0.12) % 360;
+            const shimmer = 0.5 + 0.5 * Math.sin(time * 0.006 + b + s.phase);
+            const bulbColor = `hsl(${hue}, 90%, ${35 + 30 * shimmer}%)`;
+            ctx!.fillStyle = bulbColor;
+            ctx!.beginPath();
+            ctx!.arc(bx, by, rr * (2.4 + lit), 0, Math.PI * 2);
+            setAlpha(a * (0.2 + 0.3 * shimmer + 0.5 * lit));
+            ctx!.fill();
+            ctx!.beginPath();
+            ctx!.arc(bx, by, rr, 0, Math.PI * 2);
+            setAlpha(a * (0.45 + 0.35 * shimmer + 0.2 * lit));
+            ctx!.fill();
+            ctx!.strokeStyle = bulbColor;
+            setAlpha(a);
             ctx!.stroke();
+            if (lit > 0.05) {
+              ctx!.beginPath();
+              ctx!.arc(bx, by, rr * (1.8 + 1.4 * lit), 0, Math.PI * 2);
+              setAlpha(a * 0.6 * lit);
+              ctx!.stroke();
+            }
+            ctx!.strokeStyle = ink;
           }
         }
       }
@@ -253,7 +287,22 @@ export default function LightsBackground({
       window.removeEventListener("touchmove", onTouch);
       window.removeEventListener("pointerdown", onDownEvt);
     };
-  }, [strands, bulbs, sag, size, wind, damping, glow, pulse, radius, alpha, lineWidth]);
+  }, [
+    strands,
+    bulbs,
+    multicolor,
+    weight,
+    tension,
+    size,
+    wind,
+    damping,
+    glow,
+    pulse,
+    radius,
+    alpha,
+    lineWidth,
+    color,
+  ]);
 
   return (
     <div

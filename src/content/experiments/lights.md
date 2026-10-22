@@ -1,30 +1,37 @@
 ---
 title: "Guirnalda de luces"
 description: "Guirnaldas de bombillas que cuelgan, se mecen y se encienden con el puntero o un clic."
-category: pendiente
+category: simulacion
 component: "LightsBackground"
 props:
   - name: "strands"
     label: "Guirnaldas"
     type: "number"
-    default: 3
+    default: 4
     min: 1
     max: 10
     step: 1
   - name: "bulbs"
     label: "Bombillas"
     type: "number"
-    default: 14
+    default: 16
     min: 3
     max: 40
     step: 1
-  - name: "sag"
-    label: "Holgura"
+  - name: "weight"
+    label: "Gravedad"
     type: "number"
-    default: 0.12
+    default: 0.4
     min: 0
-    max: 0.5
+    max: 1
     step: 0.01
+  - name: "tension"
+    label: "Tensión"
+    type: "number"
+    default: 50
+    min: 0
+    max: 100
+    step: 0.1
   - name: "size"
     label: "Radio bombilla (px)"
     type: "number"
@@ -35,7 +42,7 @@ props:
   - name: "wind"
     label: "Brisa"
     type: "number"
-    default: 0.4
+    default: 2
     min: 0
     max: 2
     step: 0.05
@@ -81,12 +88,24 @@ props:
     min: 0.5
     max: 3
     step: 0.1
+  - name: "multicolor"
+    label: "Luces multicolor"
+    type: "boolean"
+    default: true
 ---
 
 ## Uso
 
-Hereda el color de la página o se fija con `color`; la opacidad global se ajusta con `--lights-opacity` en CSS.
+Las bombillas cambian de color y titilan como en Guirnalda de luces 2. Desactiva `multicolor` para mostrarlas en blanco casi transparente. El prop opcional `color` fija el color de las líneas; la opacidad global se ajusta con `--lights-opacity` en CSS.
 
 ```tsx
-<LightsBackground strands={3} bulbs={14} wind={0.4} />
+<LightsBackground strands={3} bulbs={14} wind={0.4} multicolor />
 ```
+
+### Controles
+
+- **Gravedad:** controla la fuerza aplicada hacia abajo a cada punto de la cuerda. Un valor mayor hace que las guirnaldas caigan más; en `0`, la gravedad no provoca caída.
+- **Tensión:** ajusta el número de iteraciones que mantienen la cuerda tensa. La escala de 0 a 100 se convierte exponencialmente en 10–1000 iteraciones: 0 equivale a 10, 100 a 1000 y el punto medio a unas 250. El valor inicial equivale aproximadamente a 150 iteraciones.
+- **Amortiguación:** cuánta velocidad conserva el movimiento de la cuerda en cada fotograma; valores altos mantienen la oscilación durante más tiempo y valores bajos la frenan antes.
+- **Pulso:** velocidad en píxeles por segundo de la onda de luz que se expande desde el punto donde haces clic.
+- **Alcance de luz:** distancia en píxeles a la que el puntero empieza a encender las bombillas; un valor mayor afecta a más luces y desde más lejos.
