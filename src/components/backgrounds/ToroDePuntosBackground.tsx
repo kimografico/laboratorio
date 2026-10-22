@@ -24,11 +24,11 @@ export interface ToroDePuntosBackgroundProps {
 }
 
 const DEFAULTS = {
-  nu: 64,
+  nu: 80,
   nv: 22,
-  r: 0.35,
-  size: 230,
-  dot: 1.3,
+  r: 0.44,
+  size: 325,
+  dot: 1.5,
   spin: 0.5,
   tilt: 1,
   alpha: 0.7,

@@ -1,27 +1,27 @@
 ---
 title: "Tendido de cables"
 description: "Cables horizontales con gravedad y muelles que se hunden y vibran al pasar el puntero."
-category: pendiente
+category: simulacion
 component: "TendidoDeCablesBackground"
 props:
   - name: "rows"
     label: "Cables"
     type: "number"
-    default: 16
+    default: 10
     min: 2
     max: 16
     step: 1
   - name: "slack"
     label: "Holgura"
     type: "number"
-    default: 0.03
-    min: 0.02
+    default: 0.02
+    min: 0
     max: 0.4
     step: 0.005
   - name: "g"
     label: "Gravedad"
     type: "number"
-    default: 0.35
+    default: 0.4
     min: 0.05
     max: 1
     step: 0.05
@@ -35,7 +35,7 @@ props:
   - name: "push"
     label: "Empuje"
     type: "number"
-    default: 10
+    default: 18
     min: 0
     max: 30
     step: 1

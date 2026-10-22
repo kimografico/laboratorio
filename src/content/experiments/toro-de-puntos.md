@@ -1,13 +1,13 @@
 ---
 title: "Toro de puntos"
 description: "Toro de puntos en 3D que gira e inclina con el puntero."
-category: pendiente
+category: matematica
 component: "ToroDePuntosBackground"
 props:
   - name: "nu"
     label: "Puntos mayor"
     type: "number"
-    default: 64
+    default: 80
     min: 20
     max: 120
     step: 2
@@ -21,21 +21,21 @@ props:
   - name: "r"
     label: "Radio tubo"
     type: "number"
-    default: 0.35
+    default: 0.44
     min: 0.15
     max: 0.6
     step: 0.01
   - name: "size"
     label: "Tamaño (px)"
     type: "number"
-    default: 230
+    default: 325
     min: 80
     max: 400
     step: 5
   - name: "dot"
     label: "Punto (px)"
     type: "number"
-    default: 1.3
+    default: 1.5
     min: 0.5
     max: 3
     step: 0.1

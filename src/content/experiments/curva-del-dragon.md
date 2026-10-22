@@ -1,7 +1,7 @@
 ---
 title: "Curva del dragón"
 description: "Curva fractal que se despliega progresivamente y gira con el puntero."
-category: pendiente
+category: matematica
 component: "CurvaDelDragonBackground"
 props:
   - name: "lv"

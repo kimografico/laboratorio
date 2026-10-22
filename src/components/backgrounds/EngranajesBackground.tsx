@@ -16,19 +16,25 @@ export interface EngranajesBackgroundProps {
   lw?: number;
   /** Opacidad (0.05 a 1) */
   alpha?: number;
+  /** Desfase de rotación de los engranajes alternos, en grados (-180 a 180) */
+  offset?: number;
+  /** Rellena los engranajes en lugar de dibujar solo el contorno */
+  filled?: boolean;
   /** Opcional: fija el color. Por defecto se hereda del CSS de la pagina (color). */
   color?: string;
   className?: string;
 }
 
 const DEFAULTS = {
-  step: 44,
-  sep: 0,
+  step: 114,
+  sep: 11,
   teeth: 8,
-  speed: 1,
+  speed: 1.7,
   ctrl: 1.5,
   lw: 0.7,
-  alpha: 0.5,
+  alpha: 0.08,
+  offset: -31,
+  filled: true,
 };
 
 type Params = typeof DEFAULTS;
@@ -37,10 +43,10 @@ type Pointer = { x: number; y: number; sx: number; sy: number; on: boolean };
 function init(W: number, H: number, P: Params, S: any) {}
 
 function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const s=P.step,sp=s+P.sep,N=P.teeth,r0=s/2,ro=r0*1.1,ri=r0*.86,ta=6.2832/N;S.a=(S.a||0)+dt*.001*P.speed*(1+(m.sx/W-.5)*2*P.ctrl);
-c.strokeStyle=ink;c.lineWidth=P.lw;c.lineJoin='round';c.globalAlpha=P.alpha;c.beginPath();
-for(let j=0;j*sp<H+s;j++)for(let i=0;i*sp<W+s;i++){const x=(i+.5)*sp,y=(j+.5)*sp,od=(i+j)&1,rot=(od?-1:1)*S.a+(od?Math.PI/N:0);
+const off=P.offset*Math.PI/180;c.strokeStyle=ink;c.fillStyle=ink;c.lineWidth=P.lw;c.lineJoin='round';c.globalAlpha=P.alpha;c.beginPath();
+for(let j=0;j*sp<H+s;j++)for(let i=0;i*sp<W+s;i++){const x=(i+.5)*sp,y=(j+.5)*sp,od=(i+j)&1,rot=(od?-1:1)*S.a+(od?Math.PI/N+off:0);
 for(let k=0;k<N;k++){const b=rot+k*ta;for(const q of [[0,ri],[.15,ro],[.5,ro],[.65,ri]]){const a=b+q[0]*ta,px=x+q[1]*Math.cos(a),py=y+q[1]*Math.sin(a);k||q[0]?c.lineTo(px,py):c.moveTo(px,py)}}
-c.closePath();c.moveTo(x+r0*.2,y);c.arc(x,y,r0*.2,0,6.2832)}c.stroke()}
+c.closePath();c.moveTo(x+r0*.2,y);c.arc(x,y,r0*.2,0,6.2832)}if(P.filled)c.fill('evenodd');c.stroke()}
 
 export default function EngranajesBackground(props: EngranajesBackgroundProps) {
   const { color, className, ...rest } = props;

@@ -22,11 +22,11 @@ export interface TendidoDeCablesBackgroundProps {
 }
 
 const DEFAULTS = {
-  rows: 16,
-  slack: 0.03,
-  g: 0.35,
+  rows: 10,
+  slack: 0.02,
+  g: 0.4,
   reach: 110,
-  push: 10,
+  push: 18,
   lw: 1.2,
   alpha: 0.55,
 };

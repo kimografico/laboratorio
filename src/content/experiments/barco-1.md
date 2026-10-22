@@ -1,5 +1,5 @@
 ---
-title: Capas de olas
+title: "Barco y olas I"
 description: Capas superpuestas de olas que se cruzan con oleaje lento y se hunden bajo el puntero.
 category: naturaleza
 component: WaveLayersBackground

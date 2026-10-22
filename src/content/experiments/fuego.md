@@ -1,76 +1,62 @@
 ---
 title: "Fuego"
-description: "Autómata de fuego en celdas que arde desde la base y prende bajo el puntero."
+description: "Fuego celular clásico con paleta de llama; el puntero es una antorcha y el clic provoca una llamarada."
 category: simulacion
 component: "FuegoBackground"
 props:
-  - name: "cell"
-    label: "Celda (px)"
+  - name: "b"
+    label: "Tamaño de píxel"
     type: "number"
-    default: 2
+    default: 5
     min: 1
     max: 10
     step: 1
+  - name: "decay"
+    label: "Enfriamiento"
+    type: "number"
+    default: 3
+    min: 1.1
+    max: 6
+    step: 0.1
+  - name: "wind"
+    label: "Viento"
+    type: "number"
+    default: 0.4
+    min: -2
+    max: 2
+    step: 0.05
   - name: "base"
-    label: "Base de brasas"
+    label: "Base encendida"
     type: "number"
     default: 1
     min: 0
     max: 1
-    step: 0.01
-  - name: "bwidth"
-    label: "Ancho brasas"
-    type: "number"
-    default: 1.5
-    min: 0.1
-    max: 1.5
-    step: 0.01
-  - name: "decay"
-    label: "Enfriamiento"
-    type: "number"
-    default: 0.03
-    min: 0.01
-    max: 0.20
-    step: 0.005
-  - name: "pdecay"
-    label: "Enfriamiento puntero"
-    type: "number"
-    default: 0.15
-    min: 0.01
-    max: 0.20
-    step: 0.005
-  - name: "wind"
-    label: "Viento"
-    type: "number"
-    default: 0.45
-    min: -1
-    max: 1
     step: 0.05
-  - name: "rad"
-    label: "Radio puntero (px)"
+  - name: "bsize"
+    label: "Llamarada (px)"
     type: "number"
-    default: 20
+    default: 50
     min: 10
+    max: 200
+    step: 1
+  - name: "torch"
+    label: "Radio de la antorcha (px)"
+    type: "number"
+    default: 25
+    min: 0
     max: 120
     step: 1
-  - name: "alpha"
-    label: "Opacidad"
-    type: "number"
-    default: 0.8
-    min: 0.05
-    max: 1
-    step: 0.01
   - name: "color"
-    label: "Color"
+    label: "Color de llama"
     type: "color"
-    default: "#ff7300"
+    default: "#ffc800"
     themed: false
 ---
 
 ## Uso
 
-Usa `#ff7300` por defecto; el color se cambia con `color` y la opacidad global se ajusta con `--fuego-opacity` en CSS.
+Fuego celular con antorcha bajo el puntero. El clic lanza una llamarada.
 
 ```tsx
-<FuegoBackground cell={5} base={0.6} decay={0.04} />
+<FuegoBackground b={5} decay={3} torch={15} />
 ```

@@ -1,13 +1,13 @@
 ---
 title: "Túnel"
 description: "Anillos poligonales que se alejan hacia el centro y se tuercen con el puntero."
-category: pendiente
+category: geometria
 component: "TunelBackground"
 props:
   - name: "rings"
     label: "Anillos"
     type: "number"
-    default: 22
+    default: 25
     min: 6
     max: 40
     step: 1
@@ -28,7 +28,7 @@ props:
   - name: "twist"
     label: "Torsión"
     type: "number"
-    default: 0.8
+    default: 1.5
     min: 0
     max: 3
     step: 0.05

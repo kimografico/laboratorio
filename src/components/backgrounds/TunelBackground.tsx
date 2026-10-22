@@ -22,10 +22,10 @@ export interface TunelBackgroundProps {
 }
 
 const DEFAULTS = {
-  rings: 22,
+  rings: 25,
   sides: 4,
   speed: 1,
-  twist: 0.8,
+  twist: 1.5,
   spin: 0.3,
   lw: 1,
   alpha: 0.5,

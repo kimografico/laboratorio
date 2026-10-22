@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 export interface PenduloDobleBackgroundProps {
   /** Escala (px) (60 a 260) */
   size?: number;
+  /** Brazos (1 a 3) */
+  arms?: number;
   /** Velocidad (0.2 a 3) */
   speed?: number;
   /** Estela (50 a 1200) */
@@ -16,6 +18,8 @@ export interface PenduloDobleBackgroundProps {
   lw?: number;
   /** Opacidad (0.05 a 1) */
   alpha?: number;
+  /** Fija el pivote al centro horizontal y al 35% de la altura */
+  fixed?: boolean;
   /** Opcional: fija el color. Por defecto se hereda del CSS de la pagina (color). */
   color?: string;
   className?: string;
@@ -23,25 +27,119 @@ export interface PenduloDobleBackgroundProps {
 
 const DEFAULTS = {
   size: 150,
+  arms: 2,
   speed: 1.2,
   trail: 500,
   kick: 3,
   damp: 0.002,
   lw: 1.4,
   alpha: 0.6,
+  fixed: false,
 };
 
 type Params = typeof DEFAULTS;
 type Pointer = { x: number; y: number; sx: number; sy: number; on: boolean };
 
-function init(W: number, H: number, P: Params, S: any) {S.a=2.4+Math.random()*.3;S.b=2.1;S.u=0;S.v=0;S.tr=[];S.px=W/2}
+function init(W: number, H: number, P: Params, S: any) {
+  const n = Math.max(1, Math.min(3, Math.round(P.arms)));
+  S.n = n;
+  S.th = Array.from({ length: n }, (_, i) => (i === 0 ? 2.4 + Math.random() * 0.3 : 2.1 - (i - 1) * 0.15));
+  S.om = new Array(n).fill(0);
+  S.tr = [];
+  S.px = W / 2;
+}
 
-function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {const px=W/2+(m.sx-W/2)*.5,py=H*.4+(m.sy-H/2)*.3,g=9.8,n=8,h=dt/1000*P.speed/n;S.u+=(px-S.px)*P.kick*.004;S.px=px;
-for(let i=0;i<n;i++){const d=S.a-S.b,den=3-Math.cos(2*d),a1=(-3*g*Math.sin(S.a)-g*Math.sin(S.a-2*S.b)-2*Math.sin(d)*(S.v*S.v+S.u*S.u*Math.cos(d)))/den,a2=2*Math.sin(d)*(2*S.u*S.u+2*g*Math.cos(S.a)+S.v*S.v*Math.cos(d))/den;S.u+=a1*h;S.v+=a2*h;S.u*=1-P.damp;S.v*=1-P.damp;S.a+=S.u*h;S.b+=S.v*h}
-const x1=px+Math.sin(S.a)*P.size,y1=py+Math.cos(S.a)*P.size,x2=x1+Math.sin(S.b)*P.size,y2=y1+Math.cos(S.b)*P.size;
-S.tr.push(x2,y2);while(S.tr.length>P.trail*2)S.tr.splice(0,2);c.strokeStyle=ink;c.fillStyle=ink;c.lineWidth=P.lw;c.lineCap='round';const L=S.tr.length/2;
-for(let i=1;i<L;i++){c.globalAlpha=P.alpha*i/L;c.beginPath();c.moveTo(S.tr[2*i-2],S.tr[2*i-1]);c.lineTo(S.tr[2*i],S.tr[2*i+1]);c.stroke()}
-c.globalAlpha=P.alpha;c.beginPath();c.moveTo(px,py);c.lineTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.beginPath();c.moveTo(x1+4,y1);c.arc(x1,y1,4,0,6.2832);c.moveTo(x2+5,y2);c.arc(x2,y2,5,0,6.2832);c.fill()}
+// Aceleraciones angulares de una cadena de péndulos con masas y longitudes iguales.
+function accel(th: number[], om: number[], L: number, g: number): number[] {
+  const n = th.length;
+  const A: number[][] = [];
+  const rhs: number[] = [];
+  for (let i = 0; i < n; i++) {
+    A.push([]);
+    let b = -(n - i) * g * L * Math.sin(th[i]);
+    for (let j = 0; j < n; j++) {
+      const mu = n - Math.max(i, j);
+      A[i].push(mu * L * L * Math.cos(th[i] - th[j]));
+      b -= mu * L * L * Math.sin(th[i] - th[j]) * om[j] * om[j];
+    }
+    rhs.push(b);
+  }
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let i = c + 1; i < n; i++) if (Math.abs(A[i][c]) > Math.abs(A[p][c])) p = i;
+    [A[c], A[p]] = [A[p], A[c]];
+    [rhs[c], rhs[p]] = [rhs[p], rhs[c]];
+    for (let i = c + 1; i < n; i++) {
+      const f = A[i][c] / A[c][c];
+      for (let j = c; j < n; j++) A[i][j] -= f * A[c][j];
+      rhs[i] -= f * rhs[c];
+    }
+  }
+  const out = new Array(n).fill(0);
+  for (let i = n - 1; i >= 0; i--) {
+    let sum = rhs[i];
+    for (let j = i + 1; j < n; j++) sum -= A[i][j] * out[j];
+    out[i] = sum / A[i][i];
+  }
+  return out;
+}
+
+function frame(c: CanvasRenderingContext2D, W: number, H: number, P: Params, S: any, t: number, m: Pointer, ink: string, dt: number) {
+  const px = P.fixed ? W / 2 : W / 2 + (m.sx - W / 2) * 0.5;
+  const py = P.fixed ? H * 0.35 : H * 0.4 + (m.sy - H / 2) * 0.3;
+  const steps = 8;
+  const h = (dt / 1000) * P.speed / steps;
+  S.om[0] += (px - S.px) * P.kick * 0.004;
+  S.px = px;
+
+  for (let step = 0; step < steps; step++) {
+    // Longitudes normalizadas: la escala visual no debe frenar la simulación.
+    const a = accel(S.th, S.om, 1, 9.8);
+    for (let i = 0; i < S.n; i++) {
+      S.om[i] += a[i] * h;
+      S.om[i] *= 1 - P.damp;
+      S.th[i] += S.om[i] * h;
+    }
+  }
+
+  const pts: number[][] = [[px, py]];
+  let x = px;
+  let y = py;
+  for (let i = 0; i < S.n; i++) {
+    x += Math.sin(S.th[i]) * P.size;
+    y += Math.cos(S.th[i]) * P.size;
+    pts.push([x, y]);
+  }
+
+  const [tx, ty] = pts[pts.length - 1];
+  S.tr.push(tx, ty);
+  while (S.tr.length > P.trail * 2) S.tr.splice(0, 2);
+  c.strokeStyle = ink;
+  c.fillStyle = ink;
+  c.lineWidth = P.lw;
+  c.lineCap = "round";
+  const L = S.tr.length / 2;
+  for (let i = 1; i < L; i++) {
+    c.globalAlpha = P.alpha * i / L;
+    c.beginPath();
+    c.moveTo(S.tr[2 * i - 2], S.tr[2 * i - 1]);
+    c.lineTo(S.tr[2 * i], S.tr[2 * i + 1]);
+    c.stroke();
+  }
+
+  c.globalAlpha = P.alpha;
+  c.beginPath();
+  c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+  c.stroke();
+  c.beginPath();
+  for (let i = 1; i < pts.length; i++) {
+    const r = i === pts.length - 1 ? 5 : 4;
+    c.moveTo(pts[i][0] + r, pts[i][1]);
+    c.arc(pts[i][0], pts[i][1], r, 0, Math.PI * 2);
+  }
+  c.fill();
+}
 
 export default function PenduloDobleBackground(props: PenduloDobleBackgroundProps) {
   const { color, className, ...rest } = props;

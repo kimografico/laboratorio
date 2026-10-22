@@ -1,20 +1,20 @@
 ---
 title: "Engranajes"
 description: "Rejilla de engranajes alternos que giran y cambian de velocidad con el puntero."
-category: pendiente
+category: geometria
 component: "EngranajesBackground"
 props:
   - name: "step"
     label: "Tamaño (px)"
     type: "number"
-    default: 44
+    default: 114
     min: 40
     max: 140
     step: 2
   - name: "sep"
     label: "Separación (px)"
     type: "number"
-    default: 0
+    default: 11
     min: 0
     max: 60
     step: 1
@@ -28,7 +28,7 @@ props:
   - name: "speed"
     label: "Velocidad"
     type: "number"
-    default: 1
+    default: 1.7
     min: 0
     max: 3
     step: 0.05
@@ -39,6 +39,13 @@ props:
     min: 0
     max: 2
     step: 0.05
+  - name: "offset"
+    label: "Rotación alterna (°)"
+    type: "number"
+    default: -31
+    min: -180
+    max: 180
+    step: 0.5
   - name: "lw"
     label: "Grosor (px)"
     type: "number"
@@ -49,10 +56,14 @@ props:
   - name: "alpha"
     label: "Opacidad"
     type: "number"
-    default: 0.5
+    default: 0.08
     min: 0.05
     max: 1
     step: 0.01
+  - name: "filled"
+    label: "Rellenar"
+    type: "boolean"
+    default: true
 ---
 
 ## Uso

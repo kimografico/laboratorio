@@ -11,6 +11,13 @@ props:
     min: 60
     max: 260
     step: 5
+  - name: "arms"
+    label: "Brazos"
+    type: "number"
+    default: 2
+    min: 1
+    max: 3
+    step: 1
   - name: "speed"
     label: "Velocidad"
     type: "number"
@@ -53,6 +60,10 @@ props:
     min: 0.05
     max: 1
     step: 0.01
+  - name: "fixed"
+    label: "Fijar arriba"
+    type: "boolean"
+    default: false
 ---
 
 ## Uso

@@ -1,10 +1,12 @@
 import type { ComponentType } from "react";
+import AgujeroNegroBackground from "../components/backgrounds/AgujeroNegroBackground";
 import AnillosDeArbolBackground from "../components/backgrounds/AnillosDeArbolBackground";
 import AnimatedBackground from "../components/backgrounds/AnimatedBackground";
 import ArbolDePitagorasBackground from "../components/backgrounds/ArbolDePitagorasBackground";
 import AtractorDeCliffordBackground from "../components/backgrounds/AtractorDeCliffordBackground";
 import AtractorDeLorenzBackground from "../components/backgrounds/AtractorDeLorenzBackground";
 import AuroraBackground from "../components/backgrounds/AuroraBackground";
+import BarcoEnOlasBackground from "../components/backgrounds/BarcoEnOlasBackground";
 import BlobBackground from "../components/backgrounds/BlobBackground";
 import BrushBackground from "../components/backgrounds/BrushBackground";
 import BubbleBackground from "../components/backgrounds/BubbleBackground";
@@ -16,6 +18,7 @@ import ChladniBackground from "../components/backgrounds/ChladniBackground";
 import CircuitBackground from "../components/backgrounds/CircuitBackground";
 import CobwebBackground from "../components/backgrounds/CobwebBackground";
 import ClothBackground from "../components/backgrounds/ClothBackground";
+import ColonizacionDelEspacioBackground from "../components/backgrounds/ColonizacionDelEspacioBackground";
 import ConjuntoDeJuliaBackground from "../components/backgrounds/ConjuntoDeJuliaBackground";
 import Contour2Background from "../components/backgrounds/Contour2Background";
 import CoralBackground from "../components/backgrounds/CoralBackground";
@@ -26,7 +29,6 @@ import CurvaDelDragonBackground from "../components/backgrounds/CurvaDelDragonBa
 import DandelionBackground from "../components/backgrounds/DandelionBackground";
 import DitherBackground from "../components/backgrounds/DitherBackground";
 import DotBackground from "../components/backgrounds/DotBackground";
-import DoublePendulumBackground from "../components/backgrounds/DoublePendulumBackground";
 import EcualizadorEspejoBackground from "../components/backgrounds/EcualizadorEspejoBackground";
 import ElectrocardiogramaBackground from "../components/backgrounds/ElectrocardiogramaBackground";
 import EngranajesBackground from "../components/backgrounds/EngranajesBackground";
@@ -39,6 +41,7 @@ import FlowBackground from "../components/backgrounds/FlowBackground";
 import FogBackground from "../components/backgrounds/FogBackground";
 import FuegoBackground from "../components/backgrounds/FuegoBackground";
 import GalaxyBackground from "../components/backgrounds/GalaxyBackground";
+import GatosMinimalistasBackground from "../components/backgrounds/GatosMinimalistasBackground";
 import GlobeBackground from "../components/backgrounds/GlobeBackground";
 import GardenEelBackground from "../components/backgrounds/GardenEelBackground";
 import HalftoneBackground from "../components/backgrounds/HalftoneBackground";
@@ -64,6 +67,7 @@ import MeadowBackground from "../components/backgrounds/MeadowBackground";
 import MoonPhasesBackground from "../components/backgrounds/MoonPhasesBackground";
 import NeedleBackground from "../components/backgrounds/NeedleBackground";
 import NetworkBackground2 from "../components/backgrounds/NetworkBackground2";
+import NevadaAcumuladaBackground from "../components/backgrounds/NevadaAcumuladaBackground";
 import OjosBackground from "../components/backgrounds/OjosBackground";
 import OrbitBackground from "../components/backgrounds/OrbitBackground";
 import PanalDeRuidoBackground from "../components/backgrounds/PanalDeRuidoBackground";
@@ -87,6 +91,7 @@ import SandpileBackground from "../components/backgrounds/SandpileBackground";
 import SchotterBackground from "../components/backgrounds/SchotterBackground";
 import SeigaihaBackground from "../components/backgrounds/SeigaihaBackground";
 import ShoalBackground from "../components/backgrounds/ShoalBackground";
+import SistemaPlanetarioBackground from "../components/backgrounds/SistemaPlanetarioBackground";
 import SnowflakeBackground from "../components/backgrounds/SnowflakeBackground";
 import StarfishBackground from "../components/backgrounds/StarfishBackground";
 import StrandbeestBackground from "../components/backgrounds/StrandbeestBackground";
@@ -96,9 +101,12 @@ import SuperformulaBackground from "../components/backgrounds/SuperformulaBackgr
 import TablaDeLissajousBackground from "../components/backgrounds/TablaDeLissajousBackground";
 import TendidoDeCablesBackground from "../components/backgrounds/TendidoDeCablesBackground";
 import TentacleBackground from "../components/backgrounds/TentacleBackground";
+import TeseractoBackground from "../components/backgrounds/TeseractoBackground";
 import ThreadBackground from "../components/backgrounds/ThreadBackground";
 import TileBackground from "../components/backgrounds/TileBackground";
 import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
+import TimidezDeCopasBackground from "../components/backgrounds/TimidezDeCopasBackground";
+import TimidezDeCopasFollajeBackground from "../components/backgrounds/TimidezDeCopasFollajeBackground";
 import ToroDePuntosBackground from "../components/backgrounds/ToroDePuntosBackground";
 import TrendilBackground from "../components/backgrounds/TrendilBackground";
 import TriangleBackground2 from "../components/backgrounds/TriangleBackground2";
@@ -127,12 +135,14 @@ import ThemeToggle from "../components/ui/ThemeToggle";
 
 /** Maps the `component` field from experiment frontmatter to a React component. */
 export const registry: Record<string, ComponentType<any>> = {
+  AgujeroNegroBackground,
   AnillosDeArbolBackground,
   AnimatedBackground,
   ArbolDePitagorasBackground,
   AtractorDeCliffordBackground,
   AtractorDeLorenzBackground,
   AuroraBackground,
+  BarcoEnOlasBackground,
   BlobBackground,
   BrushBackground,
   BubbleBackground,
@@ -144,6 +154,7 @@ export const registry: Record<string, ComponentType<any>> = {
   CircuitBackground,
   CobwebBackground,
   ClothBackground,
+  ColonizacionDelEspacioBackground,
   ConjuntoDeJuliaBackground,
   CrossBackground,
   Contour2Background,
@@ -154,7 +165,6 @@ export const registry: Record<string, ComponentType<any>> = {
   DandelionBackground,
   DitherBackground,
   DotBackground,
-  DoublePendulumBackground,
   EcualizadorEspejoBackground,
   ElectrocardiogramaBackground,
   EngranajesBackground,
@@ -167,6 +177,7 @@ export const registry: Record<string, ComponentType<any>> = {
   FogBackground,
   FuegoBackground,
   GalaxyBackground,
+  GatosMinimalistasBackground,
   GlobeBackground,
   GardenEelBackground,
   HalftoneBackground,
@@ -192,6 +203,7 @@ export const registry: Record<string, ComponentType<any>> = {
   MoonPhasesBackground,
   NeedleBackground,
   NetworkBackground2,
+  NevadaAcumuladaBackground,
   OjosBackground,
   OrbitBackground,
   PanalDeRuidoBackground,
@@ -215,6 +227,7 @@ export const registry: Record<string, ComponentType<any>> = {
   SchotterBackground,
   SeigaihaBackground,
   ShoalBackground,
+  SistemaPlanetarioBackground,
   SnowflakeBackground,
   StarfishBackground,
   StrandbeestBackground,
@@ -224,9 +237,12 @@ export const registry: Record<string, ComponentType<any>> = {
   TablaDeLissajousBackground,
   TendidoDeCablesBackground,
   TentacleBackground,
+  TeseractoBackground,
   ThreadBackground,
   TileBackground,
   TileSpinBackground,
+  TimidezDeCopasBackground,
+  TimidezDeCopasFollajeBackground,
   ToroDePuntosBackground,
   TrendilBackground,
   TriangleBackground2,
@@ -257,6 +273,7 @@ export const registry: Record<string, ComponentType<any>> = {
 export function getComponent(id: string): ComponentType<any> | undefined {
   return registry[id];
 }
+
 
 
 
