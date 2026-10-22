@@ -1,57 +1,43 @@
 ---
 title: "Radar"
-description: "Barrido circular con anillos y ecos que se encienden al paso del haz; el puntero añade un eco."
+description: "Un barrido ilumina los objetivos al pasar. Clic = añade un objetivo."
 category: pendiente
 component: "RadarBackground"
 props:
   - name: "n"
-    label: "Ecos"
+    label: "Objetivos"
     type: "number"
-    default: 40
-    min: 5
-    max: 120
+    default: 18
+    min: 0
+    max: 100
     step: 1
+  - name: "sp"
+    label: "Giro"
+    type: "number"
+    default: 1.2
+    min: 0.1
+    max: 5
+    step: 0.1
+  - name: "fade"
+    label: "Desvanecer"
+    type: "number"
+    default: 0.7
+    min: 0.1
+    max: 5
+    step: 0.1
   - name: "rings"
     label: "Anillos"
     type: "number"
     default: 5
-    min: 2
-    max: 10
+    min: 1
+    max: 12
     step: 1
-  - name: "speed"
-    label: "Giro"
-    type: "number"
-    default: 0.8
-    min: 0.1
-    max: 3
-    step: 0.05
-  - name: "decay"
-    label: "Desvanecer"
-    type: "number"
-    default: 3
-    min: 0.5
-    max: 8
-    step: 0.1
-  - name: "tail"
-    label: "Estela"
-    type: "number"
-    default: 0.9
-    min: 0.2
-    max: 2
-    step: 0.05
-  - name: "alpha"
-    label: "Opacidad"
-    type: "number"
-    default: 0.6
-    min: 0.05
-    max: 1
-    step: 0.01
 ---
 
 ## Uso
 
-Hereda el color de la página o se fija con `color`; la opacidad global se ajusta con `--radar-opacity` en CSS.
+El barrido ilumina los objetivos al pasar; el clic añade uno.
 
 ```tsx
-<RadarBackground n={40} rings={5} speed={0.8} />
+<RadarBackground n={18} rings={5} />
 ```
