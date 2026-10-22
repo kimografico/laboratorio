@@ -2,20 +2,43 @@
 // Tinta: Mueve el ratón para dejar tinta que se funde; clic = gota grande.
 // Generado desde el laboratorio de fondos. Los colores van fijos dentro de la escena.
 import { useEffect, useId, useRef } from "react";
+import { getInkDropScale } from "../../lib/ink";
 
 export interface TintaBackgroundProps {
   /** Tamaño */
   size?: number;
-  /** Duración (s) */
+  /** Duración total heredada (s). @deprecated Use growTime, holdTime, and fadeTime instead. */
   life?: number;
   /** Emisión */
   emit?: number;
   /** Deriva */
   drift?: number;
+  /** Velocidad de animación */
+  speed?: number;
+  /** Tiempo de crecimiento (s) */
+  growTime?: number;
+  /** Pausa en el tamaño máximo (s) */
+  holdTime?: number;
+  /** Tiempo de desvanecimiento (s) */
+  fadeTime?: number;
+  /** Multiplicador de expansión máxima */
+  maxScale?: number;
+  /** Multiplicador de tamaño al hacer clic */
+  clickScale?: number;
   className?: string;
 }
 
-const DEFAULTS = { size: 22, life: 4, emit: 25, drift: 12 };
+const DEFAULTS = {
+  size: 22,
+  emit: 25,
+  drift: 12,
+  speed: 1,
+  growTime: 1.5,
+  holdTime: 0.5,
+  fadeTime: 2,
+  maxScale: 1,
+  clickScale: 3,
+};
 
 export default function TintaBackground(props: TintaBackgroundProps) {
   const { className } = props;
@@ -30,7 +53,21 @@ export default function TintaBackground(props: TintaBackgroundProps) {
     const q = o.getContext("2d")!;
     const R = Math.random;
     const TAU = Math.PI * 2;
-    const P: any = { ...DEFAULTS, ...props };
+    const legacyScale =
+      props.growTime === undefined && props.holdTime === undefined && props.fadeTime === undefined && props.life !== undefined
+        ? props.life / 4
+        : 1;
+    const P: any = {
+      ...DEFAULTS,
+      ...props,
+      speed: props.speed ?? DEFAULTS.speed,
+      growTime: props.growTime ?? DEFAULTS.growTime * legacyScale,
+      holdTime: props.holdTime ?? DEFAULTS.holdTime * legacyScale,
+      fadeTime: props.fadeTime ?? DEFAULTS.fadeTime * legacyScale,
+      maxScale: props.maxScale ?? DEFAULTS.maxScale,
+      clickScale: props.clickScale ?? DEFAULTS.clickScale,
+    };
+    P.totalLife = P.growTime + P.holdTime + P.fadeTime;
     const ink = getComputedStyle(c).getPropertyValue("--fg").trim() || "#161a2b";
     const ptr = { x: -9999, y: -9999, on: false };
     let W = 0, H = 0, S: any = {}, raf = 0, last = 0;
@@ -39,9 +76,9 @@ export default function TintaBackground(props: TintaBackgroundProps) {
     const E: any = {
       setup(s){s.d=[]},
       add(s,x,y,r){s.d.push({x,y,r,a:0,vx:(R()-.5)*P.drift,vy:(R()-.5)*P.drift})},
-      click(s,x,y){this.add(s,x,y,P.size*3)},
+      click(s,x,y){this.add(s,x,y,P.size*P.clickScale)},
       draw(s,t,dt){if(ptr.on&&R()<dt*P.emit)this.add(s,ptr.x+(R()-.5)*20,ptr.y+(R()-.5)*20,P.size*(.5+R()));
-       s.d=s.d.filter(d=>(d.a+=dt)<P.life);g.fillStyle=ink;g.beginPath();for(const d of s.d){d.x+=d.vx*dt;d.y+=d.vy*dt;dot(g,d.x,d.y,d.r*Math.sin(Math.PI*d.a/P.life))}g.fill()}
+       const step=dt*P.speed;s.d=s.d.filter(d=>(d.a+=step)<P.totalLife);g.fillStyle=ink;g.beginPath();for(const d of s.d){d.x+=d.vx*step;d.y+=d.vy*step;dot(g,d.x,d.y,d.r*getInkDropScale(d.a,P.growTime,P.holdTime,P.fadeTime,P.maxScale))}g.fill()}
     };
 
     const reset = () => { S = {}; if (E.setup) E.setup(S); };
@@ -79,7 +116,18 @@ export default function TintaBackground(props: TintaBackgroundProps) {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
     };
-  }, [props.size, props.life, props.emit, props.drift]);
+  }, [
+    props.size,
+    props.life,
+    props.emit,
+    props.drift,
+    props.speed,
+    props.growTime,
+    props.holdTime,
+    props.fadeTime,
+    props.maxScale,
+    props.clickScale,
+  ]);
 
   return (
     <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", background: "var(--panel)" }}>

@@ -147,6 +147,7 @@ import TileBackground from "../components/backgrounds/TileBackground";
 import TileSpinBackground from "../components/backgrounds/TileSpinBackground";
 import TimidezDeCopasBackground from "../components/backgrounds/TimidezDeCopasBackground";
 import TimidezDeCopasFollajeBackground from "../components/backgrounds/TimidezDeCopasFollajeBackground";
+import RorschachBackground from "../components/backgrounds/RorschachBackground";
 import TintaBackground from "../components/backgrounds/TintaBackground";
 import ToroDePuntosBackground from "../components/backgrounds/ToroDePuntosBackground";
 import TrendilBackground from "../components/backgrounds/TrendilBackground";
@@ -325,6 +326,7 @@ export const registry: Record<string, ComponentType<any>> = {
   TimidezDeCopasBackground,
   TimidezDeCopasFollajeBackground,
   TintaBackground,
+  RorschachBackground,
   ToroDePuntosBackground,
   TrendilBackground,
   TriangleBackground2,
@@ -355,7 +357,6 @@ export const registry: Record<string, ComponentType<any>> = {
 export function getComponent(id: string): ComponentType<any> | undefined {
   return registry[id];
 }
-
 
 
 
