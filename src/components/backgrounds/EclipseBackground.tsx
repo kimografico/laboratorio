@@ -14,6 +14,8 @@ export interface EclipseBackgroundProps {
   cor?: number;
   /** Perlas de Baily */
   bead?: number;
+  /** Área solar visible máxima respecto al área lunar (%) */
+  beadLimit?: number;
   /** Rugosidad del limbo lunar (%) */
   rough?: number;
   /** Estrellas (reinicia la escena) */
@@ -21,7 +23,7 @@ export interface EclipseBackgroundProps {
   className?: string;
 }
 
-const DEFAULTS = { sun: 60, mr: 1.04, sp: 0.6, cor: 1, bead: 1, rough: 3, stars: 120 };
+const DEFAULTS = { sun: 60, mr: 1.04, sp: 0.6, cor: 1, bead: 1, beadLimit: 5, rough: 3, stars: 120 };
 
 export default function EclipseBackground(props: EclipseBackgroundProps) {
   const { className } = props;
@@ -53,19 +55,24 @@ export default function EclipseBackground(props: EclipseBackgroundProps) {
        g.globalCompositeOperation='lighter';
        const gk=(.28+.72*ss(0,.97,f))*Math.min(1,(1-f)*10),gc=lerp([255,250,235],[255,140,50],ss(.8,1,f));
        if(gk>0){const r2=Rs*(2.2+2.8*f),gl=g.createRadialGradient(sx,sy,Rs*.8,sx,sy,r2);gl.addColorStop(0,`rgba(${rgb(gc)},${.65*gk})`);gl.addColorStop(1,`rgba(${rgb(gc)},0)`);g.fillStyle=gl;g.beginPath();dot(g,sx,sy,r2);g.fill()}
-       const ca=Math.min(1,P.cor*ss(.9,1,f));
-       if(ca>0){const r3=Rs*3.4,cg=g.createRadialGradient(sx,sy,Rs*.95,sx,sy,r3);cg.addColorStop(0,`rgba(255,226,190,${.55*ca})`);cg.addColorStop(.35,`rgba(255,150,60,${.28*ca})`);cg.addColorStop(1,'rgba(255,120,40,0)');g.fillStyle=cg;g.beginPath();dot(g,sx,sy,r3);g.fill()}
+       const ca=Math.min(1,P.cor*ss(.2,.75,f));
+       if(ca>0){g.globalCompositeOperation='source-over';const r3=Rs*1.5,cg=g.createRadialGradient(sx,sy,Rs*.88,sx,sy,r3);cg.addColorStop(0,`rgba(255,115,25,${.72*ca})`);cg.addColorStop(.2,`rgba(255,90,15,${.58*ca})`);cg.addColorStop(.55,`rgba(255,75,10,${.2*ca})`);cg.addColorStop(1,'rgba(255,60,5,0)');g.fillStyle=cg;g.beginPath();dot(g,sx,sy,r3);g.fill()}
        g.globalCompositeOperation='source-over';
        g.fillStyle=`rgb(${rgb(lerp([255,244,194],[255,255,255],ss(0,.8,f)))})`;g.beginPath();dot(g,sx,sy,Rs);g.fill();
        g.globalCompositeOperation='lighter';g.fillStyle=`rgba(255,255,255,${.6*ss(0,.9,f)})`;g.beginPath();dot(g,sx,sy,Rs);g.fill();g.globalCompositeOperation='source-over';
-       g.fillStyle=`rgb(${rgb(lerp([228,240,255],[6,7,10],ss(0,.55,f)))})`;g.beginPath();for(let i=0;i<=240;i++){const a=i/240*TAU,r=Rm*this.lb(s,a),x=s.mx+Math.cos(a)*r,y=s.my+Math.sin(a)*r;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fill();
-       const bk=P.bead*ss(.9,.985,f)*(1-ss(.9995,1,f));
-       if(bk>0){const N=240,dp=[];for(let i=0;i<N;i++){const a=i/N*TAU,px=sx+Math.cos(a)*Rs,py=sy+Math.sin(a)*Rs;dp.push(Math.hypot(px-s.mx,py-s.my)-Rm*this.lb(s,Math.atan2(py-s.my,px-s.mx)))}
-        const st=dp.findIndex(v=>v<=0);
-        if(st>=0){g.globalCompositeOperation='lighter';
-         const bead=(a,sz)=>{const px=sx+Math.cos(a)*Rs,py=sy+Math.sin(a)*Rs;g.fillStyle=`rgba(255,246,225,${.2*bk})`;g.beginPath();dot(g,px,py,Rs*(.07+.05*sz));g.fill();g.fillStyle=`rgba(255,255,255,${Math.min(1,.95*bk)})`;g.beginPath();dot(g,px,py,Rs*(.02+.014*sz));g.fill()};
-         for(let k=1;k<=N;k++){const i=(st+k)%N;if(dp[i]>0){let j=0;while(j<N&&dp[(i+j)%N]>0)j++;const sz=Math.min(j,10)/10;
-           if(j<=26)bead((i+(j-1)/2)/N*TAU,sz);else{bead(i/N*TAU,1);bead(((i+j-1)%N)/N*TAU,1)}k+=j-1}}
+       g.fillStyle=`rgb(${rgb(lerp([204,204,255],[6,7,10],ss(.15,.65,f)))})`;g.beginPath();for(let i=0;i<=240;i++){const a=i/240*TAU,r=Rm*this.lb(s,a),x=s.mx+Math.cos(a)*r,y=s.my+Math.sin(a)*r;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fill();
+       const stripRatio=((1-f)*Rs*Rs)/(Rm*Rm*(Math.max(.01,P.beadLimit)/100));
+       const partial=d<Rs+Rm&&d>Math.abs(Rs-Rm);
+       const bk=P.bead*(partial&&stripRatio>0&&stripRatio<1?1-ss(.35,1,stripRatio):0);
+       if(bk>0){const N=240,dp=[],maxGap=Rm*.1;for(let i=0;i<N;i++){const a=i/N*TAU,px=sx+Math.cos(a)*Rs,py=sy+Math.sin(a)*Rs;dp.push(Math.hypot(px-s.mx,py-s.my)-Rm*this.lb(s,Math.atan2(py-s.my,px-s.mx)))}
+        const visible=dp.map(v=>v>0&&v<=maxGap);
+        const start=visible.findIndex(v=>!v);
+        if(start>=0){g.globalCompositeOperation='lighter';
+         const bead=(a,gap)=>{const px=sx+Math.cos(a)*Rs,py=sy+Math.sin(a)*Rs,level=Math.min(3,Math.floor(gap*4)),flicker=.78+.22*(.5+.5*Math.sin(t*.008+a*13)),glow=[.1,.15,.21,.28][level]*bk*flicker,core=[.3,.4,.52,.65][level]*bk*flicker;
+          g.save();g.filter=`blur(${Math.max(1,Rs*.035)}px)`;g.fillStyle=`rgba(255,246,225,${glow})`;g.beginPath();dot(g,px,py,Rs*(.09+.08*gap));g.fill();g.restore();
+          g.fillStyle=`rgba(255,255,255,${core})`;g.beginPath();dot(g,px,py,Rs*(.025+.025*gap));g.fill()};
+         let k=1;
+         while(k<=N){const i=(start+k)%N;if(visible[i]){const run=[];while(k<=N&&visible[(start+k)%N]){run.push((start+k)%N);k++}const count=Math.max(1,Math.ceil(run.length/8));for(let j=0;j<count;j++){const index=run[Math.floor((j+.5)*run.length/count)],gap=Math.min(1,dp[index]/maxGap);bead(index/N*TAU,gap)}}else k++}
          g.globalCompositeOperation='source-over'}}}
     };
 
@@ -104,7 +111,7 @@ export default function EclipseBackground(props: EclipseBackgroundProps) {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
     };
-  }, [props.sun, props.mr, props.sp, props.cor, props.bead, props.rough, props.stars]);
+  }, [props.sun, props.mr, props.sp, props.cor, props.bead, props.beadLimit, props.rough, props.stars]);
 
   return (
     <div className={`bg-canvas ${className ?? ""}`.trim()} style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", background: "#000" }}>

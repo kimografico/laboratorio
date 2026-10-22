@@ -39,6 +39,13 @@ props:
     min: 0
     max: 3
     step: 0.1
+  - name: "beadLimit"
+    label: "Límite de área visible (%)"
+    type: "number"
+    default: 5
+    min: 1
+    max: 10
+    step: 0.5
   - name: "rough"
     label: "Rugosidad del limbo (%)"
     type: "number"
@@ -57,8 +64,8 @@ props:
 
 ## Uso
 
-La Luna es el puntero: al cubrir el Sol aparecen la corona y las perlas de Baily.
+La Luna es el puntero: al cubrir el Sol aparecen la corona y las perlas de Baily. Las perlas se reparten por los tramos estrechos entre ambos limbos; crecen y se vuelven más transparentes al ensancharse la franja. `beadLimit` define el porcentaje máximo del área lunar que puede quedar iluminado antes de que desaparezcan; el valor inicial es 5 %.
 
 ```tsx
-<EclipseBackground sun={60} cor={1} bead={1} />
+<EclipseBackground sun={60} cor={1} bead={1} beadLimit={5} />
 ```
